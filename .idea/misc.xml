@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="DesignSurface">
+    <option name="filePathToZoomLevelMap">
+      <map>
+        <entry key="..\:/Android_Studio_Projects/SensorServer/app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.17685185185185184" />
+        <entry key="..\:/Android_Studio_Projects/SensorServer/app/src/main/res/drawable/circle.xml" value="0.10729166666666666" />
+        <entry key="..\:/Android_Studio_Projects/SensorServer/app/src/main/res/drawable/ic_available_sensors.xml" value="0.10677083333333333" />
+        <entry key="..\:/Android_Studio_Projects/SensorServer/app/src/main/res/drawable/ic_connections.xml" value="0.10677083333333333" />
+        <entry key="..\:/Android_Studio_Projects/SensorServer/app/src/main/res/drawable/ic_dashboard_black_24dp.xml" value="0.10677083333333333" />
+        <entry key="..\:/Android_Studio_Projects/SensorServer/app/src/main/res/drawable/ic_launcher_background.xml" value="0.10677083333333333" />
+        <entry key="..\:/Android_Studio_Projects/SensorServer/app/src/main/res/drawable/ic_settings.xml" value="0.2125" />
+        <entry key="..\:/Android_Studio_Projects/SensorServer/app/src/main/res/drawable/settings.xml" value="0.12962962962962962" />
+        <entry key="..\:/Android_Studio_Projects/SensorServer/app/src/main/res/drawable/smart_phone.xml" value="0.2125" />
+        <entry key="..\:/Android_Studio_Projects/SensorServer/app/src/main/res/layout/activity_bottom_nav.xml" value="0.1" />
+        <entry key="..\:/Android_Studio_Projects/SensorServer/app/src/main/res/layout/activity_main.xml" value="0.22" />
+        <entry key="..\:/Android_Studio_Projects/SensorServer/app/src/main/res/layout/activity_main_2.xml" value="0.1" />
+        <entry key="..\:/Android_Studio_Projects/SensorServer/app/src/main/res/layout/activity_main_3.xml" value="0.13994565217391305" />
+        <entry key="..\:/Android_Studio_Projects/SensorServer/app/src/main/res/layout/fragment_available_sensors.xml" value="0.16666666666666666" />
+        <entry key="..\:/Android_Studio_Projects/SensorServer/app/src/main/res/layout/fragment_connection.xml" value="0.1" />
+        <entry key="..\:/Android_Studio_Projects/SensorServer/app/src/main/res/layout/fragment_connections.xml" value="0.25" />
+        <entry key="..\:/Android_Studio_Projects/SensorServer/app/src/main/res/layout/item_connection.xml" value="0.2" />
+        <entry key="..\:/Android_Studio_Projects/SensorServer/app/src/main/res/layout/item_list_view.xml" value="0.18" />
+        <entry key="..\:/Android_Studio_Projects/SensorServer/app/src/main/res/layout/tests.xml" value="0.1" />
+        <entry key="..\:/Android_Studio_Projects/SensorServer/app/src/main/res/menu/bottom_nav_menu.xml" value="0.1" />
+        <entry key="..\:/Android_Studio_Projects/SensorServer/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" value="0.2125" />
+        <entry key="..\:/Android_Studio_Projects/SensorServer/app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml" value="0.10677083333333333" />
+        <entry key="..\:/Android_Studio_Projects/SensorServer/app/src/main/res/xml/root_preferences.xml" value="0.25" />
+        <entry key="..\:/Android_Studio_Projects/SensorServer/app/src/main/res/xml/settings_preference.xml" value="0.10914855072463768" />
+      </map>
+    </option>
+  </component>
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="Android Studio default JDK" project-jdk-type="JavaSDK">
+    <output url="file://$PROJECT_DIR$/build/classes" />
+  </component>
+  <component name="ProjectType">
+    <option name="id" value="Android" />
+  </component>
+</project>

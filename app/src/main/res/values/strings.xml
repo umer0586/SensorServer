@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">Sensor Server</string>
+
+    <string name="attachment_summary_off">Only download attachments when manually requested</string>
+    <string name="pref_key_port_no">portNo</string>
+    <string name="pref_key_server_switch">server_switch</string>
+    <string name="pref_default_port">8080</string>
+    <string name="pref_random_port">random_port</string>
+    <string name="title_activity_bottom_nav">BottomNavActivity</string>
+    <string name="title_settings">Settings</string>
+    <string name="title_connections">Connections</string>
+    <string name="title_available_sensors">Available Sensors</string>
+    <!-- TODO: Remove or change this placeholder text -->
+
+    <string name="pref_port_no_dialog_title">Enter port No</string>
+    <string name="pref_port_no_dialog_message">Enter Port No between 1024 to 49151</string>
+    <string name="pref_key_sensor_delay">pref_sensor_delay</string>
+</resources>

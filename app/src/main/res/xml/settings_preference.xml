@@ -1,0 +1,39 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory app:title="Options">
+
+
+        <SwitchPreferenceCompat
+            app:disableDependentsState="true"
+            app:key="@string/pref_key_server_switch"
+            app:title="WebSocket Server"
+            app:summaryOn="Accepting connections"
+            app:summaryOff="Server is not running"
+            />
+
+        <EditTextPreference
+            app:defaultValue="@string/pref_default_port"
+            app:dependency="@string/pref_key_server_switch"
+            app:dialogMessage="@string/pref_port_no_dialog_message"
+            app:dialogTitle="@string/pref_port_no_dialog_title"
+            app:key="@string/pref_key_port_no"
+            app:title="Websocket Port"
+            app:useSimpleSummaryProvider="true"
+            />
+
+        <ListPreference
+            app:defaultValue="3"
+            app:dependency="@string/pref_key_server_switch"
+            app:entries="@array/sensor_delay_entries"
+            app:entryValues="@array/sensor_delay_values"
+            app:key="@string/pref_key_sensor_delay"
+            app:title="Sensor Delay"
+            app:useSimpleSummaryProvider="true"
+            />
+
+    </PreferenceCategory>
+
+
+
+</PreferenceScreen>

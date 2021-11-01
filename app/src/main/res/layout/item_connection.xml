@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="80dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <TextView
+        android:id="@+id/sensor_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center|left"
+        android:layout_marginLeft="20dp"
+        android:padding="10dp"
+        android:text="sensor name here"
+
+        />
+
+    <RelativeLayout
+        android:layout_marginEnd="25dp"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="center|right"
+
+        >
+
+
+        <com.github.ybq.android.spinkit.SpinKitView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:SpinKit_Style="Pulse"
+            android:layout_centerInParent="true"
+            app:SpinKit_Color="?attr/colorPrimaryVariant"
+            />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:id="@+id/usage_count"
+            android:text="234"
+            android:textAlignment="center"
+            android:textSize="15dp"
+            />
+
+    </RelativeLayout>
+
+
+</androidx.cardview.widget.CardView>

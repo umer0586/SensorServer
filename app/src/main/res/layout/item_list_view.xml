@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="left|center"
+        android:id="@+id/text_view"
+        android:text="sensor name here \n type here"
+        android:paddingLeft="60dp"
+        android:padding="20dp"
+        android:textSize="13dp"
+        />
+
+
+</androidx.cardview.widget.CardView>
