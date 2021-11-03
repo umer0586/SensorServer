@@ -21,11 +21,5 @@
  Once connected, client will receive sensor data in `JSON Array` (float type values) through `websocket.onMessage(String)` method. Description of each data value at index in an array can be obtained from https://developer.android.com/guide/topics/sensors/sensors_motion   
  
 
- **Many clients** can connect to one `type` of Sensor, so calling 
- 
-  ```
-  Websocket gravitySensor = new Websocket("ws://IPAddress:port/sensor/connect?type=android.sensor.gravity")
-  gravitySensor.connect();
-  ```
-  several times results in creating three different connects each receving **Gravity** sensor data at same time
+ **Many clients** can connect to one `type` of Sensor. So connecting to `/sensor/connect?type=android.sensor.gravity` three times will create three different connections to the gravity sensor and each connected client will then recieve gravity sensor data at the same time. Moreover, from one or different machines you can connect to different type of sensors i-e one websocket client object could be connected to step detector sensor and other to gyroscope
  
