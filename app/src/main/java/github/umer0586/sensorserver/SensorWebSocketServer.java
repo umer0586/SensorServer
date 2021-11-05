@@ -324,7 +324,7 @@ public class SensorWebSocketServer extends WebSocketServer implements SensorEven
     }
 
 
-    public void setServerStartedListener(OnServerStartListener onServerStartListener)
+    public void setOnServerStartListener(OnServerStartListener onServerStartListener)
     {
         this.onServerStartListener = onServerStartListener;
     }

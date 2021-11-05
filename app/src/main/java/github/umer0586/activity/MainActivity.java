@@ -140,7 +140,7 @@ public class MainActivity extends AppCompatActivity  implements NavigationBarVie
 
         server.setSensorDelay( settingsFragment.getSensorDelay() );
 
-        server.setServerStartedListener(()->{
+        server.setOnServerStartListener(()->{
             runOnUiThread(()->{
                   showServerAddress("ws:/"+server.getAddress());
             });
