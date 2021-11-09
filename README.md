@@ -7,7 +7,7 @@
 
 
 
- This app sends sensor data from Android device to Websocket clients in realtime. A websocket client could be a web browser or any application running on a PC or a mobile device which uses **Websocket Client API**. This might be usefull in a scenario where you wish to test how your system reacts to android motion sensors. 
+ This app sends sensor data from Android device to Websocket clients in realtime. A websocket client could be a web browser or any application running on a PC or a mobile device which uses **Websocket Client API**.  
  
  
  
