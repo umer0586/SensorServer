@@ -286,6 +286,13 @@ public class MainActivity extends AppCompatActivity  implements NavigationBarVie
     }
 
 
-
-
+    /**
+     *  onBackPressed() invokes finish() which in result invoked onDestroy()
+     *  so to prevent activity from destroying when user presses back button, we must move activity as back task
+     */
+    @Override
+    public void onBackPressed()
+    {
+        moveTaskToBack(true);
+    }
 }
