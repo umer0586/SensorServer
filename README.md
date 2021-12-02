@@ -7,7 +7,7 @@
 
 
 
- This app sends sensor data from Android device to Websocket clients in realtime. A websocket client could be a web browser or any application running on a PC or a mobile device which uses **Websocket Client API**.  
+ This app streams phone's motion sensors to Websocket clients in realtime. A websocket client could be a web browser or any application running on a PC or a mobile device which uses **Websocket Client API**.  
  
  
  
@@ -15,7 +15,7 @@
  # Usage
  To receive sensor data, **Websocket client**  must connect to the app using following **URL**.
  
-                         ws://IPAddress:port/sensor/connect?type=<sensor type here> 
+                 ws://<ip>:<port>/sensor/connect?type=<sensor type here> 
  
  
   Value for the `type` parameter can be found by navigating to **Available Sensors** in the app. 
@@ -25,6 +25,8 @@
  * For **accelerometer** `/sensor/connect?type=android.sensor.accelerometer` .
  
  * For **orientation** `/sensor/connect?type=android.sensor.orientation` .
+ 
+ * For **step detector**  `/sensor/connect?type=android.sensor.step_detector`
 
  * so on... 
  
