@@ -16,9 +16,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.SensorServer">
         <activity
-            android:name=".activity.FragmentContainerActivity"
+            android:name=".activity.FragmentNavigationActivity"
             android:screenOrientation="portrait"
-            android:exported="true">
+            android:exported="true" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
