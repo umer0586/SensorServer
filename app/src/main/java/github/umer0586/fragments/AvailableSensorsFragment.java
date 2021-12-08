@@ -7,6 +7,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.ListFragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,12 +21,12 @@ import java.util.ArrayList;
 
 public class AvailableSensorsFragment extends ListFragment {
 
-
+    private static final String TAG = AvailableSensorsFragment.class.getSimpleName();
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState)
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
+        Log.i(TAG, "onCreateView: ");
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_available_sensors, container, false);
     }
@@ -34,7 +35,8 @@ public class AvailableSensorsFragment extends ListFragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState)
     {
         super.onViewCreated(view, savedInstanceState);
-
+        Log.i(TAG, "onViewCreated: ");
+        
         ArrayList<String> sensorsNameAndType = new ArrayList<>();
 
         for(Sensor sensor :  SensorUtil.getInstance(getContext()).getAvailableSensors())
@@ -47,5 +49,12 @@ public class AvailableSensorsFragment extends ListFragment {
         );
 
         getListView().setAdapter(arrayAdapter);
+    }
+
+    @Override
+    public void onDestroyView()
+    {
+        super.onDestroyView();
+        Log.i(TAG, "onDestroyView: ");
     }
 }

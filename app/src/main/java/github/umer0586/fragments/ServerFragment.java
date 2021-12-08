@@ -8,6 +8,7 @@ import androidx.annotation.Nullable;
 import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,6 +35,8 @@ public class ServerFragment extends Fragment implements OnServerStartListener, O
 
     private SensorWebSocketServer server;
 
+    private static final String TAG = ServerFragment.class.getSimpleName();
+
     // Button at center to start/stop server
     private MaterialButton startButton;
 
@@ -55,9 +58,9 @@ public class ServerFragment extends Fragment implements OnServerStartListener, O
 
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState)
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState)
     {
+        Log.i(TAG, "onCreateView: ");
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_server, container, false);
     }
@@ -66,6 +69,7 @@ public class ServerFragment extends Fragment implements OnServerStartListener, O
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState)
     {
         super.onViewCreated(view, savedInstanceState);
+        Log.i(TAG, "onViewCreated: ");
 
         startButton = view.findViewById(R.id.start_button);
         serverAddress = view.findViewById(R.id.server_address);
@@ -219,9 +223,18 @@ public class ServerFragment extends Fragment implements OnServerStartListener, O
     public void onDestroyView()
     {
         super.onDestroyView();
-        stopServer();
+        Log.i(TAG, "onDestroyView: ");
+
     }
 
+    @Override
+    public void onDestroy()
+    {
+        super.onDestroy();
+        Log.i(TAG, "onDestroy: ");
+        stopServer();
+
+    }
 
     public interface ConnectionCountListener{
         void connectionCount(int count);

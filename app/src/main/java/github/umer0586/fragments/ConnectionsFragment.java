@@ -7,6 +7,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.ListFragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,12 +23,12 @@ import java.util.ArrayList;
 
 public class ConnectionsFragment extends ListFragment implements OnNewConnectionInfoListListener {
 
-
+    private static final String TAG = ConnectionsFragment.class.getSimpleName();
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState)
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
+        Log.i(TAG, "onCreateView: ");
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_connections, container, false);
     }
@@ -36,6 +37,7 @@ public class ConnectionsFragment extends ListFragment implements OnNewConnection
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState)
     {
         super.onViewCreated(view, savedInstanceState);
+        Log.i(TAG, "onViewCreated: ");
 
     }
 
@@ -91,5 +93,12 @@ public class ConnectionsFragment extends ListFragment implements OnNewConnection
             setListAdapter( new ConnectionListAdapter(getContext(),connectionInfos) );
         });
 
+    }
+
+    @Override
+    public void onDestroyView()
+    {
+        super.onDestroyView();
+        Log.i(TAG, "onDestroyView: ");
     }
 }
