@@ -174,7 +174,9 @@ public class ServerFragment extends Fragment implements OnServerStartListener, O
             showPulseAnimation();
             startButton.setTag("started");
             startButton.setText("STOP");
-            Snackbar.make(getView(),"Server started",Snackbar.LENGTH_SHORT).show();
+
+            if(getView() != null)
+                Snackbar.make(getView(),"Server started",Snackbar.LENGTH_SHORT).show();
 
         });
     }
@@ -187,7 +189,9 @@ public class ServerFragment extends Fragment implements OnServerStartListener, O
             hidePulseAnimation();
             startButton.setTag("stopped");
             startButton.setText("START");
-            Snackbar.make(getView(),"Server stopped",Snackbar.LENGTH_SHORT).show();
+
+            if(getView() != null)
+                Snackbar.make(getView(),"Server stopped",Snackbar.LENGTH_SHORT).show();
 
         });
     }
