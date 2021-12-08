@@ -15,11 +15,12 @@ import android.widget.TextView;
 
 import github.umer0586.sensorserver.ConnectionInfo;
 import github.umer0586.R;
+import github.umer0586.sensorserver.OnNewConnectionInfoListListener;
 
 import java.util.ArrayList;
 
 
-public class ConnectionsFragment extends ListFragment {
+public class ConnectionsFragment extends ListFragment implements OnNewConnectionInfoListListener {
 
 
 
@@ -36,11 +37,6 @@ public class ConnectionsFragment extends ListFragment {
     {
         super.onViewCreated(view, savedInstanceState);
 
-    }
-
-    public void setConnectionInfoList(ArrayList<ConnectionInfo> connectionInfos)
-    {
-        setListAdapter( new ConnectionListAdapter(getContext(),connectionInfos) );
     }
 
 
@@ -83,8 +79,17 @@ public class ConnectionsFragment extends ListFragment {
         }
 
 
+
+
     }
 
 
+    @Override
+    public void onNewConnectionList(ArrayList<ConnectionInfo> connectionInfos)
+    {
+        getActivity().runOnUiThread(()->{
+            setListAdapter( new ConnectionListAdapter(getContext(),connectionInfos) );
+        });
 
+    }
 }

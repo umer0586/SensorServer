@@ -16,8 +16,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.SensorServer">
         <activity
-            android:name="github.umer0586.activity.MainActivity"
-            android:launchMode="singleTop"
+            android:name=".activity.FragmentContainerActivity"
             android:screenOrientation="portrait"
             android:exported="true">
             <intent-filter>

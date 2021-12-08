@@ -208,7 +208,7 @@ public class SensorWebSocketServer extends WebSocketServer implements SensorEven
     {
 
         if(this.onServerStartListener != null)
-            this.onServerStartListener.onStart();
+            this.onServerStartListener.onServerStarted();
 
         Log.i(TAG,"server started successfully " + this.getAddress());
     }
@@ -220,7 +220,7 @@ public class SensorWebSocketServer extends WebSocketServer implements SensorEven
         super.stop();
 
         if( onServerStopppedListener != null)
-            this.onServerStopppedListener.onStopped();
+            this.onServerStopppedListener.onServerStopped();
 
     }
 

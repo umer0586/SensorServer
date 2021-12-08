@@ -1,5 +1,6 @@
 package github.umer0586.fragments;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.InputType;
 import android.view.View;
@@ -19,11 +20,13 @@ public class SettingsFragment extends PreferenceFragmentCompat {
 
 
     private final static String TAG = SettingsFragment.class.getName();
+    private SharedPreferences sharedPreferences;
 
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey)
     {
         setPreferencesFromResource(R.xml.settings_preference, rootKey);
+        sharedPreferences = getContext().getSharedPreferences(getString(R.string.shared_pref_file),getContext().MODE_PRIVATE);
 
         handlePortNoPreference();
 
@@ -48,7 +51,12 @@ public class SettingsFragment extends PreferenceFragmentCompat {
                 int portNo = Integer.parseInt(newValue.toString());
 
                 if (portNo >= 1024 && portNo <= 49151)
+                {
+                    sharedPreferences.edit()
+                                     .putInt(getString(R.string.pref_key_port_no),portNo)
+                                     .commit();
                     return true;
+                }
                  else {
                     showAlertDialog("Please Select valid port No");
                     return false;
@@ -63,32 +71,6 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         });
     }
 
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState)
-    {
-        super.onViewCreated(view, savedInstanceState);
-
-        ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) view.getLayoutParams();
-        params.leftMargin = -60;
-    }
-
-    public SwitchPreferenceCompat getServerSwitch()
-    {
-        return findPreference(getString(R.string.pref_key_server_switch));
-    }
-
-
-    public int getServerPort()
-    {
-        EditTextPreference editTextPreference = findPreference(getString(R.string.pref_key_port_no));
-        return Integer.parseInt(editTextPreference.getText());
-    }
-
-    public int getSensorDelay()
-    {
-        ListPreference listPreference = findPreference(getString(R.string.pref_key_sensor_delay));
-        return Integer.parseInt( listPreference.getValue() );
-    }
 
 
     private void showAlertDialog(CharSequence message)

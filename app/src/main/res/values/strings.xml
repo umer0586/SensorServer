@@ -15,4 +15,7 @@
     <string name="pref_port_no_dialog_title">Enter port No</string>
     <string name="pref_port_no_dialog_message">Enter Port No between 1024 to 49151</string>
     <string name="pref_key_sensor_delay">pref_sensor_delay</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="shared_pref_file">shared_pref_file</string>
 </resources>
