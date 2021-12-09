@@ -109,6 +109,7 @@ public class FragmentNavigationActivity extends AppCompatActivity  implements Na
                         .show(serverFragment)
                         .commit();
                 activeFragment = serverFragment;
+                getSupportActionBar().setTitle("Sensor Server");
                 return true;
 
             case R.id.navigation_settings:
@@ -117,6 +118,7 @@ public class FragmentNavigationActivity extends AppCompatActivity  implements Na
                         .show(settingsFragment)
                         .commit();
                 activeFragment = settingsFragment;
+                getSupportActionBar().setTitle("Settings");
                 return true;
 
 
@@ -126,6 +128,7 @@ public class FragmentNavigationActivity extends AppCompatActivity  implements Na
                         .show(availableSensorsFragment)
                         .commit();
                 activeFragment = availableSensorsFragment;
+                getSupportActionBar().setTitle("Available Sensors");
                 return true;
 
             case R.id.navigation_connections:
@@ -134,6 +137,7 @@ public class FragmentNavigationActivity extends AppCompatActivity  implements Na
                         .show(connectionsFragment)
                         .commit();
                 activeFragment = connectionsFragment;
+                getSupportActionBar().setTitle("Connections");
                 return true;
         }
 
