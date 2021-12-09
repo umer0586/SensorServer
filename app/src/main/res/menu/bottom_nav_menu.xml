@@ -19,7 +19,7 @@
 
     <item
         android:id="@+id/navigation_available_sensors"
-        android:icon="@drawable/ic_available_sensors"
+        android:icon="@drawable/ic_baseline_more_horiz_24"
         android:title="@string/title_available_sensors" />
 
 </menu>
