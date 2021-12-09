@@ -11,6 +11,7 @@
             app:key="@string/pref_key_port_no"
             app:title="Websocket Port"
             app:useSimpleSummaryProvider="true"
+            app:icon="@drawable/ic_baseline_info_24"
             />
 
         <ListPreference
@@ -20,6 +21,7 @@
             app:key="@string/pref_key_sensor_delay"
             app:title="Sensor Delay"
             app:useSimpleSummaryProvider="true"
+            app:icon="@drawable/ic_baseline_speed_24"
             />
 
     </PreferenceCategory>
