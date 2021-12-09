@@ -20,7 +20,7 @@
 
 
     <style name="startButton" parent="Widget.MaterialComponents.ExtendedFloatingActionButton">
-        <item name="backgroundTint">#88CF6C</item>
+        <item name="backgroundTint">?attr/colorPrimary</item>
         <item name="icon">@drawable/ic_available_sensors</item>
         <item name="android:textColor">@color/white</item>
         <item name="cornerRadius">60dp</item>
