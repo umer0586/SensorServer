@@ -16,12 +16,12 @@ import android.widget.TextView;
 
 import github.umer0586.sensorserver.ConnectionInfo;
 import github.umer0586.R;
-import github.umer0586.sensorserver.OnNewConnectionInfoListListener;
+import github.umer0586.sensorserver.ConnectionInfoListener;
 
 import java.util.ArrayList;
 
 
-public class ConnectionsFragment extends ListFragment implements OnNewConnectionInfoListListener {
+public class ConnectionsFragment extends ListFragment implements ConnectionInfoListener {
 
     private static final String TAG = ConnectionsFragment.class.getSimpleName();
 

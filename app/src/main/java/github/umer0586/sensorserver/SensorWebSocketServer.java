@@ -44,9 +44,9 @@ public class SensorWebSocketServer extends WebSocketServer implements SensorEven
     //Callbacks
     private OnServerStartListener onServerStartListener;
     private OnServerStopppedListener onServerStopppedListener;
-    private OnNewConnectionInfoListListener onNewConnectionInfoListListener;
+    private ConnectionInfoListener connectionInfoListener;
 
-    //websocket close codes ranging 4000 - 4999 are for applications use
+    //websocket close codes ranging 4000 - 4999 are for application's custom messages
     private static final int CLOSE_CODE_SENSOR_NOT_FOUND = 4001;
     private static final int CLOSE_CODE_UNSUPPORTED_REQUEST = 4002;
     private static final int CLOSE_CODE_TYPE_PARAMETER_MISSING = 4003;
@@ -303,8 +303,8 @@ public class SensorWebSocketServer extends WebSocketServer implements SensorEven
         for(Sensor sensor : sensorsSet)
             connectionInfos.add( new ConnectionInfo(sensor, getSensorUsageCount(sensor) ) );
 
-        if(onNewConnectionInfoListListener != null)
-            this.onNewConnectionInfoListListener.onNewConnectionList(connectionInfos);
+        if(connectionInfoListener != null)
+            this.connectionInfoListener.onNewConnectionList(connectionInfos);
     }
 
     public boolean hasActiveConnections()
@@ -334,9 +334,9 @@ public class SensorWebSocketServer extends WebSocketServer implements SensorEven
         this.onServerStopppedListener = onServerStopppedListener;
     }
 
-    public void setOnNewConnectionInfoListListener(OnNewConnectionInfoListListener onNewConnectionInfoListListener)
+    public void setConnectionInfoListener(ConnectionInfoListener connectionInfoListener)
     {
-        this.onNewConnectionInfoListListener = onNewConnectionInfoListListener;
+        this.connectionInfoListener = connectionInfoListener;
     }
 
 

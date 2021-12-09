@@ -20,11 +20,10 @@ import com.google.android.material.snackbar.Snackbar;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.util.ArrayList;
 
 import github.umer0586.R;
 import github.umer0586.sensorserver.ConnectionInfo;
-import github.umer0586.sensorserver.OnNewConnectionInfoListListener;
+import github.umer0586.sensorserver.ConnectionInfoListener;
 import github.umer0586.sensorserver.OnServerStartListener;
 import github.umer0586.sensorserver.OnServerStopppedListener;
 import github.umer0586.sensorserver.SensorWebSocketServer;
@@ -50,7 +49,7 @@ public class ServerFragment extends Fragment implements OnServerStartListener, O
     //Ripple animation behind startButton
     private SpinKitView pulseAnimation;
 
-    private OnNewConnectionInfoListListener onNewConnectionInfoListListeners;
+    private ConnectionInfoListener connectionInfoListeners;
     private ConnectionCountListener connectionCountListener;
 
 
@@ -128,10 +127,10 @@ public class ServerFragment extends Fragment implements OnServerStartListener, O
         server.setOnServerStartListener(this);
         server.setOnServerStopped(this);
 
-        server.setOnNewConnectionInfoListListener((connectionInfoArrayList)->{
+        server.setConnectionInfoListener((connectionInfoArrayList)->{
 
-                if ( onNewConnectionInfoListListeners != null)
-                    onNewConnectionInfoListListeners.onNewConnectionList(connectionInfoArrayList);
+                if ( connectionInfoListeners != null)
+                    connectionInfoListeners.onNewConnectionList(connectionInfoArrayList);
 
                 if( connectionCountListener != null)
                 {
@@ -212,9 +211,9 @@ public class ServerFragment extends Fragment implements OnServerStartListener, O
         serverAddress.setVisibility(View.GONE);
     }
 
-    public void setOnNewConnectionInfoListener(OnNewConnectionInfoListListener listener)
+    public void setConnectionInfoListener(ConnectionInfoListener listener)
     {
-        onNewConnectionInfoListListeners = listener;
+        connectionInfoListeners = listener;
     }
 
     public void setConnectionCountListener(ConnectionCountListener listener)
