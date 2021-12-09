@@ -33,7 +33,9 @@
         <entry key="..\:/Github repos/SensorServer/app/src/main/res/layout/activity_main_2.xml" value="0.18" />
         <entry key="..\:/Github repos/SensorServer/app/src/main/res/layout/activity_main_fragment_container.xml" value="0.1" />
         <entry key="..\:/Github repos/SensorServer/app/src/main/res/layout/fragment_available_sensors.xml" value="0.19635416666666666" />
+        <entry key="..\:/Github repos/SensorServer/app/src/main/res/layout/fragment_connections.xml" value="0.19635416666666666" />
         <entry key="..\:/Github repos/SensorServer/app/src/main/res/layout/fragment_server.xml" value="0.1" />
+        <entry key="..\:/Github repos/SensorServer/app/src/main/res/layout/item_connection.xml" value="0.19635416666666666" />
         <entry key="..\:/Github repos/SensorServer/app/src/main/res/menu/bottom_nav_menu.xml" value="0.1" />
         <entry key="..\:/Github repos/SensorServer/app/src/main/res/xml/settings_preference.xml" value="0.1" />
       </map>
