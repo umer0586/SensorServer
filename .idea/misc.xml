@@ -28,7 +28,14 @@
         <entry key="..\:/Android_Studio_Projects/SensorServer/app/src/main/res/xml/root_preferences.xml" value="0.25" />
         <entry key="..\:/Android_Studio_Projects/SensorServer/app/src/main/res/xml/settings_preference.xml" value="0.10914855072463768" />
         <entry key="..\:/Github repos/SensorServer/app/src/main/res/drawable/circle.xml" value="0.10729166666666666" />
-        <entry key="..\:/Github repos/SensorServer/app/src/main/res/layout/activity_fragment_navigation.xml" value="0.2" />
+        <entry key="..\:/Github repos/SensorServer/app/src/main/res/drawable/ic_baseline_graphic_eq_24.xml" value="0.10677083333333333" />
+        <entry key="..\:/Github repos/SensorServer/app/src/main/res/drawable/ic_baseline_info_24.xml" value="0.10677083333333333" />
+        <entry key="..\:/Github repos/SensorServer/app/src/main/res/drawable/ic_baseline_more_horiz_24.xml" value="0.10677083333333333" />
+        <entry key="..\:/Github repos/SensorServer/app/src/main/res/drawable/ic_baseline_speed_24.xml" value="0.10677083333333333" />
+        <entry key="..\:/Github repos/SensorServer/app/src/main/res/drawable/ic_connections.xml" value="0.10677083333333333" />
+        <entry key="..\:/Github repos/SensorServer/app/src/main/res/drawable/ic_settings.xml" value="0.10677083333333333" />
+        <entry key="..\:/Github repos/SensorServer/app/src/main/res/drawable/ic_signal.xml" value="0.10677083333333333" />
+        <entry key="..\:/Github repos/SensorServer/app/src/main/res/layout/activity_fragment_navigation.xml" value="0.14" />
         <entry key="..\:/Github repos/SensorServer/app/src/main/res/layout/activity_main.xml" value="0.19635416666666666" />
         <entry key="..\:/Github repos/SensorServer/app/src/main/res/layout/activity_main_2.xml" value="0.18" />
         <entry key="..\:/Github repos/SensorServer/app/src/main/res/layout/activity_main_fragment_container.xml" value="0.1" />

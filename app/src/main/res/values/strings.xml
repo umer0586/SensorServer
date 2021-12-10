@@ -9,7 +9,7 @@
     <string name="title_activity_bottom_nav">BottomNavActivity</string>
     <string name="title_settings">Settings</string>
     <string name="title_connections">Connections</string>
-    <string name="title_available_sensors">Available Sensors</string>
+    <string name="title_available_sensors">Sensors</string>
     <!-- TODO: Remove or change this placeholder text -->
 
     <string name="pref_port_no_dialog_title">Enter port No</string>

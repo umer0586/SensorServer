@@ -7,6 +7,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.ListFragment;
 
+import android.text.Html;
+import android.text.Spanned;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -37,14 +39,15 @@ public class AvailableSensorsFragment extends ListFragment {
         super.onViewCreated(view, savedInstanceState);
         Log.i(TAG, "onViewCreated: ");
         
-        ArrayList<String> sensorsNameAndType = new ArrayList<>();
+        ArrayList<Spanned> sensorsNameAndType = new ArrayList<>();
 
         for(Sensor sensor :  SensorUtil.getInstance(getContext()).getAvailableSensors())
         {
-            sensorsNameAndType.add( sensor.getName() + "\n" + "Type = " + sensor.getStringType());
+            Spanned spanned = Html.fromHtml(sensor.getName() + "<br>" + "<font color=\"#5c6bc0\"><b>Type = </b></font>" + sensor.getStringType());
+            sensorsNameAndType.add(spanned);
         }
 
-        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(
+        ArrayAdapter<Spanned> arrayAdapter = new ArrayAdapter<Spanned>(
                 getContext(), R.layout.item_list_view , R.id.text_view , sensorsNameAndType
         );
 
