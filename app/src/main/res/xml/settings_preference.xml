@@ -15,7 +15,7 @@
             />
 
         <ListPreference
-            app:defaultValue="3"
+            app:defaultValue="@string/sensor_delay_default"
             app:entries="@array/sensor_delay_entries"
             app:entryValues="@array/sensor_delay_values"
             app:key="@string/pref_key_sensor_delay"
