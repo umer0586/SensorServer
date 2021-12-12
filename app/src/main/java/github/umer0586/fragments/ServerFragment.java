@@ -13,12 +13,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.github.ybq.android.spinkit.SpinKitView;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.io.IOException;
+import java.net.BindException;
 import java.net.InetSocketAddress;
 
 import github.umer0586.R;
@@ -144,7 +146,24 @@ public class ServerFragment extends Fragment implements OnServerStartListener, O
 
         });
 
-        server.run();
+
+            server.setOnServerError((exception)->{
+
+                getActivity().runOnUiThread(()->{
+
+                    if(exception instanceof BindException)
+                        Snackbar.make(getView(),"Port already in use",Snackbar.LENGTH_SHORT).show();
+
+                    else
+                        Snackbar.make(getView(),"Error Occurred : ",Snackbar.LENGTH_SHORT).show();
+
+                    Log.d(TAG, "onServerError() called");
+                });
+
+            });
+
+            server.run();
+
 
 
     }
@@ -155,14 +174,16 @@ public class ServerFragment extends Fragment implements OnServerStartListener, O
     {
         if( server != null)
         {
-            try {
+            try
+            {
                 server.stop();
-            } catch (IOException | InterruptedException e) {
+
+            } catch (IOException | InterruptedException e)
+            {
                 e.printStackTrace();
-
             }
-
         }
+
     }
 
     @Override
@@ -174,8 +195,7 @@ public class ServerFragment extends Fragment implements OnServerStartListener, O
             startButton.setTag("started");
             startButton.setText("STOP");
 
-            if(getView() != null)
-                Snackbar.make(getView(),"Server started",Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(getView(),"Server started",Snackbar.LENGTH_SHORT).show();
 
         });
     }
@@ -189,8 +209,7 @@ public class ServerFragment extends Fragment implements OnServerStartListener, O
             startButton.setTag("stopped");
             startButton.setText("START");
 
-            if(getView() != null)
-                Snackbar.make(getView(),"Server stopped",Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(getView(),"Server stopped",Snackbar.LENGTH_SHORT).show();
 
         });
     }

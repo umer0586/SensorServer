@@ -45,6 +45,9 @@ public class SensorWebSocketServer extends WebSocketServer implements SensorEven
     private OnServerStartListener onServerStartListener;
     private OnServerStopppedListener onServerStopppedListener;
     private ConnectionInfoListener connectionInfoListener;
+    private OnServerErrorListener onServerErrorListener;
+
+    private boolean serverStartUpFailed = false;
 
     //websocket close codes ranging 4000 - 4999 are for application's custom messages
     private static final int CLOSE_CODE_SENSOR_NOT_FOUND = 4001;
@@ -194,12 +197,37 @@ public class SensorWebSocketServer extends WebSocketServer implements SensorEven
     {
 
     }
-
+    // following doc taken from original source
+    /**
+     * Called when errors occurs. If an error causes the websocket connection to fail {@link #onClose(WebSocket, int, String, boolean)} will be called additionally.<br>
+     * This method will be called primarily because of IO or protocol errors.<br>
+     * If the given exception is an RuntimeException that probably means that you encountered a bug.<br>
+     *
+     * @param conn Can be null if there error does not belong to one specific websocket. For example if the servers port could not be bound.
+     * @param ex The exception causing this error
+     **/
     @Override
     public void onError(WebSocket conn, Exception ex)
     {
-        if(conn != null && ex != null)
-            Log.i(TAG,"an error occurred on connection " + conn.getRemoteSocketAddress() + ":" + ex);
+        // error occurred on websocket conn (we don't notify anything to the user about this for now)
+        if(conn != null)
+            Log.e(TAG,"an error occurred on connection " + conn.getRemoteSocketAddress());
+
+        // if conn is null than we have error related to server
+        if(conn == null)
+        {
+            /*
+                seeing the implementation of onError(conn,ex), this method
+                always invokes stop() whether server is running or not,
+                So onError() would invoke stop() when some exception like BindException occurs (because of port already in use)
+            */
+            if (onServerErrorListener != null)
+                onServerErrorListener.onError(ex); // listener must filter exception by itself
+
+            serverStartUpFailed = true; // we will use this in stop() method to check if there was an exception during server startup
+        }
+
+            ex.printStackTrace();
 
     }
 
@@ -213,14 +241,18 @@ public class SensorWebSocketServer extends WebSocketServer implements SensorEven
         Log.i(TAG,"server started successfully " + this.getAddress());
     }
 
-    @Override
+   @Override
     public void stop() throws IOException, InterruptedException
-    {
+   {
         closeAllConnections();
         super.stop();
+        Log.d(TAG, "stop() called");
 
-        if( onServerStopppedListener != null)
-            this.onServerStopppedListener.onServerStopped();
+            if( onServerStopppedListener != null && !serverStartUpFailed )
+                this.onServerStopppedListener.onServerStopped();
+
+
+
 
     }
 
@@ -339,6 +371,8 @@ public class SensorWebSocketServer extends WebSocketServer implements SensorEven
         this.connectionInfoListener = connectionInfoListener;
     }
 
-
-
+    public void setOnServerError(OnServerErrorListener onServerErrorListener)
+    {
+        this.onServerErrorListener = onServerErrorListener;
+    }
 }
