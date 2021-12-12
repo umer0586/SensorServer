@@ -2,7 +2,7 @@
  An Android app which streams phone's motion sensors to **Websocket** clients.
  
 
-![connection](https://user-images.githubusercontent.com/35717992/140100371-eb401512-6d60-430f-8909-9a454ee15844.gif) ![connection info](https://user-images.githubusercontent.com/35717992/140101390-82c2b712-a777-4167-82e7-b71322d9495d.gif) ![available sensors](https://user-images.githubusercontent.com/35717992/140101489-08f682e9-96fb-4dbf-a03b-0943b94722c0.gif).
+![Screenrecorder-2021-12-12-22-21-24-565](https://user-images.githubusercontent.com/35717992/145722978-e4ee34a4-d8e5-4a5a-aa5c-ce1051f01c70.gif)
 
 
 
