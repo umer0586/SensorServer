@@ -39,7 +39,7 @@
 Moreover, from one or different machines you can connect to different types of sensors as well i-e one **Websocket Client object** could connect to step detector sensor and other **Websocket Client object** to gyroscope. All active connections can be viewed by selecting **Connections** navigation button.
  
 ## Test with Websocket testing tools 
-Before writing your own websocket client, test this app with any websocket testing tools available on the web or playstore
+Before writing your own websocket client, test this app with any websocket testing tools available on the web or playstore. You can use http://livepersoninc.github.io/ws-test-page/ for testing purpose.
  
 
 # APK Download
