@@ -1,7 +1,5 @@
 package github.umer0586.sensorserver;
 
-import github.umer0586.util.JsonUtil;
-
 import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -9,6 +7,10 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.net.Uri;
 import android.util.Log;
+
+import org.java_websocket.WebSocket;
+import org.java_websocket.handshake.ClientHandshake;
+import org.java_websocket.server.WebSocketServer;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -18,13 +20,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-
-import org.java_websocket.WebSocket;
-import org.java_websocket.handshake.ClientHandshake;
-import org.java_websocket.server.WebSocketServer;
-
-
-
+import github.umer0586.util.JsonUtil;
 import github.umer0586.util.SensorUtil;
 
 

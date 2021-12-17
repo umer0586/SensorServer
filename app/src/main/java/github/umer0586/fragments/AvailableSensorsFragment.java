@@ -3,15 +3,7 @@ package github.umer0586.fragments;
 import android.content.Context;
 import android.hardware.Sensor;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.widget.AppCompatTextView;
-import androidx.core.app.DialogCompat;
-import androidx.fragment.app.ListFragment;
-
 import android.text.Html;
-import android.text.Spanned;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,13 +11,17 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.widget.AppCompatTextView;
+import androidx.fragment.app.ListFragment;
+
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+
+import java.util.List;
 
 import github.umer0586.R;
 import github.umer0586.util.SensorUtil;
-
-import java.util.ArrayList;
-import java.util.List;
 
 
 public class AvailableSensorsFragment extends ListFragment {
