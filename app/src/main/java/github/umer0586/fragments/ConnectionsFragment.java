@@ -71,7 +71,7 @@ public class ConnectionsFragment extends ListFragment implements ConnectionInfoL
             TextView sensorName = view.findViewById(R.id.sensor_name);
             TextView usageCount = view.findViewById(R.id.usage_count);
 
-            sensorName.setText( info.getSensor().getStringType() );
+            sensorName.setText( info.getSensor().getName() );
             usageCount.setText( info.getSensorUsageCount() + "");
 
 
