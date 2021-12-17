@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+
+
+    >
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/sensor_name"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="15dp"
+        android:text="sensor name here"
+        />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:id="@+id/sensor_type"
+        android:text="type= type here"
+        android:singleLine="true"
+        android:textSize="12dp"
+        android:layout_marginBottom="15dp"
+
+        />
+
+</androidx.appcompat.widget.LinearLayoutCompat>
