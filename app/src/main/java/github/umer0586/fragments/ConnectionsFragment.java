@@ -66,13 +66,13 @@ public class ConnectionsFragment extends ListFragment implements ConnectionInfoL
                 view = convertView;
             }
 
-            ConnectionInfo info = getItem(position);
+            ConnectionInfo connectionInfo = getItem(position);
 
             TextView sensorName = view.findViewById(R.id.sensor_name);
             TextView usageCount = view.findViewById(R.id.usage_count);
 
-            sensorName.setText( info.getSensor().getName() );
-            usageCount.setText( info.getSensorUsageCount() + "");
+            sensorName.setText( connectionInfo.getSensor().getName() );
+            usageCount.setText( connectionInfo.getSensorUsageCount() + "");
 
 
             return view;
