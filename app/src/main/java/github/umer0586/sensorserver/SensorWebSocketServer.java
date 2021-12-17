@@ -339,11 +339,6 @@ public class SensorWebSocketServer extends WebSocketServer implements SensorEven
             this.connectionInfoListener.onNewConnectionList(connectionInfos);
     }
 
-    public boolean hasActiveConnections()
-    {
-        return getConnections().size() > 0;
-    }
-
     public int getConnectionCount()
     {
         return getConnections().size();
