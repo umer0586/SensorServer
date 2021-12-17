@@ -52,6 +52,7 @@ public class FragmentNavigationActivity extends AppCompatActivity  implements Na
         connectionsFragment = new ConnectionsFragment();
         availableSensorsFragment = new AvailableSensorsFragment();
 
+        connectionsFragment.setOnConnectionItemClickedListener(serverFragment);
 
         serverFragment.setConnectionInfoListener(connectionsFragment);
         serverFragment.setConnectionCountListener((totalConnections)->{

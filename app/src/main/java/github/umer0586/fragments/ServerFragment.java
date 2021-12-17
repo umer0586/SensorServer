@@ -15,6 +15,7 @@ import androidx.fragment.app.Fragment;
 
 import com.github.ybq.android.spinkit.SpinKitView;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.io.IOException;
@@ -30,7 +31,7 @@ import github.umer0586.sensorserver.SensorWebSocketServer;
 import github.umer0586.util.IpUtil;
 
 
-public class ServerFragment extends Fragment implements OnServerStartListener, OnServerStopppedListener {
+public class ServerFragment extends Fragment implements OnServerStartListener, OnServerStopppedListener, ConnectionsFragment.onConnectionItemClickedListener {
 
     private SensorWebSocketServer server;
 
@@ -244,6 +245,29 @@ public class ServerFragment extends Fragment implements OnServerStartListener, O
         connectionCountListener = listener;
     }
 
+
+    @Override
+    public void onConnectionItemClicked(ConnectionInfo connectionInfo)
+    {
+        String message = "Do you want to close this connection\n" +
+                          "Sensor : " + connectionInfo.getSensor().getName() + "\n" +
+                          "Connections : " + connectionInfo.getSensorUsageCount();
+
+        new MaterialAlertDialogBuilder(getContext())
+                .setTitle("Close Connection")
+                .setMessage(message)
+                .setPositiveButton("Yes",(dialogInterface, i) -> {
+
+                    if(server != null)
+                        server.closeConnectionBySensor(connectionInfo.getSensor());
+                    dialogInterface.dismiss();
+                })
+                .setNegativeButton("No", (dialogInterface, i) -> {
+                    dialogInterface.dismiss();
+                })
+                .setCancelable(false)
+                .show();
+    }
 
     @Override
     public void onDestroyView()

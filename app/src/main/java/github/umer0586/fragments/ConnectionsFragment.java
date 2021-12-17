@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ListView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -23,6 +24,11 @@ import github.umer0586.sensorserver.ConnectionInfoListener;
 public class ConnectionsFragment extends ListFragment implements ConnectionInfoListener {
 
     private static final String TAG = ConnectionsFragment.class.getSimpleName();
+    private onConnectionItemClickedListener onConnectionItemClickedListener;
+
+    public interface onConnectionItemClickedListener{
+        void onConnectionItemClicked(ConnectionInfo connectionInfo);
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
@@ -40,6 +46,20 @@ public class ConnectionsFragment extends ListFragment implements ConnectionInfoL
 
     }
 
+    public void setOnConnectionItemClickedListener(ConnectionsFragment.onConnectionItemClickedListener onConnectionItemClickedListener)
+    {
+        this.onConnectionItemClickedListener = onConnectionItemClickedListener;
+    }
+
+    @Override
+    public void onListItemClick(@NonNull ListView l, @NonNull View v, int position, long id)
+    {
+        super.onListItemClick(l, v, position, id);
+        ConnectionInfo connectionInfo = (ConnectionInfo) v.getTag();
+
+        if(onConnectionItemClickedListener != null)
+            onConnectionItemClickedListener.onConnectionItemClicked(connectionInfo);
+    }
 
     private class ConnectionListAdapter extends ArrayAdapter<ConnectionInfo>{
 
@@ -73,7 +93,7 @@ public class ConnectionsFragment extends ListFragment implements ConnectionInfoL
             sensorName.setText( connectionInfo.getSensor().getName() );
             usageCount.setText( connectionInfo.getSensorUsageCount() + "");
 
-
+            view.setTag(connectionInfo);
             return view;
 
 

@@ -50,6 +50,7 @@ public class SensorWebSocketServer extends WebSocketServer implements SensorEven
     private static final int CLOSE_CODE_UNSUPPORTED_REQUEST = 4002;
     private static final int CLOSE_CODE_TYPE_PARAMETER_MISSING = 4003;
     private static final int CLOSE_CODE_SERVER_STOPPED = 4004;
+    private static final int CLOSE_CODE_CONNECTION_CLOSED_BY_APP_USER = 4005;
 
 
 
@@ -344,6 +345,18 @@ public class SensorWebSocketServer extends WebSocketServer implements SensorEven
     {
         for(WebSocket webSocket : getConnections())
             webSocket.close(CLOSE_CODE_SERVER_STOPPED,"Server stopped");
+    }
+
+    public void closeConnectionBySensor(Sensor sensor)
+    {
+        for(WebSocket webSocket : getConnections())
+        {
+            if( ((Sensor) webSocket.getAttachment()) !=null )
+            {
+                if( ((Sensor) webSocket.getAttachment()).getType() == sensor.getType() )
+                    webSocket.close(CLOSE_CODE_CONNECTION_CLOSED_BY_APP_USER,"connection closed by app user");
+            }
+        }
     }
 
 
