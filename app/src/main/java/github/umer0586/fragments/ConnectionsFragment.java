@@ -5,6 +5,7 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.AppCompatTextView;
 import androidx.fragment.app.ListFragment;
 
 import android.util.Log;
@@ -12,7 +13,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.TextView;
 
 import github.umer0586.sensorserver.ConnectionInfo;
 import github.umer0586.R;
@@ -68,8 +68,8 @@ public class ConnectionsFragment extends ListFragment implements ConnectionInfoL
 
             ConnectionInfo connectionInfo = getItem(position);
 
-            TextView sensorName = view.findViewById(R.id.sensor_name);
-            TextView usageCount = view.findViewById(R.id.usage_count);
+            AppCompatTextView sensorName = view.findViewById(R.id.sensor_name);
+            AppCompatTextView usageCount = view.findViewById(R.id.usage_count);
 
             sensorName.setText( connectionInfo.getSensor().getName() );
             usageCount.setText( connectionInfo.getSensorUsageCount() + "");
