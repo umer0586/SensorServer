@@ -81,10 +81,10 @@ public class ConnectionsFragment extends ListFragment implements ConnectionInfoL
             ConnectionInfo connectionInfo = getItem(position);
 
             AppCompatTextView sensorName = view.findViewById(R.id.sensor_name);
-            AppCompatTextView usageCount = view.findViewById(R.id.usage_count);
+            AppCompatTextView connectionCount = view.findViewById(R.id.connection_count);
 
             sensorName.setText( connectionInfo.getSensor().getName() );
-            usageCount.setText( connectionInfo.getSensorUsageCount() + "");
+            connectionCount.setText( connectionInfo.getSensorConnectionCount() + "");
 
             view.setTag(connectionInfo);
             return view;

@@ -8,13 +8,13 @@ import java.util.List;
 public class ConnectionInfo {
 
     private Sensor sensor;
-    private int sensorUsageCount;
+    private int sensorConnectionCount;
     private List<InetSocketAddress> connectedClients;
 
-    public ConnectionInfo(Sensor sensor, int sensorUsageCount, List<InetSocketAddress> connectedClients)
+    public ConnectionInfo(Sensor sensor, int sensorConnectionCount, List<InetSocketAddress> connectedClients)
     {
         this.sensor = sensor;
-        this.sensorUsageCount = sensorUsageCount;
+        this.sensorConnectionCount = sensorConnectionCount;
         this.connectedClients = connectedClients;
     }
 
@@ -23,9 +23,9 @@ public class ConnectionInfo {
         return sensor;
     }
 
-    public int getSensorUsageCount()
+    public int getSensorConnectionCount()
     {
-        return sensorUsageCount;
+        return sensorConnectionCount;
     }
 
     public List<InetSocketAddress> getConnectedClients()

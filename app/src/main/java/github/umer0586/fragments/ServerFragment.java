@@ -137,7 +137,7 @@ public class ServerFragment extends Fragment implements OnServerStartListener, O
                 {
                     int totalConnections = 0;
                     for(ConnectionInfo connectionInfo : connectionInfoArrayList)
-                        totalConnections += connectionInfo.getSensorUsageCount();
+                        totalConnections += connectionInfo.getSensorConnectionCount();
 
                     connectionCountListener.connectionCount(totalConnections);
 
@@ -257,7 +257,7 @@ public class ServerFragment extends Fragment implements OnServerStartListener, O
     {
         String message = "Do you want to close this connection\n" +
                           "Sensor : " + connectionInfo.getSensor().getName() + "\n" +
-                          "Connections : " + connectionInfo.getSensorUsageCount() + "\n\n";
+                          "Connections : " + connectionInfo.getSensorConnectionCount() + "\n\n";
 
         for(InetSocketAddress inetSocketAddress : connectionInfo.getConnectedClients())
             message += inetSocketAddress + "\n";
