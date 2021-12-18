@@ -286,15 +286,7 @@ public class SensorWebSocketServer extends WebSocketServer implements SensorEven
 
     private int getSensorConnectionCount(Sensor sensor)
     {
-        //java.util.Stream requires android API 24
-
-        int usageCount = 0;
-        for(Sensor registeredSensor : registeredSensors)
-            if(registeredSensor.getType() == sensor.getType())
-                usageCount++;
-
-            return usageCount;
-
+        return getClientsAddressBySensor(sensor).size();
     }
 
     private List<InetSocketAddress> getClientsAddressBySensor(Sensor sensor)
