@@ -52,8 +52,14 @@ public class FragmentNavigationActivity extends AppCompatActivity  implements Na
         connectionsFragment = new ConnectionsFragment();
         availableSensorsFragment = new AvailableSensorsFragment();
 
+        /*
+            when user click connection item from ConnectionsFragments
+            ServerFragment will catch that click event and prompts if user wants to close selected connection
+            its because ServerFragment holds reference to SensorWebSocketServer's object
+         */
         connectionsFragment.setOnConnectionItemClickedListener(serverFragment);
 
+        // ServerFragment hold reference to server object therefore to get a connection info list from server, client must register to ServerFragment
         serverFragment.setConnectionInfoListener(connectionsFragment);
         serverFragment.setConnectionCountListener((totalConnections)->{
             runOnUiThread(()->{
