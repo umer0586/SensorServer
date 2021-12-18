@@ -345,7 +345,7 @@ public class SensorWebSocketServer extends WebSocketServer implements SensorEven
         ArrayList<ConnectionInfo> connectionInfos = new ArrayList<>();
 
         for(Sensor sensor : sensorsSet)
-            connectionInfos.add( new ConnectionInfo(sensor, getSensorUsageCount(sensor), getClientsAddressBySensor(sensor) ) );
+            connectionInfos.add( new ConnectionInfo(sensor, getClientsAddressBySensor(sensor) ) );
 
         if(connectionInfoListener != null)
             this.connectionInfoListener.onConnectionInfo(connectionInfos);
