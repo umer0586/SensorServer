@@ -257,7 +257,10 @@ public class ServerFragment extends Fragment implements OnServerStartListener, O
     {
         String message = "Do you want to close this connection\n" +
                           "Sensor : " + connectionInfo.getSensor().getName() + "\n" +
-                          "Connections : " + connectionInfo.getSensorUsageCount();
+                          "Connections : " + connectionInfo.getSensorUsageCount() + "\n\n";
+
+        for(InetSocketAddress inetSocketAddress : connectionInfo.getConnectedClients())
+            message += inetSocketAddress + "\n";
 
         new MaterialAlertDialogBuilder(getContext())
                 .setTitle("Close Connection")

@@ -297,6 +297,21 @@ public class SensorWebSocketServer extends WebSocketServer implements SensorEven
 
     }
 
+    private List<InetSocketAddress> getClientsAddressBySensor(Sensor sensor)
+    {
+        List<InetSocketAddress> clientSocketAddresses = new ArrayList<>();
+
+        for(WebSocket webSocket : getConnections())
+        {
+            if( ((Sensor) webSocket.getAttachment()) !=null )
+                if( ((Sensor) webSocket.getAttachment()).getType() == sensor.getType())
+                    clientSocketAddresses.add(webSocket.getRemoteSocketAddress());
+
+        }
+
+        return clientSocketAddresses;
+    }
+
     public void setSensorDelay(int sensorDelay)
     {
         switch(sensorDelay)
@@ -330,7 +345,7 @@ public class SensorWebSocketServer extends WebSocketServer implements SensorEven
         ArrayList<ConnectionInfo> connectionInfos = new ArrayList<>();
 
         for(Sensor sensor : sensorsSet)
-            connectionInfos.add( new ConnectionInfo(sensor, getSensorUsageCount(sensor) ) );
+            connectionInfos.add( new ConnectionInfo(sensor, getSensorUsageCount(sensor), getClientsAddressBySensor(sensor) ) );
 
         if(connectionInfoListener != null)
             this.connectionInfoListener.onConnectionInfo(connectionInfos);
