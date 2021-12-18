@@ -191,6 +191,7 @@ public class ServerFragment extends Fragment implements OnServerStartListener, O
 
     }
 
+    // a callback from server thread
     @Override
     public void onServerStarted()
     {
@@ -205,6 +206,7 @@ public class ServerFragment extends Fragment implements OnServerStartListener, O
         });
     }
 
+    // a callback from server thread
     @Override
     public void onServerStopped()
     {
@@ -246,6 +248,10 @@ public class ServerFragment extends Fragment implements OnServerStartListener, O
     }
 
 
+    /**
+     *  A callback from ConnectionFragment when user taps connection item
+     *  we have to catch that event in this fragment because this fragment holds server object
+     */
     @Override
     public void onConnectionItemClicked(ConnectionInfo connectionInfo)
     {
