@@ -131,7 +131,7 @@ public class ServerFragment extends Fragment implements OnServerStartListener, O
         server.setConnectionInfoListener((connectionInfoArrayList)->{
 
                 if ( connectionInfoListeners != null)
-                    connectionInfoListeners.onNewConnectionList(connectionInfoArrayList);
+                    connectionInfoListeners.onConnectionInfo(connectionInfoArrayList);
 
                 if( connectionCountListener != null)
                 {

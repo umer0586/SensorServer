@@ -99,7 +99,7 @@ public class ConnectionsFragment extends ListFragment implements ConnectionInfoL
 
 
     @Override
-    public void onNewConnectionList(ArrayList<ConnectionInfo> connectionInfos)
+    public void onConnectionInfo(ArrayList<ConnectionInfo> connectionInfos)
     {
         getActivity().runOnUiThread(()->{
             setListAdapter( new ConnectionListAdapter(getContext(),connectionInfos) );

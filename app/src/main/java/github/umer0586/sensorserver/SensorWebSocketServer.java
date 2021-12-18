@@ -333,7 +333,7 @@ public class SensorWebSocketServer extends WebSocketServer implements SensorEven
             connectionInfos.add( new ConnectionInfo(sensor, getSensorUsageCount(sensor) ) );
 
         if(connectionInfoListener != null)
-            this.connectionInfoListener.onNewConnectionList(connectionInfos);
+            this.connectionInfoListener.onConnectionInfo(connectionInfos);
     }
 
     public int getConnectionCount()
