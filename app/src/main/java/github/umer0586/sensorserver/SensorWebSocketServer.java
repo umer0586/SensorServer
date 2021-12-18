@@ -161,7 +161,7 @@ public class SensorWebSocketServer extends WebSocketServer implements SensorEven
             return;
 
         // When client has closed connection, how many clients receiving same sensor data from this server
-        long sensorUseCount = getSensorUsageCount(sensor);
+        long sensorUseCount = getSensorConnectionCount(sensor);
 
 
         Log.i(TAG, "Sensor : " + sensor.getStringType() + " Usage : " + sensorUseCount );
@@ -284,7 +284,7 @@ public class SensorWebSocketServer extends WebSocketServer implements SensorEven
 
     }
 
-    private int getSensorUsageCount(Sensor sensor)
+    private int getSensorConnectionCount(Sensor sensor)
     {
         //java.util.Stream requires android API 24
 
