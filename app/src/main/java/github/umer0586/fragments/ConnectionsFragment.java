@@ -20,7 +20,9 @@ import github.umer0586.R;
 import github.umer0586.sensorserver.ConnectionInfo;
 import github.umer0586.sensorserver.ConnectionInfoListener;
 
-
+/**
+ * TODO: functionality to allow user to close all connections (using button in action bar)
+ */
 public class ConnectionsFragment extends ListFragment implements ConnectionInfoListener {
 
     private static final String TAG = ConnectionsFragment.class.getSimpleName();
