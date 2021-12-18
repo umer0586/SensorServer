@@ -43,4 +43,4 @@ Before writing your own websocket client, test this app with any websocket testi
  
 
 # APK Download
-Download *APK* from [Release page](https://github.com/umer0586/SensorServer/releases/tag/v1.0) *(requires Android 5.0)* 
+Download latest *APK* from [Release page](https://github.com/umer0586/SensorServer/releases) *(requires Android 5.0)* 
