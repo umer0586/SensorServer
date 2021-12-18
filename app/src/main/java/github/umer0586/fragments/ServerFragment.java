@@ -40,7 +40,7 @@ public class ServerFragment extends Fragment implements OnServerStartListener, O
     // Button at center to start/stop server
     private MaterialButton startButton;
 
-    // Address of server (http://192.168.2.1:8081)
+    // Address of server (ws://192.168.2.1:8081)
     private TextView serverAddress;
 
 
@@ -156,7 +156,7 @@ public class ServerFragment extends Fragment implements OnServerStartListener, O
                     else
                         Snackbar.make(getView(),"Error Occurred : ",Snackbar.LENGTH_SHORT).show();
 
-                    Log.d(TAG, "onServerError() called");
+                    Log.e(TAG, "onServerError() called");
                 });
 
             });
