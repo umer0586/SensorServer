@@ -11,7 +11,7 @@ android {
         targetSdk 31
         multiDexEnabled true
         versionCode 1
-        versionName "1.1"
+        versionName "1.2"
 
 
     }
