@@ -1,8 +1,10 @@
 # SensorServer
- An Android app which streams phone's motion sensors to **Websocket** clients.
+Android app which streams phone's motion sensors to **Websocket** clients.
  
 
-![Screenrecorder-2021-12-12-22-21-24-565](https://user-images.githubusercontent.com/35717992/145722978-e4ee34a4-d8e5-4a5a-aa5c-ce1051f01c70.gif)
+![server](https://user-images.githubusercontent.com/35717992/146649500-f4f1aadf-60e0-4305-81bc-f7db21540bd7.gif)    ![connections](https://user-images.githubusercontent.com/35717992/146649573-9b86ff77-565c-46ef-900b-63350f4eac3b.gif)    ![sensors](https://user-images.githubusercontent.com/35717992/146649578-adb5f0eb-4a7a-462a-9e16-264f4599903f.gif)
+
+
 
 
 
