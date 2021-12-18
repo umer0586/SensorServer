@@ -73,12 +73,10 @@ public class ConnectionsFragment extends ListFragment implements ConnectionInfoL
 
             View view;
             if (convertView == null)
-            {
                 view = getLayoutInflater().inflate(R.layout.item_connection, parent, false);
-            } else
-            {
+             else
                 view = convertView;
-            }
+
 
             ConnectionInfo connectionInfo = getItem(position);
 
