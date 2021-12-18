@@ -42,7 +42,40 @@ Moreover, from one or different machines you can connect to different types of s
  
 ## Test with Websocket testing tools 
 Before writing your own websocket client, test this app with any websocket testing tools available on the web or playstore. You can use http://livepersoninc.github.io/ws-test-page/ for testing purpose.
- 
+
+## Sample Websocket client (python) 
+Here is a simple websocket client in python using [websocket-client api](https://github.com/websocket-client/websocket-client) which receives live data from accelerometer sensor.
+
+```python
+import websocket
+
+def on_message(ws, message):
+    print(message) # sensor data here in JSON format
+
+def on_error(ws, error):
+    print("### error ###")
+    print(error)
+
+def on_close(ws, close_code, reason):
+    print("### closed ###")
+    print("close code : ", close_code)
+    print("reason : ", reason  )
+
+def on_open(ws):
+    print("connection opened")
+    
+
+if __name__ == "__main__":
+    ws = websocket.WebSocketApp("ws://192.168.0.102:8082/sensor/connect?type=android.sensor.accelerometer",
+                              on_open=on_open,
+                              on_message=on_message,
+                              on_error=on_error,
+                              on_close=on_close)
+
+    ws.run_forever()
+
+
+```
 
 # APK Download
 Download latest *APK* from [Release page](https://github.com/umer0586/SensorServer/releases) *(requires Android 5.0)* 
