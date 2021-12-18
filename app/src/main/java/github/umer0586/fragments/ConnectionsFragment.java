@@ -38,13 +38,6 @@ public class ConnectionsFragment extends ListFragment implements ConnectionInfoL
         return inflater.inflate(R.layout.fragment_connections, container, false);
     }
 
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState)
-    {
-        super.onViewCreated(view, savedInstanceState);
-        Log.i(TAG, "onViewCreated: ");
-
-    }
 
     public void setOnConnectionItemClickedListener(ConnectionsFragment.onConnectionItemClickedListener onConnectionItemClickedListener)
     {
@@ -114,10 +107,5 @@ public class ConnectionsFragment extends ListFragment implements ConnectionInfoL
 
     }
 
-    @Override
-    public void onDestroyView()
-    {
-        super.onDestroyView();
-        Log.i(TAG, "onDestroyView: ");
-    }
+
 }

@@ -269,13 +269,6 @@ public class ServerFragment extends Fragment implements OnServerStartListener, O
                 .show();
     }
 
-    @Override
-    public void onDestroyView()
-    {
-        super.onDestroyView();
-        Log.i(TAG, "onDestroyView: ");
-
-    }
 
     @Override
     public void onDestroy()
