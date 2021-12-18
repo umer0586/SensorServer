@@ -39,7 +39,7 @@ public class FragmentNavigationActivity extends AppCompatActivity  implements Na
 
         bottomNavigationView = findViewById(R.id.nav_bar);
 
-        //SettingsFragments will initially be displayed when app starts
+        //ServerFragment will initially be displayed when app starts
         bottomNavigationView.setSelectedItemId(R.id.navigation_server);
         bottomNavigationView.setOnItemSelectedListener(this);
         setupFragments();
