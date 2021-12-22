@@ -42,7 +42,11 @@ public class FragmentNavigationActivity extends AppCompatActivity  implements Na
         //ServerFragment will initially be displayed when app starts
         bottomNavigationView.setSelectedItemId(R.id.navigation_server);
         bottomNavigationView.setOnItemSelectedListener(this);
-        setupFragments();
+
+        // prevent fragment overlapping issue see https://stackoverflow.com/a/54978055/9193164
+        // make sure we add fragments once (i-e when Activity is created first time) not when activity state is restored after destroying
+        if(savedInstanceState == null)
+            setupFragments();
     }
 
     private void setupFragments()
