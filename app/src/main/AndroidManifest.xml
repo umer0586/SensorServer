@@ -15,8 +15,14 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.SensorServer">
+
+        <!--
+            see https://stackoverflow.com/a/51963216/9193164 for launchMode="singleTask"
+            app work fine while debugging but when an apk is generated app recreates activity when back button is pressed
+         -->
         <activity
             android:name=".activity.FragmentNavigationActivity"
+            android:launchMode="singleTask"
             android:screenOrientation="portrait"
             android:exported="true" >
             <intent-filter>
