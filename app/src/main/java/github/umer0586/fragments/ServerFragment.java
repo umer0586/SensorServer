@@ -108,9 +108,18 @@ public class ServerFragment extends Fragment implements OnServerStartListener, O
     private void startServer()
     {
 
+        boolean localHostPref = sharedPreferences.getBoolean(getString(R.string.pref_key_localhost),false);
 
-        String ipAddress = IpUtil.getWifiIpAddress(getContext());
+        String ipAddress = null;
 
+        // is "local host" switch in enable
+        // no need to check for wifi network
+        if(localHostPref)
+            ipAddress = "127.0.0.1"; // use loopback address
+        else // check wifi
+            ipAddress = IpUtil.getWifiIpAddress(getContext());
+
+        // This condition will always be false when localHostPref is true, hence no network check
         if(ipAddress == null)
         {
             Snackbar.make(getView(),"No Network", Snackbar.LENGTH_SHORT).show();

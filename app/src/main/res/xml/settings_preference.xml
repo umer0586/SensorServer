@@ -3,6 +3,14 @@
 
     <PreferenceCategory app:title="Options">
 
+        <SwitchPreferenceCompat
+            app:key="@string/pref_key_localhost"
+            app:defaultValue="false"
+            app:title="Local Host"
+            app:summary="Use adb to connect over USB"
+            app:icon="@drawable/ic_baseline_usb_24"
+            />
+
 
         <EditTextPreference
             app:defaultValue="@string/pref_default_port"
