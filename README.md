@@ -1,5 +1,5 @@
 # SensorServer
-Android app which streams phone's motion sensors to **Websocket** clients.
+Android app which streams phone's motion sensors to **Websocket** clients over Wi-fi or USB.
  
 
 ![server](https://user-images.githubusercontent.com/35717992/146649500-f4f1aadf-60e0-4305-81bc-f7db21540bd7.gif)    ![connections](https://user-images.githubusercontent.com/35717992/146649573-9b86ff77-565c-46ef-900b-63350f4eac3b.gif)    ![sensors](https://user-images.githubusercontent.com/35717992/146649578-adb5f0eb-4a7a-462a-9e16-264f4599903f.gif)
@@ -77,5 +77,11 @@ if __name__ == "__main__":
 
 ```
 
-# APK Download
+## Connecting over USB (using ADB)
+To connect over USB make sure `USB debugging` option is enable in your phone and `adb` is available in your machine
+* **Step 1 :** Enable `Local Host` option in app
+* **Step 2** : Run adb command `adb forward tcp:8081 tcp:8081` (8081 is just for example)
+* **Step 3** : use address `ws://localhost:8081:/sensor/connection?type=<sensor type here>` to connect 
+
+# APK Download ⏬
 Download latest *APK* from [Release page](https://github.com/umer0586/SensorServer/releases) *(requires Android 5.0)* 
