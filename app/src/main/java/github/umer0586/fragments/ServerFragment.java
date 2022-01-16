@@ -122,7 +122,7 @@ public class ServerFragment extends Fragment implements OnServerStartListener, O
         // This condition will always be false when localHostPref is true, hence no network check
         if(ipAddress == null)
         {
-            Snackbar.make(getView(),"No Network", Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(getView(),"Unable to obtain Wifi IP", Snackbar.LENGTH_SHORT).show();
             return;
         }
 
