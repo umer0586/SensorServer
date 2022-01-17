@@ -32,8 +32,26 @@ Android app which streams phone's motion sensors to **Websocket** clients over W
 
  * so on... 
  
- Once connected, client will receive sensor data in `JSON Array` (float type values) through `websocket.onMessage`. Description of each data value at index in an array can be obtain from https://developer.android.com/guide/topics/sensors/sensors_motion   
+ Once connected, client will receive sensor data in `JSON Array` (float type values) through `websocket.onMessage`. Description of each data value at index in an array can be obtain from https://developer.android.com/guide/topics/sensors/sensors_motion
  
+ A snapshot from accelerometer 
+ 
+ ```json
+{
+  "accuracy": 2,
+  "timestamp": 3925657519043709,
+  "values": [0.31892395,-0.97802734,10.049896]
+}
+ ```
+where
+
+| Array Item  | Description |
+| ------------- | ------------- |
+| values[0]  | Acceleration force along the x axis (including gravity)  |
+| values[1]  | Acceleration force along the y axis (including gravity)  |
+| values[2]  | Acceleration force along the z axis (including gravity)  |
+
+
 ## Supports multiple connections
 
  **Many Websocket clients** can connect to one `type` of a Sensor. So connecting to **`/sensor/connect?type=android.sensor.gravity`** three times will create three different connections to the gravity sensor and each connected client will then receive gravity sensor data at the same time.
@@ -74,6 +92,26 @@ if __name__ == "__main__":
 
     ws.run_forever()
 
+
+```
+
+
+## Sample Websocket client (javascript)
+
+```javascript
+var websocket = new WebSocket("ws://192.168.0.102:8081/sensor/connect?type=android.sensor.accelerometer");
+
+websocket.onopen = ()=>{
+	console.log("connected");
+};
+
+websocket.onmessage = (event) => {
+	console.log(event.data);
+};
+
+websocket.onclose = ()=>{
+	console.log("closed");
+};
 
 ```
 
