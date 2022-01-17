@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -30,6 +31,7 @@ public class SensorWebSocketServer extends WebSocketServer implements SensorEven
 
     private int sensorDelay = SensorManager.SENSOR_DELAY_FASTEST;
     private static final String CONNECTION_PATH = "/sensor/connect";
+    private static final HashMap<String,Object> response = new HashMap<>();
 
     private SensorManager sensorManager;
     private SensorUtil sensorUtil;
@@ -267,6 +269,8 @@ public class SensorWebSocketServer extends WebSocketServer implements SensorEven
     @Override
     public void onSensorChanged(SensorEvent sensorEvent)
     {
+        response.clear();
+
         // Loop through each connected client
         for( WebSocket webSocket : getConnections())
         {
@@ -274,7 +278,14 @@ public class SensorWebSocketServer extends WebSocketServer implements SensorEven
             // Send data as per sensor type requested by client
             if( ((Sensor) webSocket.getAttachment()) !=null )
                 if( ((Sensor) webSocket.getAttachment()).getType() == sensorEvent.sensor.getType() && !webSocket.isClosing())
-                    webSocket.send(JsonUtil.toJSON(sensorEvent.values));
+                {
+                    response.put("values", sensorEvent.values);
+                    response.put("timestamp",sensorEvent.timestamp);
+                    response.put("accuracy",sensorEvent.accuracy);
+
+                    webSocket.send(JsonUtil.toJSON(response));
+                }
+
         }
     }
 
