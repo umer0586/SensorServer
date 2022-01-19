@@ -52,7 +52,7 @@ where
 | values[2]  | Acceleration force along the z axis (including gravity)  |
 
 And [timestamp](https://developer.android.com/reference/android/hardware/SensorEvent#timestamp) is the time in nanoseconds at which the event happened
-## Supports multiple connections
+## Supports multiple connections to multiple sensors simultaneously
 
  **Many Websocket clients** can connect to one `type` of a Sensor. So connecting to **`/sensor/connect?type=android.sensor.gravity`** three times will create three different connections to the gravity sensor and each connected client will then receive gravity sensor data at the same time.
  
