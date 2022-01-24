@@ -9,7 +9,7 @@ Android app which streams phone's motion sensors to **Websocket** clients over W
 
 
 
- This app streams phone's motion sensors to Websocket clients in realtime. A websocket client could be a web browser or any application running on a PC or a mobile device which uses **Websocket Client API**.  
+ This app streams phone's motion sensors to Websocket clients in realtime. A websocket client could be a web browser or any application running on a PC or a mobile device which uses **Websocket Client API**.  You can easily get a **Websocket library** for your favourite programming language. 
  
  
  
@@ -123,7 +123,10 @@ asyncio.run(accelerometer(URI))
 To connect over USB make sure `USB debugging` option is enable in your phone and `adb` is available in your machine
 * **Step 1 :** Enable `Local Host` option in app
 * **Step 2** : Run adb command `adb forward tcp:8081 tcp:8081` (8081 is just for example)
-* **Step 3** : use address `ws://localhost:8081:/sensor/connection?type=<sensor type here>` to connect 
+* **Step 3** : use address `ws://localhost:8081:/sensor/connect?type=<sensor type here>` to connect 
 
 # APK Download ⏬
-Download latest *APK* from [Release page](https://github.com/umer0586/SensorServer/releases) *(requires Android 5.0)* 
+Download latest *APK* from [Release page](https://github.com/umer0586/SensorServer/releases) *(requires Android 5.0)* . Don't forget to ⭐ to this repo if you found this helpful
+
+# Issues and Contributions
+Post a new issue if you encounter any. To contribute, fork this repo then create feature/fix branch and send pull request for that branch.
