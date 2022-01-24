@@ -69,25 +69,30 @@ Here is a simple websocket client in python using [websocket-client api](https:/
 
 ```python
 import websocket
+import json
 
 def on_message(ws, message):
-    print(message) # sensor data here in JSON format
+    accelerometer = json.loads(message)['values']
+    x = accelerometer[0]
+    y = accelerometer[1]
+    z = accelerometer[2]
+    print('x =',x,'y = ',y,'z = ',z)
 
 def on_error(ws, error):
-    print("### error ###")
+    print("error occurred")
     print(error)
 
 def on_close(ws, close_code, reason):
-    print("### closed ###")
+    print("connection close")
     print("close code : ", close_code)
     print("reason : ", reason  )
 
 def on_open(ws):
-    print("connection opened")
+    print("connection open")
     
 
 if __name__ == "__main__":
-    ws = websocket.WebSocketApp("ws://192.168.0.102:8082/sensor/connect?type=android.sensor.accelerometer",
+    ws = websocket.WebSocketApp("ws://192.168.0.101:8081/sensor/connect?type=android.sensor.accelerometer",
                               on_open=on_open,
                               on_message=on_message,
                               on_error=on_error,
@@ -95,28 +100,24 @@ if __name__ == "__main__":
 
     ws.run_forever()
 
+```
+There is another python websocket API which is based on `asyncio` [https://github.com/aaugustin/websockets](https://github.com/aaugustin/websockets)
+
+```python
+import asyncio
+from websockets import connect
+
+async def accelerometer(uri):
+    async with connect(uri) as websocket:
+        while True:
+            data = await websocket.recv()
+            print(data)
+            
+URI = "ws://192.168.0.101:8081/sensor/connect?type=android.sensor.accelerometer"
+asyncio.run(accelerometer(URI))
 
 ```
 
-
-## Sample Websocket client (javascript)
-
-```javascript
-var websocket = new WebSocket("ws://192.168.0.102:8081/sensor/connect?type=android.sensor.accelerometer");
-
-websocket.onopen = ()=>{
-	console.log("connected");
-};
-
-websocket.onmessage = (event) => {
-	console.log(event.data);
-};
-
-websocket.onclose = ()=>{
-	console.log("closed");
-};
-
-```
 
 ## Connecting over USB (using ADB)
 To connect over USB make sure `USB debugging` option is enable in your phone and `adb` is available in your machine
