@@ -120,10 +120,12 @@ asyncio.run(accelerometer(URI))
 
 
 ## Connecting over USB (using ADB)
-To connect over USB make sure `USB debugging` option is enable in your phone and `adb` is available in your machine
+To connect over USB make sure `USB debugging` option is enable in your phone and `ADB` (android debug bridge) is available in your machine
 * **Step 1 :** Enable `Local Host` option in app
-* **Step 2** : Run adb command `adb forward tcp:8081 tcp:8081` (8081 is just for example)
+* **Step 2** : Run adb command `adb forward tcp:8081 tcp:8081` (8081 is just for example) from client
 * **Step 3** : use address `ws://localhost:8081:/sensor/connect?type=<sensor type here>` to connect 
+
+Make sure you have installed your android device driver and `adb devices` command detects your connected android phone.
 
 # APK Download ⏬
 Download latest *APK* from [Release page](https://github.com/umer0586/SensorServer/releases) *(requires Android 5.0)* . Don't forget to ⭐ to this repo if you found this helpful
