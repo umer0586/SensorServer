@@ -7,6 +7,7 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.net.Uri;
 import android.os.Handler;
+import android.os.HandlerThread;
 import android.os.Looper;
 import android.util.Log;
 
@@ -34,6 +35,9 @@ public class SensorWebSocketServer extends WebSocketServer implements SensorEven
     private int sensorDelay = SensorManager.SENSOR_DELAY_FASTEST;
     private static final String CONNECTION_PATH = "/sensor/connect";
     private static final HashMap<String,Object> response = new HashMap<>();
+
+    private HandlerThread handlerThread;
+    private Handler handler;
 
     private SensorManager sensorManager;
     private SensorUtil sensorUtil;
@@ -134,8 +138,14 @@ public class SensorWebSocketServer extends WebSocketServer implements SensorEven
 
          if(requestedSensor != null)
          {
-            //Register requested sensor
-            sensorManager.registerListener(this,requestedSensor, getSensorDelay());
+             /*
+              Register requested sensor
+              sensor events will be reported to main thread if handler is not provided
+              see https://stackoverflow.com/questions/23209804/android-sensor-registerlistener-in-a-separate-thread
+              and https://pastebin.com/QuHd0LNU
+            */
+            sensorManager.registerListener(this,requestedSensor, getSensorDelay(), handler);
+
 
             // Update registry
              registeredSensors.add(requestedSensor);
@@ -253,6 +263,8 @@ public class SensorWebSocketServer extends WebSocketServer implements SensorEven
             if( onServerStopppedListener != null && !serverStartUpFailed )
                 this.onServerStopppedListener.onServerStopped();
 
+            if(handlerThread.isAlive())
+                handlerThread.quitSafely();
 
     }
 
@@ -265,6 +277,11 @@ public class SensorWebSocketServer extends WebSocketServer implements SensorEven
     public void run()
     {
         new Thread (()->super.run()).start();
+
+        // see https://stackoverflow.com/questions/23209804/android-sensor-registerlistener-in-a-separate-thread
+        handlerThread = new HandlerThread("Handler Thread");
+        handlerThread.start();
+        handler = new Handler(handlerThread.getLooper());
     }
     int counter = 0;
     @Override
