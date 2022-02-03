@@ -287,23 +287,21 @@ public class SensorWebSocketServer extends WebSocketServer implements SensorEven
     @Override
     public void onSensorChanged(SensorEvent sensorEvent)
     {
-        Log.i(TAG, "onSensorChanged: Thread " + Thread.currentThread().getName());
-        Log.i(TAG, "onSensorChanged: Sensor " + sensorEvent.sensor.getStringType());
+       // Log.i(TAG, "onSensorChanged: Thread " + Thread.currentThread().getName());
+       // Log.i(TAG, "onSensorChanged: Sensor " + sensorEvent.sensor.getStringType());
 
-/*        if(registeredSensors.isEmpty())
-        {   counter++;
-            Log.i(TAG, "onSensorChanged: counter "+counter);
-            sensorManager.unregisterListener(this, sensorUtil.getSensorFromStringType("android.sensor.rotation_vector"));
-        }*/
         response.clear();
 
         // Loop through each connected client
-        for( WebSocket webSocket : getConnections())
+        for( WebSocket webSocket : getConnections() )
         {
 
             // Send data as per sensor type requested by client
-            if( ((Sensor) webSocket.getAttachment()) !=null )
-                if( ((Sensor) webSocket.getAttachment()).getType() == sensorEvent.sensor.getType() && !webSocket.isClosing())
+            Sensor clientAssociatedSensor = ((Sensor) webSocket.getAttachment());
+
+            if( clientAssociatedSensor != null )
+
+                if( clientAssociatedSensor.getType() == sensorEvent.sensor.getType() && !webSocket.isClosing())
                 {
                     response.put("values", sensorEvent.values);
                     response.put("timestamp",sensorEvent.timestamp);
