@@ -16,7 +16,7 @@ public class JsonUtil {
         String json = "";
 
         try {
-            json = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(object);
+            json = objectMapper.writer().writeValueAsString(object);
         } catch (IOException e) {
             e.printStackTrace();
         }
