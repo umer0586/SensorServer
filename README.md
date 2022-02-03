@@ -1,5 +1,5 @@
 # SensorServer
-Android app which streams phone's motion sensors to **Websocket** clients over Wi-fi or USB.
+Android app which streams phone's motion, environmental and position sensors to **Websocket** clients over Wi-fi or USB.
  
 
 ![server](https://user-images.githubusercontent.com/35717992/146649500-f4f1aadf-60e0-4305-81bc-f7db21540bd7.gif)    ![connections](https://user-images.githubusercontent.com/35717992/146649573-9b86ff77-565c-46ef-900b-63350f4eac3b.gif)    ![sensors](https://user-images.githubusercontent.com/35717992/146649578-adb5f0eb-4a7a-462a-9e16-264f4599903f.gif)
@@ -9,7 +9,7 @@ Android app which streams phone's motion sensors to **Websocket** clients over W
 
 
 
- This app streams phone's motion sensors to Websocket clients in realtime. A websocket client could be a web browser or any application running on a PC or a mobile device which uses **Websocket Client API**.  You can easily get a **Websocket library** for your favourite programming language. 
+ This app can stream phone's sensors (motion, environmental and position) to Websocket clients in realtime. A websocket client could be a web browser or any application running on a PC or a mobile device which uses **Websocket Client API**.  You can easily get a **Websocket library** for your favourite programming language. 
  
  
  
