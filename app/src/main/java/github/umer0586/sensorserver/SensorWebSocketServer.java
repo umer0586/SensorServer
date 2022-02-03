@@ -6,6 +6,8 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.net.Uri;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 
 import org.java_websocket.WebSocket;
@@ -143,7 +145,7 @@ public class SensorWebSocketServer extends WebSocketServer implements SensorEven
               so that this Servers knows which client has requested which type of sensor
               */
              clientWebsocket.setAttachment(requestedSensor);
-             Log.i(TAG, "Connections : " + getConnectionCount());
+             Log.i(TAG, "Total Connections : " + getConnectionCount());
          }
 
 
@@ -163,10 +165,10 @@ public class SensorWebSocketServer extends WebSocketServer implements SensorEven
             return;
 
         // When client has closed connection, how many clients receiving same sensor data from this server
-        long sensorUseCount = getSensorConnectionCount(sensor);
+        long sensorConnectionCount = getSensorConnectionCount(sensor);
 
 
-        Log.i(TAG, "Sensor : " + sensor.getStringType() + " Usage : " + sensorUseCount );
+        Log.i(TAG, "Sensor : " + sensor.getStringType() + " Connections : " + sensorConnectionCount );
 
         /*
             Suppose we have 3 clients each receiving light sensor data \
@@ -176,12 +178,13 @@ public class SensorWebSocketServer extends WebSocketServer implements SensorEven
         */
 
         //  Unregister sensor if and only if one client is using it
-        if(sensorUseCount == 1)
-             sensorManager.unregisterListener(this, sensor);
+        if(sensorConnectionCount == 1)
+            sensorManager.unregisterListener(this, sensor);
+
 
         registeredSensors.remove(sensor);
 
-        Log.i(TAG, "Connections : " + getConnectionCount());
+        Log.i(TAG, "Total Connections : " + getConnectionCount());
         notifyConnectionInfoList();
     }
 
@@ -251,8 +254,6 @@ public class SensorWebSocketServer extends WebSocketServer implements SensorEven
                 this.onServerStopppedListener.onServerStopped();
 
 
-
-
     }
 
     /*
@@ -265,10 +266,18 @@ public class SensorWebSocketServer extends WebSocketServer implements SensorEven
     {
         new Thread (()->super.run()).start();
     }
-
+    int counter = 0;
     @Override
     public void onSensorChanged(SensorEvent sensorEvent)
     {
+        Log.i(TAG, "onSensorChanged: Thread " + Thread.currentThread().getName());
+        Log.i(TAG, "onSensorChanged: Sensor " + sensorEvent.sensor.getStringType());
+
+/*        if(registeredSensors.isEmpty())
+        {   counter++;
+            Log.i(TAG, "onSensorChanged: counter "+counter);
+            sensorManager.unregisterListener(this, sensorUtil.getSensorFromStringType("android.sensor.rotation_vector"));
+        }*/
         response.clear();
 
         // Loop through each connected client
@@ -297,7 +306,12 @@ public class SensorWebSocketServer extends WebSocketServer implements SensorEven
 
     private int getSensorConnectionCount(Sensor sensor)
     {
-        return getClientsAddressBySensor(sensor).size();
+        int count = 0;
+        for(Sensor registeredSensor : registeredSensors)
+            if(registeredSensor.getType() == sensor.getType())
+                count++;
+
+        return count;
     }
 
     private List<InetSocketAddress> getClientsAddressBySensor(Sensor sensor)
