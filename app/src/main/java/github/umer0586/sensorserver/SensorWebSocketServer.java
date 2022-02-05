@@ -145,6 +145,14 @@ public class SensorWebSocketServer extends WebSocketServer implements SensorEven
             */
             sensorManager.registerListener(this,requestedSensor, getSamplingRate() , handler);
 
+            /*
+            TODO:
+             android offical docs say (https://developer.android.com/reference/android/hardware/SensorManager)
+             Note: Don't use this method (registerListener) with a one shot trigger sensor such as Sensor#TYPE_SIGNIFICANT_MOTION.
+             Use requestTriggerSensor(android.hardware.TriggerEventListener, android.hardware.Sensor) instead.
+
+             */
+
 
             // Update registry
              registeredSensors.add(requestedSensor);
