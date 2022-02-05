@@ -170,11 +170,9 @@ public class ServerFragment extends Fragment implements OnServerStartListener, O
 
             });
 
-            int delay = Integer.parseInt( sharedPreferences.getString(
-                            getString(R.string.pref_key_sensor_delay),
-                            getString(R.string.sensor_delay_default)) );
+            int samplingRate = sharedPreferences.getInt(getString(R.string.pref_key_sampling_rate),200000);
 
-            server.setSensorDelay(delay);
+            server.setSamplingRate(samplingRate);
 
             server.run();
 

@@ -22,12 +22,14 @@
             app:icon="@drawable/ic_baseline_info_24"
             />
 
-        <ListPreference
-            app:defaultValue="@string/sensor_delay_default"
-            app:entries="@array/sensor_delay_entries"
-            app:entryValues="@array/sensor_delay_values"
-            app:key="@string/pref_key_sensor_delay"
-            app:title="Sensor Delay"
+
+
+        <EditTextPreference
+            app:defaultValue="200000"
+            app:dialogMessage="Enter sampling rate in Microseconds"
+            app:dialogTitle="Sampling Rate"
+            app:key="@string/pref_key_sampling_rate"
+            app:title="Sampling Rate (Microseconds)"
             app:useSimpleSummaryProvider="true"
             app:icon="@drawable/ic_baseline_speed_24"
             />

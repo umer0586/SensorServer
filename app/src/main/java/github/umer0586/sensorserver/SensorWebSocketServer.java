@@ -8,7 +8,6 @@ import android.hardware.SensorManager;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.HandlerThread;
-import android.os.Looper;
 import android.util.Log;
 
 import org.java_websocket.WebSocket;
@@ -32,7 +31,7 @@ public class SensorWebSocketServer extends WebSocketServer implements SensorEven
 
     private static final String TAG = SensorWebSocketServer.class.getName();
 
-    private int sensorDelay = SensorManager.SENSOR_DELAY_FASTEST;
+    private int samplingRate = 200000;//default value normal rate
     private static final String CONNECTION_PATH = "/sensor/connect";
     private static final HashMap<String,Object> response = new HashMap<>();
 
@@ -144,7 +143,7 @@ public class SensorWebSocketServer extends WebSocketServer implements SensorEven
               see https://stackoverflow.com/questions/23209804/android-sensor-registerlistener-in-a-separate-thread
               and https://pastebin.com/QuHd0LNU
             */
-            sensorManager.registerListener(this,requestedSensor, getSensorDelay(), handler);
+            sensorManager.registerListener(this,requestedSensor, getSamplingRate() , handler);
 
 
             // Update registry
@@ -251,6 +250,7 @@ public class SensorWebSocketServer extends WebSocketServer implements SensorEven
             this.onServerStartListener.onServerStarted();
 
         Log.i(TAG,"server started successfully " + this.getAddress());
+        Log.i(TAG, "sampling rate " + getSamplingRate());
     }
 
    @Override
@@ -283,7 +283,7 @@ public class SensorWebSocketServer extends WebSocketServer implements SensorEven
         handlerThread.start();
         handler = new Handler(handlerThread.getLooper());
     }
-    int counter = 0;
+
     @Override
     public void onSensorChanged(SensorEvent sensorEvent)
     {
@@ -344,24 +344,14 @@ public class SensorWebSocketServer extends WebSocketServer implements SensorEven
         return clientSocketAddresses;
     }
 
-    public void setSensorDelay(int sensorDelay)
+    public void setSamplingRate(int samplingRate)
     {
-        switch(sensorDelay)
-        {
-            case   SensorManager.SENSOR_DELAY_FASTEST:
-            case   SensorManager.SENSOR_DELAY_NORMAL:
-            case   SensorManager.SENSOR_DELAY_UI:
-            case   SensorManager.SENSOR_DELAY_GAME:
-                this.sensorDelay = sensorDelay;
-                break;
-            default:
-                throw new IllegalArgumentException("Sensor Delay type Unsupported");
-        }
+        this.samplingRate = samplingRate;
     }
 
-    public int getSensorDelay()
+    public int getSamplingRate()
     {
-        return sensorDelay;
+        return samplingRate;
     }
 
     /*
