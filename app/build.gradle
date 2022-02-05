@@ -11,7 +11,7 @@ android {
         targetSdk 31
         multiDexEnabled true
         versionCode 1
-        versionName "1.4.0" // JSON Response Updated
+        versionName "1.5.0"
 
 
     }
