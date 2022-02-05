@@ -56,12 +56,12 @@ public class AvailableSensorsFragment extends ListFragment {
 
         String sensorInfo = "";
         sensorInfo += "Name : " + sensor.getName() + "\n";
-        sensorInfo += "Type : " + sensor.getStringType() + "\n";
-        sensorInfo += "MinDelay : " + sensor.getMinDelay() + "\n";
-        sensorInfo += "MaxDelay : " + sensor.getMaxDelay() + "\n";
+        sensorInfo += "MinDelay : " + sensor.getMinDelay() + "μs\n";
+        sensorInfo += "MaxDelay : " + sensor.getMaxDelay() + "μs\n";
         sensorInfo += "MaxRange : " + sensor.getMaximumRange() + "\n";
         sensorInfo += "Resolution : " + sensor.getResolution() + "\n";
-        sensorInfo += "Power : " + sensor.getPower() + "\n";
+        sensorInfo += "Reporting Mode : " + getSensorReportingModeString(sensor.getReportingMode()) + "\n";
+        sensorInfo += "Power : " + sensor.getPower() + "mA\n";
         sensorInfo += "Vendor : " + sensor.getVendor() + "\n";
         sensorInfo += "Version : " + sensor.getVersion() + "\n";
         sensorInfo += "WakeUp sensor : " + sensor.isWakeUpSensor()+ "\n";
@@ -72,6 +72,30 @@ public class AvailableSensorsFragment extends ListFragment {
                 .setMessage(sensorInfo)
                 .show();
 
+    }
+
+    private static String getSensorReportingModeString(int reportingMode)
+    {
+            String reportingModeString = "";
+
+            switch (reportingMode)
+            {
+                case Sensor.REPORTING_MODE_CONTINUOUS:
+                    reportingModeString = "Continuous";
+                    break;
+                case Sensor.REPORTING_MODE_ON_CHANGE:
+                    reportingModeString = "On Change";
+                    break;
+                case Sensor.REPORTING_MODE_ONE_SHOT:
+                    reportingModeString = "One Shot";
+                    break;
+                case Sensor.REPORTING_MODE_SPECIAL_TRIGGER:
+                    reportingModeString = "Special Trigger";
+                    break;
+
+            }
+
+            return reportingModeString;
     }
 
     private class SensorsListAdapter extends ArrayAdapter<Sensor>{
