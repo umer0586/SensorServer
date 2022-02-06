@@ -34,7 +34,9 @@ Android app which streams phone's motion, environmental and position sensors to 
  
  Once connected, client will receive sensor data in `JSON Array` (float type values) through `websocket.onMessage`. Description of each data value at index in an array can be obtain from https://developer.android.com/guide/topics/sensors/sensors_motion
  
- A snapshot from accelerometer 
+ A snapshot from accelerometer.
+ 
+**Note** : *Use [this page](https://developer.android.com/guide/topics/sensors/sensors_motion) to know what each value in **values** array corresponds to*  
  
  ```json
 {
@@ -99,6 +101,8 @@ if __name__ == "__main__":
                               on_close=on_close)
 
     ws.run_forever()
+ 
+ # To analyse multiple sensor data simultaneously, you can add as many websocket connections for different sensors as you want. 
 
 ```
 There is another python websocket API which is based on `asyncio` [https://github.com/aaugustin/websockets](https://github.com/aaugustin/websockets)
@@ -115,6 +119,8 @@ async def accelerometer(uri):
             
 URI = "ws://192.168.0.101:8081/sensor/connect?type=android.sensor.accelerometer"
 asyncio.run(accelerometer(URI))
+
+# Add more connections to other sensors
 
 ```
 
