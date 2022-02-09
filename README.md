@@ -74,10 +74,10 @@ import websocket
 import json
 
 def on_message(ws, message):
-    accelerometer = json.loads(message)['values']
-    x = accelerometer[0]
-    y = accelerometer[1]
-    z = accelerometer[2]
+    values = json.loads(message)['values']
+    x = values[0]
+    y = values[1]
+    z = values[2]
     print('x =',x,'y = ',y,'z = ',z)
 
 def on_error(ws, error):
