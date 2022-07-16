@@ -45,6 +45,8 @@ Android app which streams phone's motion, environmental and position sensors to 
   "values": [0.31892395,-0.97802734,10.049896]
 }
  ```
+![axis_device](https://user-images.githubusercontent.com/35717992/179351418-bf3b511a-ebea-49bb-af65-5afd5f464e14.png)
+
 where
 
 | Array Item  | Description |
@@ -56,6 +58,9 @@ where
 And [timestamp](https://developer.android.com/reference/android/hardware/SensorEvent#timestamp) is the time in nanoseconds at which the event happened
 
 Use `JSON` parser to get these individual values.
+
+## Undocumented (mostly QTI) sensors on Android devices
+Some Android devices have additional sensors like **Coarse Motion Classifier** `(com.qti.sensor.motion_classifier)`, **Basic Gesture** `(com.qti.sensor.basic_gestures)` etc  which are not documented on offical android docs. Please refer to this [Blog](https://louis993546.medium.com/quick-tech-support-undocumented-mostly-qti-sensors-on-android-devices-d7e2fb6c5064) for corresponding values in `values` array  
 
 ## Supports multiple connections to multiple sensors simultaneously
 
