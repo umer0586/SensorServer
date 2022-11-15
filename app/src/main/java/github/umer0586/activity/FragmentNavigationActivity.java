@@ -1,11 +1,18 @@
 package github.umer0586.activity;
 
+import android.content.ComponentName;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.IBinder;
+import android.util.Log;
 import android.view.MenuItem;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
+import androidx.viewpager2.adapter.FragmentStateAdapter;
+import androidx.viewpager2.widget.ViewPager2;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
@@ -15,21 +22,28 @@ import github.umer0586.fragments.AvailableSensorsFragment;
 import github.umer0586.fragments.ConnectionsFragment;
 import github.umer0586.fragments.ServerFragment;
 import github.umer0586.fragments.SettingsFragment;
+import github.umer0586.sensorserver.ConnectionCountChangeListener;
+import github.umer0586.service.SensorService;
+import github.umer0586.service.ServiceBindHelper;
 
-public class FragmentNavigationActivity extends AppCompatActivity  implements NavigationBarView.OnItemSelectedListener {
 
+public class FragmentNavigationActivity extends AppCompatActivity
+        implements NavigationBarView.OnItemSelectedListener,
+        ServiceConnection, ConnectionCountChangeListener {
 
-    //Fragments
-    private ServerFragment serverFragment;
-    private SettingsFragment settingsFragment;
-    private AvailableSensorsFragment availableSensorsFragment;
-    private ConnectionsFragment connectionsFragment;
+    private static final String TAG = FragmentNavigationActivity.class.getSimpleName();
+    private ViewPager2 viewPager;
 
-    // Reference to active Fragment
-    private Fragment activeFragment;
+    private ServiceBindHelper serviceBindHelper;
+    private SensorService sensorService;
 
-    //Bottom navigation to show and hide fragments as per navigation item selection
     private BottomNavigationView bottomNavigationView;
+
+    // Fragments Positions
+    private static final int POSITION_SERVER_FRAGMENT = 0;
+    private static final int POSITION_SETTING_FRAGMENT = 1;
+    private static final int POSITION_CONNECTIONS_FRAGMENT = 2;
+    private static final int POSITION_AVAILABLE_SENSORS_FRAGMENT = 3;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -38,131 +52,166 @@ public class FragmentNavigationActivity extends AppCompatActivity  implements Na
         setContentView(R.layout.activity_fragment_navigation);
 
         bottomNavigationView = findViewById(R.id.nav_bar);
-
-        //ServerFragment will initially be displayed when app starts
         bottomNavigationView.setSelectedItemId(R.id.navigation_server);
         bottomNavigationView.setOnItemSelectedListener(this);
 
-        // prevent fragment overlapping issue see https://stackoverflow.com/a/54978055/9193164
-        // make sure we add fragments once (i-e when Activity is created first time) not when activity state is restored after destroying
-        if(savedInstanceState == null)
-            setupFragments();
+
+        serviceBindHelper = new ServiceBindHelper(
+                getApplicationContext(),
+                this,
+                SensorService.class
+        );
+
+
+        viewPager = findViewById(R.id.view_pager);
+        viewPager.setUserInputEnabled(false);
+        viewPager.setAdapter(new MyFragmentStateAdapter(this));
+
+
+
+
     }
 
-    private void setupFragments()
+    @Override
+    public void onConnectionCountChange(int totalConnections)
     {
-        serverFragment = new ServerFragment();
-        settingsFragment = new SettingsFragment();
-        connectionsFragment = new ConnectionsFragment();
-        availableSensorsFragment = new AvailableSensorsFragment();
+        Log.d(TAG, "onConnectionCountChange() called with: totalConnections = [" + totalConnections + "]");
 
-        /*
-            when user click connection item from ConnectionsFragments
-            ServerFragment will catch that click event and prompts if user wants to close selected connection
-            its because ServerFragment holds reference to SensorWebSocketServer's object
-         */
-        connectionsFragment.setOnConnectionItemClickedListener(serverFragment);
-
-        // ServerFragment hold reference to server object therefore to get a connection info list from server, client must register to ServerFragment
-        serverFragment.setConnectionInfoListener(connectionsFragment);
-        serverFragment.setConnectionCountListener((totalConnections)->{
-            runOnUiThread(()->{
-
-                if(totalConnections > 0)
-                    bottomNavigationView.getOrCreateBadge(R.id.navigation_connections).setNumber(totalConnections);
-                else
-                    bottomNavigationView.removeBadge(R.id.navigation_connections);
-            });
-        });
-
-
-        getSupportFragmentManager().beginTransaction()
-                .add(R.id.fragment_container, serverFragment, null)
-                .hide(serverFragment)
-                .commit();
-
-        getSupportFragmentManager().beginTransaction()
-                .add(R.id.fragment_container, settingsFragment, null)
-                .hide(settingsFragment)
-                .commit();
-
-        getSupportFragmentManager().beginTransaction()
-                .add(R.id.fragment_container, availableSensorsFragment, null)
-                .hide(availableSensorsFragment)
-                .commit();
-
-        getSupportFragmentManager().beginTransaction()
-                .add(R.id.fragment_container, connectionsFragment,null)
-                .hide(connectionsFragment)
-                .commit();
-
-
-        getSupportFragmentManager().beginTransaction()
-                .show(serverFragment)
-                .commit();
-
-        activeFragment = serverFragment;
-
-        // transaction.commit() is non blocking call therefore we need to make sure no transaction is pending
-        getSupportFragmentManager().executePendingTransactions();
+        runOnUiThread(()-> setConnectionCountBadge(totalConnections) );
 
     }
+
+    @Override
+    public void onServiceConnected(ComponentName name, IBinder service)
+    {
+        serviceBindHelper.setBounded(true);
+        Log.d(TAG, "onServiceConnected() called with: name = [" + name + "], service = [" + service + "]");
+        SensorService.LocalBinder localBinder = (SensorService.LocalBinder) service;
+
+         sensorService = localBinder.getService();
+        Log.i(TAG, "service instance : " + sensorService);
+        if(sensorService != null)
+        {
+            setConnectionCountBadge(sensorService.getConnectionCount());
+
+            sensorService.setConnectionCountChangeListener(this);
+        }
+
+    }
+
+    @Override
+    public void onServiceDisconnected(ComponentName name)
+    {
+        Log.d(TAG, "onServiceDisconnected()");
+        serviceBindHelper.setBounded(false);
+    }
+
+
+    @Override
+    protected void onPause()
+    {
+        super.onPause();
+        Log.d(TAG, "onPause() called");
+
+
+        if(sensorService != null)
+            sensorService.setConnectionCountChangeListener(null);
+
+        serviceBindHelper.unBindFromService();
+
+    }
+
+    @Override
+    protected void onResume()
+    {
+        super.onResume();
+        Log.d(TAG, "onResume() called");
+
+        serviceBindHelper.bindToService();
+    }
+
+    @Override
+    protected void onDestroy()
+    {
+        super.onDestroy();
+        Log.d(TAG, "onDestroy()");
+
+        serviceBindHelper.unBindFromService();
+
+
+    }
+
+    private void setConnectionCountBadge(int totalConnections)
+    {
+        if(totalConnections > 0)
+            bottomNavigationView.getOrCreateBadge(R.id.navigation_connections).setNumber(totalConnections);
+        else
+            bottomNavigationView.removeBadge(R.id.navigation_connections);
+    }
+
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item)
     {
 
         switch (item.getItemId())
         {
-
-            case R.id.navigation_server:
-                getSupportFragmentManager().beginTransaction()
-                        .hide(activeFragment)
-                        .show(serverFragment)
-                        .commit();
-                activeFragment = serverFragment;
-                getSupportActionBar().setTitle("Sensor Server");
-                return true;
-
             case R.id.navigation_settings:
-                getSupportFragmentManager().beginTransaction()
-                        .hide(activeFragment)
-                        .show(settingsFragment)
-                        .commit();
-                activeFragment = settingsFragment;
+                viewPager.setCurrentItem(POSITION_SETTING_FRAGMENT,false);
                 getSupportActionBar().setTitle("Settings");
                 return true;
 
 
             case R.id.navigation_available_sensors:
-                getSupportFragmentManager().beginTransaction()
-                        .hide(activeFragment)
-                        .show(availableSensorsFragment)
-                        .commit();
-                activeFragment = availableSensorsFragment;
+                viewPager.setCurrentItem(POSITION_AVAILABLE_SENSORS_FRAGMENT,false);
                 getSupportActionBar().setTitle("Available Sensors");
                 return true;
 
             case R.id.navigation_connections:
-                getSupportFragmentManager().beginTransaction()
-                        .hide(activeFragment)
-                        .show(connectionsFragment)
-                        .commit();
-                activeFragment = connectionsFragment;
+                viewPager.setCurrentItem(POSITION_CONNECTIONS_FRAGMENT,false);
                 getSupportActionBar().setTitle("Connections");
                 return true;
+
+            case R.id.navigation_server:
+                viewPager.setCurrentItem(POSITION_SERVER_FRAGMENT,false);
+                getSupportActionBar().setTitle("Sensor Server");
+                return true;
+
         }
 
 
         return false;
     }
 
-    /**
-     *  onBackPressed() invokes finish() which in result invoked onDestroy()
-     *  so to prevent activity from destroying when user presses back button, we must move activity as back task
-     */
-    @Override
-    public void onBackPressed()
-    {
-        moveTaskToBack(true);
+
+    private class MyFragmentStateAdapter extends FragmentStateAdapter {
+
+
+        public MyFragmentStateAdapter(@NonNull FragmentActivity fragmentActivity)
+        {
+            super(fragmentActivity);
+        }
+
+        @Override
+        public Fragment createFragment(int pos) {
+
+            switch(pos)
+            {
+
+                case POSITION_SERVER_FRAGMENT:return new ServerFragment();
+                case POSITION_SETTING_FRAGMENT: return new SettingsFragment();
+                case POSITION_CONNECTIONS_FRAGMENT: return new ConnectionsFragment();
+                case POSITION_AVAILABLE_SENSORS_FRAGMENT: return new AvailableSensorsFragment();
+
+            }
+
+            return new ServerFragment();
+        }
+
+        @Override
+        public int getItemCount() {
+            return 4;
+        }
     }
+
+
 }
