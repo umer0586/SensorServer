@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="github.umer0586">
 
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
@@ -15,16 +16,16 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.SensorServer">
+        <service
+            android:name=".service.SensorService"
+            android:enabled="true"
+            android:exported="false"></service>
 
-        <!--
-            see https://stackoverflow.com/a/51963216/9193164 for launchMode="singleTask"
-            app work fine while debugging but when an apk is generated app recreates activity when back button is pressed
-         -->
         <activity
             android:name=".activity.FragmentNavigationActivity"
+            android:exported="true"
             android:launchMode="singleTask"
-            android:screenOrientation="portrait"
-            android:exported="true" >
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
