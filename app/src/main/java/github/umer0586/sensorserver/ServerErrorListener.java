@@ -1,5 +1,5 @@
 package github.umer0586.sensorserver;
 
-public interface OnServerErrorListener {
+public interface ServerErrorListener {
     void onError(Exception ex);
 }
