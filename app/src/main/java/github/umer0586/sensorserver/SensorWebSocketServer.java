@@ -45,12 +45,14 @@ public class SensorWebSocketServer extends WebSocketServer implements SensorEven
     private List<Sensor> registeredSensors;
 
     //Callbacks
-    private OnServerStartListener onServerStartListener;
-    private OnServerStopppedListener onServerStopppedListener;
-    private ConnectionInfoListener connectionInfoListener;
-    private OnServerErrorListener onServerErrorListener;
+    private ServerStartListener serverStartListener;
+    private ServerStopListener serverStopListener;
+    private ConnectionInfoChangeListener connectionInfoChangeListener;
+    private ServerErrorListener serverErrorListener;
+    private ConnectionCountChangeListener connectionCountChangeListener;
 
     private boolean serverStartUpFailed = false;
+    private boolean isRunning = false;
 
     //websocket close codes ranging 4000 - 4999 are for application's custom messages
     private static final int CLOSE_CODE_SENSOR_NOT_FOUND = 4001;
@@ -240,8 +242,8 @@ public class SensorWebSocketServer extends WebSocketServer implements SensorEven
                 always invokes stop() whether server is running or not,
                 So onError() would invoke stop() when some exception like BindException occurs (because of port already in use)
             */
-            if (onServerErrorListener != null)
-                onServerErrorListener.onError(ex); // listener must filter exception by itself
+            if (serverErrorListener != null)
+                serverErrorListener.onError(ex); // listener must filter exception by itself
 
             serverStartUpFailed = true; // we will use this in stop() method to check if there was an exception during server startup
         }
@@ -254,11 +256,13 @@ public class SensorWebSocketServer extends WebSocketServer implements SensorEven
     public void onStart()
     {
 
-        if(this.onServerStartListener != null)
-            this.onServerStartListener.onServerStarted();
+        if(this.serverStartListener != null)
+            this.serverStartListener.onServerStarted(getAddress().getHostName(),getPort());
 
+        isRunning = true;
         Log.i(TAG,"server started successfully " + this.getAddress());
         Log.i(TAG, "sampling rate " + getSamplingRate());
+
     }
 
    @Override
@@ -268,12 +272,19 @@ public class SensorWebSocketServer extends WebSocketServer implements SensorEven
         super.stop();
         Log.d(TAG, "stop() called");
 
-            if( onServerStopppedListener != null && !serverStartUpFailed )
-                this.onServerStopppedListener.onServerStopped();
+            if( serverStopListener != null && !serverStartUpFailed )
+                this.serverStopListener.onServerStopped();
 
             if(handlerThread.isAlive())
                 handlerThread.quitSafely();
 
+        isRunning = false;
+
+    }
+
+    public boolean isRunning()
+    {
+        return isRunning;
     }
 
     /*
@@ -372,13 +383,39 @@ public class SensorWebSocketServer extends WebSocketServer implements SensorEven
         // converting List to Set removes those duplicate entries
         Set<Sensor> sensorsSet = new HashSet<Sensor>( new ArrayList<>(registeredSensors));
 
+        ArrayList<ConnectionInfo> connectionInfoArrayList = new ArrayList<>();
+
+        for(Sensor sensor : sensorsSet)
+            connectionInfoArrayList.add( new ConnectionInfo(sensor, getClientsAddressBySensor(sensor) ) );
+
+        if(connectionInfoChangeListener != null)
+            this.connectionInfoChangeListener.onConnectionInfoChanged(connectionInfoArrayList);
+
+
+        if( connectionCountChangeListener != null)
+        {
+            int totalConnections = 0;
+            for(ConnectionInfo connectionInfo : connectionInfoArrayList)
+                totalConnections += connectionInfo.getSensorConnectionCount();
+
+            connectionCountChangeListener.onConnectionCountChange(totalConnections);
+
+        }
+    }
+
+    public ArrayList<ConnectionInfo> getConnectionInfoList()
+    {
+        // registeredSensors (List) may contain duplicate entry (too keep track of sensor usage count) ,
+        // converting List to Set removes those duplicate entries
+        Set<Sensor> sensorsSet = new HashSet<Sensor>( new ArrayList<>(registeredSensors));
+
         ArrayList<ConnectionInfo> connectionInfos = new ArrayList<>();
 
         for(Sensor sensor : sensorsSet)
             connectionInfos.add( new ConnectionInfo(sensor, getClientsAddressBySensor(sensor) ) );
 
-        if(connectionInfoListener != null)
-            this.connectionInfoListener.onConnectionInfo(connectionInfos);
+        return connectionInfos;
+
     }
 
     public int getConnectionCount()
@@ -405,23 +442,28 @@ public class SensorWebSocketServer extends WebSocketServer implements SensorEven
     }
 
 
-    public void setOnServerStartListener(OnServerStartListener onServerStartListener)
+    public void setServerStartListener(ServerStartListener serverStartListener)
     {
-        this.onServerStartListener = onServerStartListener;
+        this.serverStartListener = serverStartListener;
     }
 
-    public void setOnServerStopped(OnServerStopppedListener onServerStopppedListener)
+    public void setServerStopListener(ServerStopListener serverStopListener)
     {
-        this.onServerStopppedListener = onServerStopppedListener;
+        this.serverStopListener = serverStopListener;
     }
 
-    public void setConnectionInfoListener(ConnectionInfoListener connectionInfoListener)
+    public void setConnectionInfoChangeListener(ConnectionInfoChangeListener connectionInfoChangeListener)
     {
-        this.connectionInfoListener = connectionInfoListener;
+        this.connectionInfoChangeListener = connectionInfoChangeListener;
     }
 
-    public void setOnServerError(OnServerErrorListener onServerErrorListener)
+    public void setServerErrorListener(ServerErrorListener serverErrorListener)
     {
-        this.onServerErrorListener = onServerErrorListener;
+        this.serverErrorListener = serverErrorListener;
+    }
+
+    public void setConnectionCountChangeListener(ConnectionCountChangeListener connectionCountChangeListener)
+    {
+        this.connectionCountChangeListener = connectionCountChangeListener;
     }
 }
