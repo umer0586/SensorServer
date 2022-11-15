@@ -10,8 +10,6 @@ import androidx.preference.EditTextPreference;
 import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.SwitchPreferenceCompat;
 
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import github.umer0586.R;
 
 public class SettingsFragment extends PreferenceFragmentCompat {
