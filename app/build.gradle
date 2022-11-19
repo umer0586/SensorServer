@@ -10,8 +10,8 @@ android {
         minSdk 21
         targetSdk 31
         multiDexEnabled true
-        versionCode 8
-        versionName "2.0.0"
+        versionCode 9
+        versionName "2.1.0"
 
 
     }
@@ -31,6 +31,9 @@ android {
         viewBinding true
     }*/
 }
+apply plugin: "com.android.application"
+// Apply the Bugsnag plugin
+apply plugin: "com.bugsnag.android.gradle"
 
 dependencies {
 
@@ -48,6 +51,8 @@ dependencies {
     implementation "org.java-websocket:Java-WebSocket:1.5.1"
 
     implementation 'com.github.ybq:Android-SpinKit:1.4.0'
+
+    implementation "com.bugsnag:bugsnag-android:5.+"
 
 }
 
