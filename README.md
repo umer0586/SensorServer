@@ -107,8 +107,6 @@ if __name__ == "__main__":
 
     ws.run_forever()
  
- # To analyse multiple sensor data simultaneously, you can add as many websocket connections for different sensors as you want. 
-
 ```
 There is another python websocket API which is based on `asyncio` [https://github.com/aaugustin/websockets](https://github.com/aaugustin/websockets)
 
