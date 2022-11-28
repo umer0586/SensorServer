@@ -108,6 +108,7 @@ public class SensorService extends Service implements MessageReceiver.MessageLis
     {
 
         Log.d(TAG, "onStartCommand()");
+        handleAndroid8andAbove();
 
 
         boolean localHostPref = sharedPreferences.getBoolean(getString(R.string.pref_key_localhost),false);
@@ -129,7 +130,7 @@ public class SensorService extends Service implements MessageReceiver.MessageLis
             if(serverErrorListener != null)
                 serverErrorListener.onError(new UnknownHostException());
 
-            handleAndroid8andAbove();
+
             stopForeground(true);
 
             return START_NOT_STICKY;
@@ -242,7 +243,7 @@ public class SensorService extends Service implements MessageReceiver.MessageLis
                     .setContentText("").build();
 
             startForeground(TEMP_NOTIFICATION_ID, tempNotification);
-            //stopForeground(true);
+            stopForeground(true);
 
 
         }
