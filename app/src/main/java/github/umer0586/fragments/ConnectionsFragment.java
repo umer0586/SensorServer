@@ -58,6 +58,8 @@ public class ConnectionsFragment extends ListFragment
                 this,
                 SensorService.class
         );
+
+        getLifecycle().addObserver(serviceBindHelper);
     }
 
 
@@ -65,35 +67,27 @@ public class ConnectionsFragment extends ListFragment
     public void onPause()
     {
         super.onPause();
-        Log.d(TAG, "onPause() called");
+        Log.d(TAG, "onPause()");
 
         if(sensorService != null)
             sensorService.setConnectionInfoChangeListener(null);
 
-        serviceBindHelper.unBindFromService();
     }
-
 
     @Override
-    public void onResume()
+    public void onDestroy()
     {
-        super.onResume();
-        Log.d(TAG, "onResume() called");
-
-        serviceBindHelper.bindToService();
-
+        super.onDestroy();
+        getLifecycle().removeObserver(serviceBindHelper);
     }
+
 
     @Override
     public void onServiceConnected(ComponentName name, IBinder service)
     {
-        serviceBindHelper.setBounded(true);
-        Log.d(TAG, "onServiceConnected() called with: name = [" + name + "], service = [" + service + "]");
+
         SensorService.LocalBinder localBinder = (SensorService.LocalBinder) service;
-
         sensorService =  localBinder.getService();
-        Log.d(TAG, "service instance : " + service);
-
 
         if(sensorService != null)
         {
@@ -112,8 +106,7 @@ public class ConnectionsFragment extends ListFragment
     @Override
     public void onServiceDisconnected(ComponentName name)
     {
-        Log.d(TAG, "onServiceDisconnected() called with: name = [" + name + "]");
-        serviceBindHelper.setBounded(false);
+
     }
 
 

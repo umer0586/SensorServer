@@ -1,11 +1,21 @@
 package github.umer0586.service;
 
 import android.app.Service;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.os.IBinder;
+import android.util.Log;
 
-public class ServiceBindHelper {
+import androidx.annotation.NonNull;
+import androidx.lifecycle.Lifecycle;
+import androidx.lifecycle.LifecycleEventObserver;
+import androidx.lifecycle.LifecycleOwner;
+
+public class ServiceBindHelper implements ServiceConnection, LifecycleEventObserver {
+
+    private static final String TAG = ServiceBindHelper.class.getSimpleName();
 
     private boolean bounded = false;
     private Context context;
@@ -23,22 +33,54 @@ public class ServiceBindHelper {
 
     public void bindToService()
     {
+        Log.d(TAG, "bindToService()");
+
         Intent intent = new Intent(this.context, this.service);
-        context.bindService(intent, this.serviceConnection, Context.BIND_AUTO_CREATE);
+        context.bindService(intent, this, Context.BIND_AUTO_CREATE);
         bounded = true;
     }
 
     public void unBindFromService()
     {
+        Log.d(TAG, "unBindFromService()");
         if(bounded)
         {
-            context.unbindService(this.serviceConnection);
+            context.unbindService(this);
             bounded = false;
         }
     }
 
-    public void setBounded(boolean bounded)
+    @Override
+    public void onServiceConnected(ComponentName name, IBinder service)
     {
-        this.bounded = bounded;
+        Log.d(TAG, "onServiceConnected()");
+
+        bounded = true;
+        if(serviceConnection != null)
+            serviceConnection.onServiceConnected(name,service);
+
+    }
+
+    @Override
+    public void onServiceDisconnected(ComponentName name)
+    {
+        Log.d(TAG, "onServiceDisconnected()");
+
+        bounded = false;
+        if(serviceConnection != null)
+            serviceConnection.onServiceDisconnected(name);
+
+    }
+
+    @Override
+    public void onStateChanged(@NonNull LifecycleOwner source, @NonNull Lifecycle.Event event)
+    {
+        Log.d(TAG + " : " + source.getClass().getSimpleName(), event.name());
+
+        if(event == Lifecycle.Event.ON_RESUME)
+            bindToService();
+        else if(event == Lifecycle.Event.ON_PAUSE)
+            unBindFromService();
+
     }
 }

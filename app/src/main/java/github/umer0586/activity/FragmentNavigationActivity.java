@@ -62,6 +62,8 @@ public class FragmentNavigationActivity extends AppCompatActivity
                 SensorService.class
         );
 
+        getLifecycle().addObserver(serviceBindHelper);
+
 
         viewPager = findViewById(R.id.view_pager);
         viewPager.setUserInputEnabled(false);
@@ -84,12 +86,9 @@ public class FragmentNavigationActivity extends AppCompatActivity
     @Override
     public void onServiceConnected(ComponentName name, IBinder service)
     {
-        serviceBindHelper.setBounded(true);
-        Log.d(TAG, "onServiceConnected() called with: name = [" + name + "], service = [" + service + "]");
         SensorService.LocalBinder localBinder = (SensorService.LocalBinder) service;
+        sensorService = localBinder.getService();
 
-         sensorService = localBinder.getService();
-        Log.i(TAG, "service instance : " + sensorService);
         if(sensorService != null)
         {
             setConnectionCountBadge(sensorService.getConnectionCount());
@@ -102,8 +101,7 @@ public class FragmentNavigationActivity extends AppCompatActivity
     @Override
     public void onServiceDisconnected(ComponentName name)
     {
-        Log.d(TAG, "onServiceDisconnected()");
-        serviceBindHelper.setBounded(false);
+
     }
 
 
@@ -111,24 +109,15 @@ public class FragmentNavigationActivity extends AppCompatActivity
     protected void onPause()
     {
         super.onPause();
-        Log.d(TAG, "onPause() called");
+        Log.d(TAG, "onPause()");
 
 
         if(sensorService != null)
             sensorService.setConnectionCountChangeListener(null);
 
-        serviceBindHelper.unBindFromService();
 
     }
 
-    @Override
-    protected void onResume()
-    {
-        super.onResume();
-        Log.d(TAG, "onResume() called");
-
-        serviceBindHelper.bindToService();
-    }
 
     @Override
     protected void onDestroy()
@@ -136,7 +125,7 @@ public class FragmentNavigationActivity extends AppCompatActivity
         super.onDestroy();
         Log.d(TAG, "onDestroy()");
 
-        serviceBindHelper.unBindFromService();
+        getLifecycle().removeObserver(serviceBindHelper);
 
 
     }

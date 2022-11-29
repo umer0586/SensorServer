@@ -85,6 +85,8 @@ public class ServerFragment extends Fragment
                 SensorService.class
         );
 
+        getLifecycle().addObserver(serviceBindHelper);
+
 
         hidePulseAnimation();
         hideServerAddress();
@@ -146,7 +148,7 @@ public class ServerFragment extends Fragment
     public void onPause()
     {
         super.onPause();
-        Log.d(TAG, "onPause() called");
+        Log.d(TAG, "onPause()");
 
         if(sensorService != null)
         {
@@ -154,17 +156,6 @@ public class ServerFragment extends Fragment
             sensorService.setServerStopListener(null);
             sensorService.setServerErrorListener(null);
         }
-
-        serviceBindHelper.unBindFromService();
-    }
-
-    @Override
-    public void onResume()
-    {
-        super.onResume();
-        Log.d(TAG, "onResume() called");
-
-        serviceBindHelper.bindToService();
 
     }
 
@@ -263,15 +254,9 @@ public class ServerFragment extends Fragment
     @Override
     public void onServiceConnected(ComponentName name, IBinder service)
     {
-        serviceBindHelper.setBounded(true);
-        Log.d(TAG, "onServiceConnected()");
 
         SensorService.LocalBinder localBinder = (SensorService.LocalBinder) service;
         sensorService =  localBinder.getService();
-
-
-
-        Log.d(TAG, "service instance : " + service);
 
         if(sensorService != null)
         {
@@ -286,22 +271,22 @@ public class ServerFragment extends Fragment
                 if(sensorWebSocketServer.isRunning())
                     onServerAlreadyRunning(sensorWebSocketServer.getAddress().getHostName(),sensorWebSocketServer.getPort());
 
-
-
         }
-
-
-
 
     }
 
     @Override
     public void onServiceDisconnected(ComponentName name)
     {
-        Log.d(TAG, "onServiceDisconnected() called with: name = [" + name + "]");
-        serviceBindHelper.setBounded(false);
+
     }
 
+    @Override
+    public void onDestroy()
+    {
+        super.onDestroy();
+        getLifecycle().removeObserver(serviceBindHelper);
+    }
 
     private void showMessage(String message)
     {
