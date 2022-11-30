@@ -243,7 +243,7 @@ public class SensorWebSocketServer extends WebSocketServer implements SensorEven
                 So onError() would invoke stop() when some exception like BindException occurs (because of port already in use)
             */
             if (serverErrorListener != null)
-                serverErrorListener.onError(ex); // listener must filter exception by itself
+                serverErrorListener.onServerError(ex); // listener must filter exception by itself
 
             serverStartUpFailed = true; // we will use this in stop() method to check if there was an exception during server startup
         }
@@ -257,7 +257,10 @@ public class SensorWebSocketServer extends WebSocketServer implements SensorEven
     {
 
         if(this.serverStartListener != null)
-            this.serverStartListener.onServerStarted(getAddress().getHostName(),getPort());
+        {
+            ServerInfo serverInfo = new ServerInfo(getAddress().getHostName(),getPort());
+            this.serverStartListener.onServerStarted(serverInfo);
+        }
 
         isRunning = true;
         Log.i(TAG,"server started successfully " + this.getAddress());

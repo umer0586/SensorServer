@@ -28,17 +28,14 @@ import java.net.BindException;
 import java.net.UnknownHostException;
 
 import github.umer0586.R;
-import github.umer0586.sensorserver.SensorWebSocketServer;
-import github.umer0586.sensorserver.ServerErrorListener;
-import github.umer0586.sensorserver.ServerStartListener;
-import github.umer0586.sensorserver.ServerStopListener;
+import github.umer0586.sensorserver.ServerInfo;
 import github.umer0586.service.SensorService;
 import github.umer0586.service.ServiceBindHelper;
 import github.umer0586.util.UIUtil;
 
 
 public class ServerFragment extends Fragment
-        implements ServiceConnection, ServerStartListener, ServerStopListener, ServerErrorListener {
+        implements ServiceConnection, SensorService.ServerStateListener {
 
     private static final String TAG = ServerFragment.class.getSimpleName();
 
@@ -136,8 +133,7 @@ public class ServerFragment extends Fragment
 
     private void stopServer()
     {
-        Log.d(TAG, "stopServer() called");
-
+        Log.d(TAG, "stopServer()");
 
        // getContext().stopService(new Intent(getContext(),SensorService.class));
         getContext().sendBroadcast(new Intent(SensorService.ACTION_STOP_SERVER));
@@ -151,21 +147,18 @@ public class ServerFragment extends Fragment
         Log.d(TAG, "onPause()");
 
         if(sensorService != null)
-        {
-            sensorService.setServerStartListener(null);
-            sensorService.setServerStopListener(null);
-            sensorService.setServerErrorListener(null);
-        }
+            sensorService.setServerStateListener(null);
+
 
     }
 
     @Override
-    public void onServerStarted(String IP, int port)
+    public void onServerStarted(ServerInfo serverInfo)
     {
         Log.d(TAG, "onServerStarted() called");
         UIUtil.runOnUiThread(()->{
 
-            showServerAddress("ws://"+IP+":"+port);
+            showServerAddress("ws://"+serverInfo.getIpAddress()+":"+serverInfo.getPort());
             showPulseAnimation();
 
             startButton.setTag("started");
@@ -196,7 +189,7 @@ public class ServerFragment extends Fragment
 
 
     @Override
-    public void onError(Exception exception)
+    public void onServerError(Exception exception)
     {
 
         UIUtil.runOnUiThread(()->{
@@ -223,12 +216,12 @@ public class ServerFragment extends Fragment
 
     }
 
-    // called through on onServiceConnected()
-    public void onServerAlreadyRunning(String IP, int port)
+    @Override
+    public void onServerAlreadyRunning(ServerInfo serverInfo)
     {
         Log.d(TAG, "onServerAlreadyRunning() called");
         UIUtil.runOnUiThread(()->{
-            showServerAddress("ws://"+IP+":"+port);
+            showServerAddress("ws://"+serverInfo.getIpAddress()+":"+serverInfo.getPort());
             Toast.makeText(getContext(),"service running",Toast.LENGTH_SHORT).show();
             startButton.setTag("started");
             startButton.setText("STOP");
@@ -260,17 +253,8 @@ public class ServerFragment extends Fragment
 
         if(sensorService != null)
         {
-
-            sensorService.setServerStartListener(this);
-            sensorService.setServerStopListener(this);
-            sensorService.setServerErrorListener(this);
-
-            SensorWebSocketServer  sensorWebSocketServer = sensorService.getSensorWebSocketServer();
-
-            if(sensorWebSocketServer != null)
-                if(sensorWebSocketServer.isRunning())
-                    onServerAlreadyRunning(sensorWebSocketServer.getAddress().getHostName(),sensorWebSocketServer.getPort());
-
+            sensorService.setServerStateListener(this);
+            sensorService.isServerRunning(); // this callbacks onServerAlreadyRunning()
         }
 
     }

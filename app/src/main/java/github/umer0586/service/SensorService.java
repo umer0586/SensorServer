@@ -6,8 +6,6 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.hardware.Sensor;
 import android.os.Binder;
 import android.os.Build;
 import android.os.IBinder;
@@ -26,9 +24,8 @@ import github.umer0586.sensorserver.ConnectionCountChangeListener;
 import github.umer0586.sensorserver.ConnectionInfo;
 import github.umer0586.sensorserver.ConnectionInfoChangeListener;
 import github.umer0586.sensorserver.SensorWebSocketServer;
-import github.umer0586.sensorserver.ServerErrorListener;
-import github.umer0586.sensorserver.ServerStartListener;
-import github.umer0586.sensorserver.ServerStopListener;
+import github.umer0586.sensorserver.ServerInfo;
+import github.umer0586.setting.AppSettings;
 import github.umer0586.util.IpUtil;
 
 public class SensorService extends Service implements MessageReceiver.MessageListener {
@@ -37,7 +34,7 @@ public class SensorService extends Service implements MessageReceiver.MessageLis
 
 
     private SensorWebSocketServer sensorWebSocketServer;
-    private SharedPreferences sharedPreferences;
+    private AppSettings appSettings;
 
     // Binder given to clients
     private final IBinder binder = new LocalBinder();
@@ -57,21 +54,28 @@ public class SensorService extends Service implements MessageReceiver.MessageLis
 
 
     //Callbacks
-    private ServerStartListener serverStartListener;
-    private ServerStopListener serverStopListener;
+
+    private ServerStateListener serverStateListener;
+
     private ConnectionInfoChangeListener connectionInfoChangeListener;
-    private ServerErrorListener serverErrorListener;
     private ConnectionCountChangeListener connectionCountChangeListener;
+
+    public interface ServerStateListener {
+        void onServerStarted(ServerInfo serverInfo);
+        void onServerStopped();
+        void onServerError(Exception ex);
+        void onServerAlreadyRunning(ServerInfo serverInfo);
+    }
 
 
     @Override
     public void onCreate()
     {
         super.onCreate();
-        Log.d(TAG, "onCreate() called");
+        Log.d(TAG, "onCreate()");
 
         createNotificationChannel();
-        sharedPreferences = getApplicationContext().getSharedPreferences(getString(R.string.shared_pref_file),getApplicationContext().MODE_PRIVATE);
+        appSettings = new AppSettings(getApplicationContext());
 
 
         messageReceiver = new MessageReceiver(getApplicationContext());
@@ -111,13 +115,11 @@ public class SensorService extends Service implements MessageReceiver.MessageLis
         handleAndroid8andAbove();
 
 
-        boolean localHostPref = sharedPreferences.getBoolean(getString(R.string.pref_key_localhost),false);
-
         String ipAddress = null;
 
         // is "local host" switch in enable
         // no need to check for wifi network
-        if(localHostPref)
+        if(appSettings.isLocalHostOptionEnable())
             ipAddress = "127.0.0.1"; // use loopback address
         else // check wifi
             ipAddress = IpUtil.getWifiIpAddress(getApplicationContext());
@@ -127,8 +129,8 @@ public class SensorService extends Service implements MessageReceiver.MessageLis
         {
             Log.i(TAG, "hostIP = null");
 
-            if(serverErrorListener != null)
-                serverErrorListener.onError(new UnknownHostException());
+            if(serverStateListener != null)
+                serverStateListener.onServerError(new UnknownHostException());
 
 
             stopForeground(true);
@@ -136,7 +138,7 @@ public class SensorService extends Service implements MessageReceiver.MessageLis
             return START_NOT_STICKY;
         }
 
-        int portNo = sharedPreferences.getInt(getString(R.string.pref_key_port_no),8081);
+        int portNo = appSettings.getPortNo();
 
         sensorWebSocketServer = new SensorWebSocketServer(
                 getApplicationContext(),
@@ -144,10 +146,10 @@ public class SensorService extends Service implements MessageReceiver.MessageLis
         );
 
 
-        sensorWebSocketServer.setServerStartListener((hostIP, port)->{
+        sensorWebSocketServer.setServerStartListener((serverInfo)->{
 
-          if(serverStartListener != null)
-                serverStartListener.onServerStarted(hostIP,port);
+          if(serverStateListener != null)
+              serverStateListener.onServerStarted(serverInfo);
 
             Intent notificationIntent = new Intent(this, FragmentNavigationActivity.class);
             PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_IMMUTABLE);
@@ -155,7 +157,7 @@ public class SensorService extends Service implements MessageReceiver.MessageLis
             NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(getApplicationContext(), CHANNEL_ID)
                     .setSmallIcon(R.drawable.ic_signal)
                     .setContentTitle("Sensor Server Running...")
-                    .setContentText("ws://"+hostIP+":"+port)
+                    .setContentText("ws://"+serverInfo.getIpAddress()+":"+serverInfo.getPort())
                     .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                     // Set the intent that will fire when the user taps the notification
                     .setContentIntent(pendingIntent)
@@ -170,8 +172,8 @@ public class SensorService extends Service implements MessageReceiver.MessageLis
 
         sensorWebSocketServer.setServerStopListener(()->{
 
-            if(serverStopListener != null)
-                serverStopListener.onServerStopped();
+            if(serverStateListener != null)
+                serverStateListener.onServerStopped();
 
             //remove the service from foreground but don't stop (destroy) the service
             stopForeground(true);
@@ -179,8 +181,8 @@ public class SensorService extends Service implements MessageReceiver.MessageLis
         });
         sensorWebSocketServer.setServerErrorListener((exception)->{
 
-            if(serverErrorListener != null)
-                serverErrorListener.onError(exception);
+            if(serverStateListener != null)
+                serverStateListener.onServerError(exception);
 
             stopForeground(true);
 
@@ -194,9 +196,7 @@ public class SensorService extends Service implements MessageReceiver.MessageLis
                     connectionInfoChangeListener.onConnectionInfoChanged(connectionInfoList);
         });
 
-        int samplingRate = sharedPreferences.getInt(getString(R.string.pref_key_sampling_rate),200000);
-
-        sensorWebSocketServer.setSamplingRate(samplingRate);
+        sensorWebSocketServer.setSamplingRate(appSettings.getSamplingRate());
 
         sensorWebSocketServer.run();
 
@@ -253,7 +253,7 @@ public class SensorService extends Service implements MessageReceiver.MessageLis
     public void onDestroy()
     {
         super.onDestroy();
-        Log.d(TAG, "onDestroy() called");
+        Log.d(TAG, "onDestroy()");
 
 
         if (sensorWebSocketServer != null)
@@ -295,6 +295,20 @@ public class SensorService extends Service implements MessageReceiver.MessageLis
         return sensorWebSocketServer != null ? sensorWebSocketServer.getConnectionInfoList() : null;
     }
 
+    public void isServerRunning()
+    {
+        if(sensorWebSocketServer != null && sensorWebSocketServer.isRunning())
+        {
+            if(serverStateListener != null)
+            {
+                ServerInfo serverInfo = new ServerInfo(sensorWebSocketServer.getAddress().getHostName(),sensorWebSocketServer.getPort());
+                serverStateListener.onServerAlreadyRunning(serverInfo);
+
+            }
+
+        }
+    }
+
 
     /**
      * Class used for the client Binder.  Because we know this service always
@@ -315,25 +329,13 @@ public class SensorService extends Service implements MessageReceiver.MessageLis
         this.connectionCountChangeListener = connectionCountChangeListener;
     }
 
-    public void setServerStartListener(ServerStartListener serverStartListener)
-    {
-        this.serverStartListener = serverStartListener;
-    }
-
-    public void setServerStopListener(ServerStopListener serverStopListener)
-    {
-        this.serverStopListener = serverStopListener;
-    }
-
     public void setConnectionInfoChangeListener(ConnectionInfoChangeListener connectionInfoChangeListener)
     {
        this.connectionInfoChangeListener = connectionInfoChangeListener;
     }
 
-    public void setServerErrorListener(ServerErrorListener serverErrorListener)
+    public void setServerStateListener(ServerStateListener serverStateListener)
     {
-        this.serverErrorListener = serverErrorListener;
+        this.serverStateListener = serverStateListener;
     }
-
-
 }
