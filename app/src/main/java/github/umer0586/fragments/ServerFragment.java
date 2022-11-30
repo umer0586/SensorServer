@@ -21,6 +21,7 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import com.github.ybq.android.spinkit.SpinKitView;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.snackbar.Snackbar;
 
@@ -40,6 +41,7 @@ public class ServerFragment extends Fragment
     private static final String TAG = ServerFragment.class.getSimpleName();
 
     private SensorService sensorService;
+    private ServiceBindHelper serviceBindHelper;
 
     // Button at center to start/stop server
     private MaterialButton startButton;
@@ -47,14 +49,11 @@ public class ServerFragment extends Fragment
     // Address of server (ws://192.168.2.1:8081)
     private TextView serverAddress;
 
-
     // card view which holds serverAddress
     private CardView cardView;
 
     //Ripple animation behind startButton
     private SpinKitView pulseAnimation;
-
-    private ServiceBindHelper serviceBindHelper;
 
 
     @Override
@@ -119,7 +118,7 @@ public class ServerFragment extends Fragment
 
         if(!wifiManager.isWifiEnabled())
         {
-            Snackbar.make(getView(),"Please enable Wi-Fi",Snackbar.LENGTH_SHORT).show();
+            showMessage("Please enable Wi-Fi");
             return;
         }
 
@@ -274,10 +273,17 @@ public class ServerFragment extends Fragment
 
     private void showMessage(String message)
     {
+
         View view = getView();
         Context context = getContext();
+
         if(view != null)
-          Snackbar.make(view,message,Snackbar.LENGTH_SHORT).show();
+        {
+            Snackbar snackbar = Snackbar.make(view, message, Snackbar.LENGTH_SHORT);
+            //R.id.nav_bar is in FragmentNavigationActivity
+            snackbar.setAnchorView(R.id.nav_bar);
+            snackbar.show();
+        }
         else if( context != null)
            Toast.makeText(context,message,Toast.LENGTH_SHORT).show();
         else
