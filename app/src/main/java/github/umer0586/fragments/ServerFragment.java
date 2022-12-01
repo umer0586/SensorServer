@@ -115,7 +115,8 @@ public class ServerFragment extends Fragment
         Log.d(TAG, "startServer() called");
 
         WifiManager wifiManager = (WifiManager) getContext().getApplicationContext().getSystemService(getContext().WIFI_SERVICE);
-
+        
+        // TODO: ignore wifi check when user has enabled adb option
         if(!wifiManager.isWifiEnabled())
         {
             showMessage("Please enable Wi-Fi");
