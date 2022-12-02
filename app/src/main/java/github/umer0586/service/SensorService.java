@@ -117,7 +117,7 @@ public class SensorService extends Service implements MessageReceiver.MessageLis
 
         String ipAddress = null;
 
-        // is "local host" switch in enable
+        // if "local host" switch in enable
         // no need to check for wifi network
         if(appSettings.isLocalHostOptionEnable())
             ipAddress = "127.0.0.1"; // use loopback address

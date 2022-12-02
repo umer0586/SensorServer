@@ -32,6 +32,7 @@ import github.umer0586.R;
 import github.umer0586.sensorserver.ServerInfo;
 import github.umer0586.service.SensorService;
 import github.umer0586.service.ServiceBindHelper;
+import github.umer0586.setting.AppSettings;
 import github.umer0586.util.UIUtil;
 
 
@@ -42,6 +43,7 @@ public class ServerFragment extends Fragment
 
     private SensorService sensorService;
     private ServiceBindHelper serviceBindHelper;
+    private AppSettings appSettings;
 
     // Button at center to start/stop server
     private MaterialButton startButton;
@@ -74,6 +76,8 @@ public class ServerFragment extends Fragment
         serverAddress = view.findViewById(R.id.server_address);
         pulseAnimation = view.findViewById(R.id.loading_animation);
         cardView = view.findViewById(R.id.card_view);
+
+        appSettings = new AppSettings(getContext());
 
         serviceBindHelper = new ServiceBindHelper(
                 getContext(),
@@ -115,17 +119,26 @@ public class ServerFragment extends Fragment
         Log.d(TAG, "startServer() called");
 
         WifiManager wifiManager = (WifiManager) getContext().getApplicationContext().getSystemService(getContext().WIFI_SERVICE);
-        
-        // TODO: ignore wifi check when user has enabled adb option
-        if(!wifiManager.isWifiEnabled())
+
+        //If user has enabled local-host option (for adb) then don't check wifi state
+        if(appSettings.isLocalHostOptionEnable())
         {
-            showMessage("Please enable Wi-Fi");
-            return;
+            Intent intent = new Intent(getContext(), SensorService.class);
+            ContextCompat.startForegroundService(getContext(),intent);
+        }
+        //If user has not enabled local-host option then check if wifi is enabled
+        else if(wifiManager.isWifiEnabled())
+        {
+            Intent intent = new Intent(getContext(), SensorService.class);
+            ContextCompat.startForegroundService(getContext(),intent);
         }
 
-        serviceBindHelper.bindToService();
-        Intent intent = new Intent(getContext(), SensorService.class);
-        ContextCompat.startForegroundService(getContext(),intent);
+        else
+        {
+            showMessage("Please enable Wi-Fi");
+        }
+
+
 
     }
 
