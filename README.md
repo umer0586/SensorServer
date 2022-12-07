@@ -123,8 +123,6 @@ async def accelerometer(uri):
 URI = "ws://192.168.0.101:8081/sensor/connect?type=android.sensor.accelerometer"
 asyncio.run(accelerometer(URI))
 
-# Add more connections to other sensors
-
 ```
 
 
