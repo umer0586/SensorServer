@@ -114,36 +114,54 @@ public class SensorService extends Service implements MessageReceiver.MessageLis
         Log.d(TAG, "onStartCommand()");
         handleAndroid8andAbove();
 
-
-        String ipAddress = null;
-
-        // if "local host" switch in enable
-        // no need to check for wifi network
-        if(appSettings.isLocalHostOptionEnable())
-            ipAddress = "127.0.0.1"; // use loopback address
-        else // check wifi
-            ipAddress = IpUtil.getWifiIpAddress(getApplicationContext());
-
-        // This condition will always be false when localHostPref is true, hence no network check
-        if(ipAddress == null)
+        if(appSettings.isHotspotOptionEnabled())
         {
-            Log.i(TAG, "hostIP = null");
+            String hotspotIpAddress = IpUtil.getHotspotIPAddress(getApplicationContext());
 
-            if(serverStateListener != null)
-                serverStateListener.onServerError(new UnknownHostException());
+            if( hotspotIpAddress != null)
+            {
+                sensorWebSocketServer = new SensorWebSocketServer(
+                        getApplicationContext(),
+                        new InetSocketAddress(hotspotIpAddress,appSettings.getPortNo())
+                );
+            }
+            else
+            {
+                if(serverStateListener != null)
+                    serverStateListener.onServerError(new UnknownHostException("Unable to obtain hotspot IP"));
 
-
-            stopForeground(true);
-
-            return START_NOT_STICKY;
+                stopForeground(true);
+                return START_NOT_STICKY;
+            }
         }
+        else if(appSettings.isLocalHostOptionEnable())
+        {
+            sensorWebSocketServer = new SensorWebSocketServer(
+                    getApplicationContext(),
+                    new InetSocketAddress("127.0.0.1",appSettings.getPortNo())
+            );
+        }
+        else
+        {
+            String wifiIpAddress = IpUtil.getWifiIpAddress(getApplicationContext());
 
-        int portNo = appSettings.getPortNo();
+            if(wifiIpAddress != null)
+            {
+                sensorWebSocketServer = new SensorWebSocketServer(
+                        getApplicationContext(),
+                        new InetSocketAddress(wifiIpAddress,appSettings.getPortNo())
+                );
+            }
+            else
+            {
+                if (serverStateListener != null)
+                    serverStateListener.onServerError(new UnknownHostException("Unable to obtain IP"));
 
-        sensorWebSocketServer = new SensorWebSocketServer(
-                getApplicationContext(),
-                new InetSocketAddress(ipAddress,portNo)
-        );
+                stopForeground(true);
+
+                return START_NOT_STICKY;
+            }
+        }
 
 
         sensorWebSocketServer.setServerStartListener((serverInfo)->{
