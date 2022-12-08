@@ -112,16 +112,22 @@ There is another python websocket API which is based on `asyncio` [https://githu
 
 ```python
 import asyncio
+import json
 from websockets import connect
 
-async def accelerometer(uri):
+async def sensor(type):
+    uri = f"ws://192.168.0.102:8081/sensor/connect?type={type}"
     async with connect(uri) as websocket:
         while True:
             data = await websocket.recv()
-            print(data)
-            
-URI = "ws://192.168.0.101:8081/sensor/connect?type=android.sensor.accelerometer"
-asyncio.run(accelerometer(URI))
+            values = json.loads(data)['values']
+            x = values[0]
+            y = values[1]
+            z = values[2]
+            print('x =',x,'y = ',y,'z = ',z)
+
+          
+asyncio.run(sensor("android.sensor.accelerometer"))
 
 ```
 
