@@ -34,6 +34,7 @@ import github.umer0586.service.SensorService;
 import github.umer0586.service.ServiceBindHelper;
 import github.umer0586.setting.AppSettings;
 import github.umer0586.util.UIUtil;
+import github.umer0586.util.WifiUtil;
 
 
 public class ServerFragment extends Fragment
@@ -118,25 +119,41 @@ public class ServerFragment extends Fragment
     {
         Log.d(TAG, "startServer() called");
 
-        WifiManager wifiManager = (WifiManager) getContext().getApplicationContext().getSystemService(getContext().WIFI_SERVICE);
+        if(appSettings.isHotspotOptionEnabled())
+        {
+            if(WifiUtil.isHotspotEnabled(getContext()))
+            {
+                Intent intent = new Intent(getContext(), SensorService.class);
+                ContextCompat.startForegroundService(getContext(),intent);
+            }
+            else
+            {
+                showMessage("Please Enable Hotspot");
+            }
+        }
 
         //If user has enabled local-host option (for adb) then don't check wifi state
-        if(appSettings.isLocalHostOptionEnable())
+        else if(appSettings.isLocalHostOptionEnable())
         {
             Intent intent = new Intent(getContext(), SensorService.class);
             ContextCompat.startForegroundService(getContext(),intent);
         }
-        //If user has not enabled local-host option then check if wifi is enabled
-        else if(wifiManager.isWifiEnabled())
-        {
-            Intent intent = new Intent(getContext(), SensorService.class);
-            ContextCompat.startForegroundService(getContext(),intent);
-        }
-
+        //If user has not enabled local-host and hotspot option then check if wifi is enabled
         else
         {
-            showMessage("Please enable Wi-Fi");
+            if(WifiUtil.isWifiEnabled(getContext()))
+            {
+                Intent intent = new Intent(getContext(), SensorService.class);
+                ContextCompat.startForegroundService(getContext(),intent);
+            }
+            else
+            {
+                showMessage("Please Enable Wi-Fi");
+            }
+
+
         }
+
 
 
 
