@@ -1,41 +1,44 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <PreferenceCategory app:title="Options">
 
-        <SwitchPreferenceCompat
+    <EditTextPreference
+        app:defaultValue="@string/pref_default_port"
+        app:dialogMessage="@string/pref_port_no_dialog_message"
+        app:dialogTitle="@string/pref_port_no_dialog_title"
+        app:key="@string/pref_key_port_no"
+        app:title="Websocket Port"
+        app:useSimpleSummaryProvider="true"
+        app:icon="@drawable/ic_baseline_info_24"
+        />
+
+
+    <EditTextPreference
+        app:defaultValue="200000"
+        app:dialogMessage="Enter sampling rate in Microseconds"
+        app:dialogTitle="Sampling Rate"
+        app:key="@string/pref_key_sampling_rate"
+        app:title="Sampling Rate (Microseconds)"
+        app:useSimpleSummaryProvider="true"
+        app:icon="@drawable/ic_baseline_speed_24"
+        />
+
+
+    <SwitchPreferenceCompat
             app:key="@string/pref_key_localhost"
             app:defaultValue="false"
             app:title="Local Host"
             app:summary="Use adb to connect over USB"
             app:icon="@drawable/ic_baseline_usb_24"
+        />
+
+        <SwitchPreferenceCompat
+            app:key="@string/pref_key_hotspot"
+            app:defaultValue="false"
+            app:title="Use Hotspot"
+            app:summaryOff="Use device's Hotspot"
+            app:icon="@drawable/ic_wifi_tethering"
             />
-
-
-        <EditTextPreference
-            app:defaultValue="@string/pref_default_port"
-            app:dialogMessage="@string/pref_port_no_dialog_message"
-            app:dialogTitle="@string/pref_port_no_dialog_title"
-            app:key="@string/pref_key_port_no"
-            app:title="Websocket Port"
-            app:useSimpleSummaryProvider="true"
-            app:icon="@drawable/ic_baseline_info_24"
-            />
-
-
-
-        <EditTextPreference
-            app:defaultValue="200000"
-            app:dialogMessage="Enter sampling rate in Microseconds"
-            app:dialogTitle="Sampling Rate"
-            app:key="@string/pref_key_sampling_rate"
-            app:title="Sampling Rate (Microseconds)"
-            app:useSimpleSummaryProvider="true"
-            app:icon="@drawable/ic_baseline_speed_24"
-            />
-
-    </PreferenceCategory>
-
 
 
 </PreferenceScreen>
