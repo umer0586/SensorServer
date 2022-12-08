@@ -16,4 +16,5 @@
     <string name="shared_pref_file">shared_pref_file</string>
     <string name="sensor_delay_default">3</string>
     <string name="pref_key_localhost">pref_key_localhost</string>
+    <string name="pref_key_hotspot">pref_key_hotspot</string>
 </resources>
