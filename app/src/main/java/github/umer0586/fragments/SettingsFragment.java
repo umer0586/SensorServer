@@ -10,35 +10,89 @@ import androidx.preference.EditTextPreference;
 import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.SwitchPreferenceCompat;
 
+import com.google.android.material.snackbar.Snackbar;
+
 import github.umer0586.R;
+import github.umer0586.setting.AppSettings;
+import github.umer0586.util.IpUtil;
+import github.umer0586.util.WifiUtil;
 
 public class SettingsFragment extends PreferenceFragmentCompat {
 
 
     private final static String TAG = SettingsFragment.class.getName();
-    private SharedPreferences sharedPreferences;
+    private AppSettings appSettings;
 
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey)
     {
         setPreferencesFromResource(R.xml.settings_preference, rootKey);
-        sharedPreferences = getContext().getSharedPreferences(getString(R.string.shared_pref_file),getContext().MODE_PRIVATE);
+        appSettings = new AppSettings(getContext());
 
         handlePortNoPreference();
         handleLocalHostPreference();
         handleSamplingRatePreference();
+        handleHotspotPref();
 
 
+    }
+
+    @Override
+    public void onResume()
+    {
+        super.onResume();
+        if(!WifiUtil.isHotspotEnabled(getContext()))
+        {
+            SwitchPreferenceCompat hotspotPref = findPreference(getString(R.string.pref_key_hotspot));
+            hotspotPref.setChecked(false);
+            appSettings.enableHotspotOption(false);
+        }
+
+    }
+
+    private void handleHotspotPref()
+    {
+        SwitchPreferenceCompat hotspotPref = findPreference(getString(R.string.pref_key_hotspot));
+
+        hotspotPref.setOnPreferenceChangeListener(((preference, newValue) -> {
+
+            boolean newState = (boolean)newValue;
+
+            //User disabled the switch
+            if(newState == false)
+            {
+                appSettings.enableHotspotOption(false);
+                return true; //persist switch state without doing anything
+            }
+
+            if(newState == true)
+            {
+
+                if (WifiUtil.isHotspotEnabled(getContext()))
+                {
+                    appSettings.enableHotspotOption(true);
+                    hotspotPref.setSummary(IpUtil.getHotspotIPAddress(getContext()));
+                    return true;
+                }
+                else
+                {
+                    Snackbar.make(getView(),"Please enable hotspot",Snackbar.LENGTH_SHORT).show();
+                    appSettings.enableHotspotOption(false);
+                    return false;
+                }
+            }
+
+            return true;
+        }));
     }
 
     private void handleLocalHostPreference()
     {
         SwitchPreferenceCompat localHostPref = findPreference(getString(R.string.pref_key_localhost));
         localHostPref.setOnPreferenceChangeListener((preference, newValue) -> {
+
             boolean newState = (boolean)newValue;
-            sharedPreferences.edit()
-                    .putBoolean(getString(R.string.pref_key_localhost),newState)
-                    .commit();
+            appSettings.enableLocalHostOption(newState);
             return true;
         });
     }
@@ -62,9 +116,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
 
                 if (portNo >= 1024 && portNo <= 49151)
                 {
-                    sharedPreferences.edit()
-                                     .putInt(getString(R.string.pref_key_port_no),portNo)
-                                     .commit();
+                    appSettings.savePortNo(portNo);
                     return true;
                 }
                  else {
@@ -122,9 +174,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
                 }
 
 
-                    sharedPreferences.edit()
-                            .putInt(getString(R.string.pref_key_sampling_rate),samplingRate)
-                            .commit();
+                appSettings.saveSamplingRate(samplingRate);
                     return true;
 
             } catch (NumberFormatException e) {
