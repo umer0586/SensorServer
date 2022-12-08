@@ -32,7 +32,7 @@ Android app which streams phone's motion, environmental and position sensors to 
 
  * so on... 
  
- Once connected, client will receive sensor data in `JSON Array` (float type values) through `websocket.onMessage`. Description of each data value at index in an array can be obtain from https://developer.android.com/guide/topics/sensors/sensors_motion
+ Once connected, client will receive sensor data in `JSON Array` (float type values) through `websocket.onMessage`. 
  
  A snapshot from accelerometer.
  
