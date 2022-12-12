@@ -82,12 +82,15 @@ Here is a simple websocket client in python using [websocket-client api](https:/
 import websocket
 import json
 
+# Change IP and PORT accordingly
+URL = "ws://192.168.0.102:8081/sensor/connect?type=android.sensor.accelerometer"
+
 def on_message(ws, message):
     values = json.loads(message)['values']
     x = values[0]
     y = values[1]
     z = values[2]
-    print('x =',x,'y = ',y,'z = ',z)
+    print(f"x = {x} , y = {y} , z = {z}")
 
 def on_error(ws, error):
     print("error occurred")
@@ -99,17 +102,18 @@ def on_close(ws, close_code, reason):
     print("reason : ", reason  )
 
 def on_open(ws):
-    print("connection open")
+    print("connected")
     
 
 if __name__ == "__main__":
-    ws = websocket.WebSocketApp("ws://192.168.0.101:8081/sensor/connect?type=android.sensor.accelerometer",
+    ws = websocket.WebSocketApp(URL,
                               on_open=on_open,
                               on_message=on_message,
                               on_error=on_error,
                               on_close=on_close)
 
     ws.run_forever()
+ 
  
 ```
 There is another python websocket API which is based on `asyncio` [https://github.com/aaugustin/websockets](https://github.com/aaugustin/websockets)
