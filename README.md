@@ -1,5 +1,5 @@
 # SensorServer
-Android app which streams phone's motion, environmental and position sensors to **Websocket** clients over Wi-fi or USB.
+Android app which streams phone's motion, environmental and position sensors to **Websocket** clients over Wi-fi, USB or Hotspot.
  
 
 ![server](https://user-images.githubusercontent.com/35717992/146649500-f4f1aadf-60e0-4305-81bc-f7db21540bd7.gif)    ![connections](https://user-images.githubusercontent.com/35717992/146649573-9b86ff77-565c-46ef-900b-63350f4eac3b.gif)    ![sensors](https://user-images.githubusercontent.com/35717992/146649578-adb5f0eb-4a7a-462a-9e16-264f4599903f.gif)
@@ -32,11 +32,9 @@ Android app which streams phone's motion, environmental and position sensors to 
 
  * so on... 
  
- Once connected, client will receive sensor data in `JSON Array` (float type values) through `websocket.onMessage`. Description of each data value at index in an array can be obtain from https://developer.android.com/guide/topics/sensors/sensors_motion
+ Once connected, client will receive sensor data in `JSON Array` (float type values) through `websocket.onMessage`. 
  
  A snapshot from accelerometer.
- 
-**Note** : *Use [this page](https://developer.android.com/guide/topics/sensors/sensors_motion) to know what each value in **values** array corresponds to*  
  
  ```json
 {
@@ -59,6 +57,12 @@ And [timestamp](https://developer.android.com/reference/android/hardware/SensorE
 
 Use `JSON` parser to get these individual values.
 
+ 
+**Note** : *Use  following links to know what each value in **values** array corresponds to*
+- For motion sensors [/topics/sensors/sensors_motion](https://developer.android.com/guide/topics/sensors/sensors_motion)
+- For position sensors [/topics/sensors/sensors_position](https://developer.android.com/guide/topics/sensors/sensors_position)
+- For Environmental sensors [/topics/sensors/sensors_environment](https://developer.android.com/guide/topics/sensors/sensors_environment)
+
 ## Undocumented (mostly QTI) sensors on Android devices
 Some Android devices have additional sensors like **Coarse Motion Classifier** `(com.qti.sensor.motion_classifier)`, **Basic Gesture** `(com.qti.sensor.basic_gestures)` etc  which are not documented on offical android docs. Please refer to this [Blog](https://louis993546.medium.com/quick-tech-support-undocumented-mostly-qti-sensors-on-android-devices-d7e2fb6c5064) for corresponding values in `values` array  
 
@@ -78,12 +82,15 @@ Here is a simple websocket client in python using [websocket-client api](https:/
 import websocket
 import json
 
+# Change IP and PORT accordingly
+URL = "ws://192.168.0.102:8081/sensor/connect?type=android.sensor.accelerometer"
+
 def on_message(ws, message):
     values = json.loads(message)['values']
     x = values[0]
     y = values[1]
     z = values[2]
-    print('x =',x,'y = ',y,'z = ',z)
+    print(f"x = {x} , y = {y} , z = {z}")
 
 def on_error(ws, error):
     print("error occurred")
@@ -95,11 +102,11 @@ def on_close(ws, close_code, reason):
     print("reason : ", reason  )
 
 def on_open(ws):
-    print("connection open")
+    print("connected")
     
 
 if __name__ == "__main__":
-    ws = websocket.WebSocketApp("ws://192.168.0.101:8081/sensor/connect?type=android.sensor.accelerometer",
+    ws = websocket.WebSocketApp(URL,
                               on_open=on_open,
                               on_message=on_message,
                               on_error=on_error,
@@ -107,21 +114,28 @@ if __name__ == "__main__":
 
     ws.run_forever()
  
+ 
 ```
 There is another python websocket API which is based on `asyncio` [https://github.com/aaugustin/websockets](https://github.com/aaugustin/websockets)
 
 ```python
 import asyncio
+import json
 from websockets import connect
 
-async def accelerometer(uri):
+async def sensor(type):
+    uri = f"ws://192.168.0.102:8081/sensor/connect?type={type}"
     async with connect(uri) as websocket:
         while True:
             data = await websocket.recv()
-            print(data)
-            
-URI = "ws://192.168.0.101:8081/sensor/connect?type=android.sensor.accelerometer"
-asyncio.run(accelerometer(URI))
+            values = json.loads(data)['values']
+            x = values[0]
+            y = values[1]
+            z = values[2]
+            print('x =',x,'y = ',y,'z = ',z)
+
+          
+asyncio.run(sensor("android.sensor.accelerometer"))
 
 ```
 
