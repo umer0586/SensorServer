@@ -148,8 +148,6 @@ To connect over USB make sure `USB debugging` option is enable in your phone and
 
 Make sure you have installed your android device driver and `adb devices` command detects your connected android phone.
 
-# APK Download ⏬
+# APK Download ⏬ ![version](https://img.shields.io/badge/version-2.3.0-blue) 
 Download latest *APK* from [Release page](https://github.com/umer0586/SensorServer/releases) *(requires Android 5.0)* .
 
-# Issues and Contributions
-Post a new issue if you encounter any. To contribute, fork this repo then create feature/fix branch and send pull request for that branch.
