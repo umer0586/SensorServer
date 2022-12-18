@@ -82,8 +82,6 @@ Here is a simple websocket client in python using [websocket-client api](https:/
 import websocket
 import json
 
-# Change IP and PORT accordingly
-URL = "ws://192.168.0.102:8081/sensor/connect?type=android.sensor.accelerometer"
 
 def on_message(ws, message):
     values = json.loads(message)['values']
@@ -105,8 +103,8 @@ def on_open(ws):
     print("connected")
     
 
-if __name__ == "__main__":
-    ws = websocket.WebSocketApp(URL,
+def connect(sensor_type):
+    ws = websocket.WebSocketApp(f"ws://192.168.0.102:8081/sensor/connect?type={sensor_type}",
                               on_open=on_open,
                               on_message=on_message,
                               on_error=on_error,
@@ -115,30 +113,8 @@ if __name__ == "__main__":
     ws.run_forever()
  
  
+connect("android.sensor.accelerometer") 
 ```
-There is another python websocket API which is based on `asyncio` [https://github.com/aaugustin/websockets](https://github.com/aaugustin/websockets)
-
-```python
-import asyncio
-import json
-from websockets import connect
-
-async def sensor(type):
-    uri = f"ws://192.168.0.102:8081/sensor/connect?type={type}"
-    async with connect(uri) as websocket:
-        while True:
-            data = await websocket.recv()
-            values = json.loads(data)['values']
-            x = values[0]
-            y = values[1]
-            z = values[2]
-            print('x =',x,'y = ',y,'z = ',z)
-
-          
-asyncio.run(sensor("android.sensor.accelerometer"))
-
-```
-
 
 ## Connecting over USB (using ADB)
 To connect over USB make sure `USB debugging` option is enable in your phone and `ADB` (android debug bridge) is available in your machine
