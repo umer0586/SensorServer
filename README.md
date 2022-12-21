@@ -115,6 +115,8 @@ def connect(sensor_type):
  
 connect("android.sensor.accelerometer") 
 ```
+## Real Time plotting
+See [Real Time Plot of Accelerometer (Python)](https://github.com/umer0586/SensorServer/wiki/Real-Time-Plot-Example-(-Python))
 
 ## Connecting over USB (using ADB)
 To connect over USB make sure `USB debugging` option is enable in your phone and `ADB` (android debug bridge) is available in your machine
