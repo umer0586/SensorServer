@@ -9,7 +9,7 @@ Android app which streams phone's motion, environmental and position sensors to 
 
 
 
- This app can stream phone's sensors (motion, environmental and position) to Websocket clients in realtime. A websocket client could be a web browser or any application running on a PC or a mobile device which uses **Websocket Client API**.  You can easily get a **Websocket library** for your favourite programming language. Check [Websocket libraries](https://github.com/facundofarias/awesome-websockets) for different programming languages.
+ This app can stream phone's sensors (motion, environmental and position) to Websocket clients in realtime. A websocket client could be a web browser or any application running on a PC or a mobile device which uses **Websocket Client API**.  You can easily get a **Websocket library** for your favourite programming language. Check [Websocket libraries](https://github.com/facundofarias/awesome-websockets) for different programming languages. This app runs a **Websocket Server** therefore you need a **Websocket Client API** to connect to the app 
  
  
  
