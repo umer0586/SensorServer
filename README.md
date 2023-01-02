@@ -134,4 +134,6 @@ Make sure you have installed your android device driver and `adb devices` comman
 
 # APK Download ⏬ ![version](https://img.shields.io/badge/version-2.4.0-blue) 
 Download latest *APK* from [Release page](https://github.com/umer0586/SensorServer/releases) *(requires Android 5.0)* .
+##
+_You can appreciate this work by buying me a coffee_ :coffee: [https://www.buymeacoffee.com/umerfarooq](https://www.buymeacoffee.com/umerfarooq) 
 
