@@ -57,6 +57,31 @@
         app:SpinKit_Color="?attr/colorSecondary"
         app:SpinKit_Style="PulseRing" />
 
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:layout_below="@id/start_button">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/donationText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textStyle="italic|bold"
+            android:textColor="?attr/colorPrimary"
+            android:text="Buy me a coffee"/>
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            app:srcCompat="@drawable/coffee_icon"
+            android:tint="?attr/colorPrimary"
+            android:tooltipText="@string/app_name"
+            android:layout_centerHorizontal="true"/>
+
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
 
 
 
