@@ -103,8 +103,8 @@ def on_open(ws):
     print("connected")
     
 
-def connect(sensor_type):
-    ws = websocket.WebSocketApp(f"ws://192.168.0.102:8081/sensor/connect?type={sensor_type}",
+def connect(url):
+    ws = websocket.WebSocketApp(url,
                               on_open=on_open,
                               on_message=on_message,
                               on_error=on_error,
@@ -113,8 +113,11 @@ def connect(sensor_type):
     ws.run_forever()
  
  
-connect("android.sensor.accelerometer") 
+connect("ws://192.168.0.101:8080/sensor/connect?type=android.sensor.accelerometer") 
+
 ```
+ *Your device's IP might be different when you tap start button, so make sure you are using correct IP address at client side*
+
 ## Real Time plotting
 See [Real Time Plot of Accelerometer (Python)](https://github.com/umer0586/SensorServer/wiki/Real-Time-Plot-Example-(-Python)) using this app
 
