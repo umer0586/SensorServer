@@ -82,20 +82,6 @@ public class ServerFragment extends Fragment
 
         appSettings = new AppSettings(getContext());
 
-        AppCompatTextView donationText = view.findViewById(R.id.donationText);
-        donationText.setOnClickListener(v->{
-            Intent intent = new Intent(Intent.ACTION_VIEW);
-            if(intent.resolveActivity(getContext().getPackageManager()) != null)
-            {
-                intent.setData(Uri.parse("http://www.buymeacoffee.com/umerfarooq"));
-                startActivity(Intent.createChooser(intent,"Select Browser"));
-            }
-            else
-            {
-                Toast.makeText(getContext(),"Browser app not found",Toast.LENGTH_SHORT).show();
-            }
-        });
-
         serviceBindHelper = new ServiceBindHelper(
                 getContext(),
                 this,

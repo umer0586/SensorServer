@@ -1,10 +1,12 @@
 package github.umer0586.activity;
 
 import android.content.ComponentName;
+import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 
 import androidx.annotation.NonNull;
@@ -72,6 +74,23 @@ public class FragmentNavigationActivity extends AppCompatActivity
 
 
 
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu)
+    {
+        getMenuInflater().inflate(R.menu.main_menu,menu);
+
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item)
+    {
+        if(item.getItemId() == R.id.about)
+            startActivity(new Intent(this,AboutActivity.class));
+
+        return super.onOptionsItemSelected(item);
     }
 
     @Override

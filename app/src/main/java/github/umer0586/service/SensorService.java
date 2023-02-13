@@ -173,7 +173,7 @@ public class SensorService extends Service implements MessageReceiver.MessageLis
             PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_IMMUTABLE);
 
             NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(getApplicationContext(), CHANNEL_ID)
-                    .setSmallIcon(R.drawable.ic_signal)
+                    .setSmallIcon(R.drawable.ic_radar_signal)
                     .setContentTitle("Sensor Server Running...")
                     .setContentText("ws://"+serverInfo.getIpAddress()+":"+serverInfo.getPort())
                     .setPriority(NotificationCompat.PRIORITY_DEFAULT)

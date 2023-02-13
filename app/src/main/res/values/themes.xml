@@ -18,6 +18,13 @@
         <!-- Customize your theme here. -->
     </style>
 
+    <style name="Theme.SensorServer.NoActionBar" parent="Theme.SensorServer">
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowActionBar">false</item>
+
+    </style>
+
 
     <style name="startButton" parent="Widget.MaterialComponents.ExtendedFloatingActionButton">
         <item name="backgroundTint">?attr/colorPrimary</item>
