@@ -75,7 +75,7 @@ Moreover, from one or different machines you can connect to different types of s
 ## Test with Websocket testing tools 
 Before writing your own websocket client, test this app with any websocket testing tools available on the web or playstore. You can use http://livepersoninc.github.io/ws-test-page/ for testing purpose.
 
-## Sample Websocket client (python) 
+## Example: Websocket client (Python) 
 Here is a simple websocket client in python using [websocket-client api](https://github.com/websocket-client/websocket-client) which receives live data from accelerometer sensor.
 
 ```python
@@ -135,8 +135,12 @@ To connect over USB make sure `USB debugging` option is enable in your phone and
 
 Make sure you have installed your android device driver and `adb devices` command detects your connected android phone.
 
-# APK Download ⏬ ![version](https://img.shields.io/badge/version-2.4.0-blue) 
-Download latest *APK* from [Release page](https://github.com/umer0586/SensorServer/releases) *(requires Android 5.0)* .
+## TODO
+- Multiple sensors on single connection
+- GPS
+
+# APK Download ⏬ ![version](https://img.shields.io/badge/version-2.6.0-blue) 
+Download latest *APK* from [Release page](https://github.com/umer0586/SensorServer/releases) *(requires Android 5.0 or above)* .
 ##
 _You can appreciate this work by buying me a coffee_ :coffee: [https://www.buymeacoffee.com/umerfarooq](https://www.buymeacoffee.com/umerfarooq) 
 
