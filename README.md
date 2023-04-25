@@ -1,5 +1,4 @@
 # SensorServer
-Android app which streams phone's motion, environmental and position sensors to **Websocket** clients over Wi-fi, USB or Hotspot.
  
 
 ![server](https://user-images.githubusercontent.com/35717992/146649500-f4f1aadf-60e0-4305-81bc-f7db21540bd7.gif)    ![connections](https://user-images.githubusercontent.com/35717992/146649573-9b86ff77-565c-46ef-900b-63350f4eac3b.gif)    ![sensors](https://user-images.githubusercontent.com/35717992/146649578-adb5f0eb-4a7a-462a-9e16-264f4599903f.gif)
@@ -9,7 +8,7 @@ Android app which streams phone's motion, environmental and position sensors to 
 
 
 
-Android app which let you stream real-time sensor data from your phone to Websocket clients. The clients, which can be web browsers or any application running on a PC or mobile device that uses the Websocket Client API, can receive the streamed data. Since this application functions as a Websocket Server, you will require a Websocket Client API to establish a connection with the application. To obtain a Websocket library for your preferred programming language click [here](https://github.com/facundofarias/awesome-websockets). With this app, you can effortlessly stream real-time sensor data from your phone to any application, allowing you to monitor the device's movement, environment, and position in real-time.
+Android app which let you stream real-time sensor data from your phone to Websocket clients. Clients, including web browsers and other applications running on PCs or mobile devices, are able to receive streamed data through the WebSocket client API. Since this application functions as a Websocket Server, you will require a Websocket Client API to establish a connection with the application. To obtain a Websocket library for your preferred programming language click [here](https://github.com/facundofarias/awesome-websockets). With this app, you can effortlessly stream real-time sensor data from your phone to any application, allowing you to monitor the device's movement, environment, and position in real-time.
  
  
  
