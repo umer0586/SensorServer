@@ -26,7 +26,7 @@ Android app which let you stream real-time sensor data from your phone to Websoc
  
  * For **accelerometer** `/sensor/connect?type=android.sensor.accelerometer` .
  
- * For **orientation** `/sensor/connect?type=android.sensor.orientation` .
+ * For **gyroscope** `/sensor/connect?type=android.sensor.gyroscope` .
  
  * For **step detector**  `/sensor/connect?type=android.sensor.step_detector`
 
