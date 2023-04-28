@@ -113,6 +113,14 @@ public class SensorWebSocketServer extends WebSocketServer implements SensorEven
         }
 
         //At this point paramType is valid (e.g android.sensor.light etc..)
+        registerSensor(requestedSensor,clientWebsocket);
+
+
+    }
+
+    // This method is used in onOpen()
+    private void registerSensor(Sensor requestedSensor, WebSocket clientWebsocket)
+    {
 
         /*
             if this WebSocket Server has already registered itself for some type of sensor (e.g android.sensor.light)
@@ -121,13 +129,13 @@ public class SensorWebSocketServer extends WebSocketServer implements SensorEven
 
         if(registeredSensors.contains(requestedSensor))
         {
-            Log.i(TAG, "Sensor " + paramType + " already registered, skipping registration");
+            Log.i(TAG, "Sensor " + requestedSensor.getStringType() + " already registered, skipping registration");
 
             //for new requesting client attach a tag of requested sensor type with client
             clientWebsocket.setAttachment(requestedSensor);
 
             //Update registry
-             registeredSensors.add(requestedSensor);
+            registeredSensors.add(requestedSensor);
 
             Log.i(TAG, "Connections : " + getConnectionCount());
 
@@ -137,8 +145,8 @@ public class SensorWebSocketServer extends WebSocketServer implements SensorEven
         }
 
 
-         if(requestedSensor != null)
-         {
+        if(requestedSensor != null)
+        {
              /*
               Register requested sensor
               sensor events will be reported to main thread if handler is not provided
@@ -157,19 +165,18 @@ public class SensorWebSocketServer extends WebSocketServer implements SensorEven
 
 
             // Update registry
-             registeredSensors.add(requestedSensor);
+            registeredSensors.add(requestedSensor);
 
              /*
               Attach info with newly connected client
               so that this Servers knows which client has requested which type of sensor
               */
-             clientWebsocket.setAttachment(requestedSensor);
-             Log.i(TAG, "Total Connections : " + getConnectionCount());
-         }
+            clientWebsocket.setAttachment(requestedSensor);
+            Log.i(TAG, "Total Connections : " + getConnectionCount());
+        }
 
 
         notifyConnectionInfoList();
-
     }
 
     @Override
@@ -183,6 +190,13 @@ public class SensorWebSocketServer extends WebSocketServer implements SensorEven
         if(sensor == null)
             return;
 
+        unregisterSensor(sensor);
+
+    }
+    // This method is used in OnClose()
+    private void unregisterSensor(Sensor sensor)
+    {
+
         // When client has closed connection, how many clients receiving same sensor data from this server
         long sensorConnectionCount = getSensorConnectionCount(sensor);
 
@@ -192,7 +206,7 @@ public class SensorWebSocketServer extends WebSocketServer implements SensorEven
         /*
             Suppose we have 3 clients each receiving light sensor data \
             if we unregister this server for light sensor when only one client is disconnected \
-            then 2 other connected client won't recieve light sensor data anymore
+            then 2 other connected client won't receive light sensor data anymore
 
         */
 
