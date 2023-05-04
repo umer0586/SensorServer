@@ -19,19 +19,20 @@ import androidx.viewpager2.widget.ViewPager2;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
 
+
 import github.umer0586.R;
 import github.umer0586.fragments.AvailableSensorsFragment;
 import github.umer0586.fragments.ConnectionsFragment;
 import github.umer0586.fragments.ServerFragment;
 import github.umer0586.fragments.SettingsFragment;
-import github.umer0586.sensorserver.ConnectionCountChangeListener;
+import github.umer0586.sensorserver.ConnectionsCountChangeListener;
 import github.umer0586.service.SensorService;
 import github.umer0586.service.ServiceBindHelper;
 
 
 public class FragmentNavigationActivity extends AppCompatActivity
         implements NavigationBarView.OnItemSelectedListener,
-        ServiceConnection, ConnectionCountChangeListener {
+        ServiceConnection, ConnectionsCountChangeListener {
 
     private static final String TAG = FragmentNavigationActivity.class.getSimpleName();
     private ViewPager2 viewPager;
@@ -94,12 +95,9 @@ public class FragmentNavigationActivity extends AppCompatActivity
     }
 
     @Override
-    public void onConnectionCountChange(int totalConnections)
+    public void onConnectionCountChange(int count)
     {
-        Log.d(TAG, "onConnectionCountChange() called with: totalConnections = [" + totalConnections + "]");
-
-        runOnUiThread(()-> setConnectionCountBadge(totalConnections) );
-
+        runOnUiThread(()-> setConnectionCountBadge( count ) );
     }
 
     @Override
@@ -112,7 +110,7 @@ public class FragmentNavigationActivity extends AppCompatActivity
         {
             setConnectionCountBadge(sensorService.getConnectionCount());
 
-            sensorService.setConnectionCountChangeListener(this);
+            sensorService.setConnectionsCountChangeListener(this);
         }
 
     }
@@ -132,7 +130,7 @@ public class FragmentNavigationActivity extends AppCompatActivity
 
 
         if(sensorService != null)
-            sensorService.setConnectionCountChangeListener(null);
+            sensorService.setConnectionsCountChangeListener(null);
 
 
     }
