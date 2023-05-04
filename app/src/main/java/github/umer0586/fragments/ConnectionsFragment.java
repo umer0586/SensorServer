@@ -3,6 +3,7 @@ package github.umer0586.fragments;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.ServiceConnection;
+import android.hardware.Sensor;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
@@ -10,7 +11,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.ListView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -19,12 +19,14 @@ import androidx.fragment.app.ListFragment;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
-import java.net.InetSocketAddress;
+import net.cachapa.expandablelayout.ExpandableLayout;
+
+import org.java_websocket.WebSocket;
+
 import java.util.ArrayList;
 
 import github.umer0586.R;
-import github.umer0586.sensorserver.ConnectionInfo;
-import github.umer0586.sensorserver.ConnectionInfoChangeListener;
+import github.umer0586.sensorserver.ConnectionsChangeListener;
 import github.umer0586.sensorserver.SensorWebSocketServer;
 import github.umer0586.service.SensorService;
 import github.umer0586.service.ServiceBindHelper;
@@ -34,7 +36,7 @@ import github.umer0586.util.UIUtil;
  * TODO: functionality to allow user to close all connections (using button in action bar)
  */
 public class ConnectionsFragment extends ListFragment
-        implements ServiceConnection, ConnectionInfoChangeListener {
+        implements ServiceConnection, ConnectionsChangeListener {
 
     private static final String TAG = ConnectionsFragment.class.getSimpleName();
 
@@ -70,7 +72,7 @@ public class ConnectionsFragment extends ListFragment
         Log.d(TAG, "onPause()");
 
         if(sensorService != null)
-            sensorService.setConnectionInfoChangeListener(null);
+            sensorService.setConnectionsChangeListener(null);
 
     }
 
@@ -91,12 +93,12 @@ public class ConnectionsFragment extends ListFragment
 
         if(sensorService != null)
         {
-            sensorService.setConnectionInfoChangeListener(this);
+            sensorService.setConnectionsChangeListener(this);
 
-            ArrayList<ConnectionInfo> connectionInfos = sensorService.getConnectionInfoList();
+            ArrayList<WebSocket> webSockets = sensorService.getConnectedClients();
 
-            if(connectionInfos != null)
-                setListAdapter( new ConnectionListAdapter(getContext(),connectionInfos) );
+            if(webSockets != null)
+                setListAdapter( new ConnectionsListAdapter(getContext(),webSockets) );
 
         }
 
@@ -111,61 +113,20 @@ public class ConnectionsFragment extends ListFragment
 
 
     @Override
-    public void onListItemClick(@NonNull ListView l, @NonNull View v, int position, long id)
+    public void onConnectionsChanged(ArrayList<WebSocket> webSockets)
     {
-        super.onListItemClick(l, v, position, id);
-        ConnectionInfo connectionInfo = (ConnectionInfo) v.getTag();
-
-        // show dialog
-
-        String message = "Do you want to close this connection\n" +
-                "Sensor : " + connectionInfo.getSensor().getName() + "\n" +
-                "Connections : " + connectionInfo.getSensorConnectionCount() + "\n\n";
-
-        for(InetSocketAddress inetSocketAddress : connectionInfo.getConnectedClients())
-            message += inetSocketAddress + "\n";
-
-        new MaterialAlertDialogBuilder(getContext())
-                .setTitle("Close Connection")
-                .setMessage(message)
-                .setPositiveButton("Yes",(dialogInterface, i) -> {
-
-                 if(sensorService != null)
-                 {
-                     SensorWebSocketServer sensorWebSocketServer = sensorService.getSensorWebSocketServer();
-                     if (sensorWebSocketServer != null)
-                         sensorWebSocketServer.closeConnectionBySensor(connectionInfo.getSensor());
-
-                     dialogInterface.dismiss();
-                 }
-                })
-                .setNegativeButton("No", (dialogInterface, i) -> {
-                    dialogInterface.dismiss();
-                })
-                .setCancelable(false)
-                .show();
-
-    }
-
-    @Override
-    public void onConnectionInfoChanged(ArrayList<ConnectionInfo> connectionInfos)
-    {
-        Log.d(TAG, "onConnectionInfo() called with: connectionInfos = [" + connectionInfos + "]");
         UIUtil.runOnUiThread(()->{
-            setListAdapter( new ConnectionListAdapter(getContext(),connectionInfos) );
+            setListAdapter( new ConnectionsListAdapter(getContext(),webSockets) );
         });
-
     }
 
-    private class ConnectionListAdapter extends ArrayAdapter<ConnectionInfo>{
+    private class ConnectionsListAdapter extends ArrayAdapter<WebSocket>{
 
 
-        public ConnectionListAdapter(@NonNull Context context, ArrayList<ConnectionInfo> connectionInfos)
+        public ConnectionsListAdapter(@NonNull Context context, ArrayList<WebSocket> webSockets)
         {
-            super(context, R.layout.item_connection, connectionInfos);
-            
+            super(context, R.layout.item_connection, webSockets);
         }
-
 
         @NonNull
         @Override
@@ -175,19 +136,58 @@ public class ConnectionsFragment extends ListFragment
             View view;
             if (convertView == null)
                 view = getLayoutInflater().inflate(R.layout.item_connection, parent, false);
-             else
+            else
                 view = convertView;
 
 
-            ConnectionInfo connectionInfo = getItem(position);
+            WebSocket webSocket = getItem(position);
+            //if(webSocket.getRemoteSocketAddress() == null) return view;
 
-            AppCompatTextView sensorName = view.findViewById(R.id.sensor_name);
-            AppCompatTextView connectionCount = view.findViewById(R.id.connection_count);
+            AppCompatTextView clientAddress = view.findViewById(R.id.client_address);
+            clientAddress.setText(webSocket.getRemoteSocketAddress().toString());
 
-            sensorName.setText( connectionInfo.getSensor().getName() );
-            connectionCount.setText( connectionInfo.getSensorConnectionCount() + "");
+            AppCompatTextView sensorDetails = view.findViewById(R.id.sensors_detail);
 
-            view.setTag(connectionInfo);
+            if(webSocket.getAttachment() instanceof Sensor)
+                sensorDetails.setText( ((Sensor)webSocket.getAttachment()).getName() );
+
+            else if(webSocket.getAttachment() instanceof ArrayList)
+            {
+                String detail = "";
+                for(Sensor sensor : (ArrayList<Sensor>)webSocket.getAttachment() )
+                    detail += sensor.getName() + "\n";
+                sensorDetails.setText(detail.trim());
+            }
+
+            AppCompatTextView closeConnection = view.findViewById(R.id.close_connection);
+            closeConnection.setOnClickListener(v->{
+
+                new MaterialAlertDialogBuilder(getContext())
+                        .setTitle("Websocket Connection")
+                        .setMessage("Close Connection?")
+                        .setPositiveButton("Yes",(dialog, which) -> {
+                            webSocket.close(SensorWebSocketServer.CLOSE_CODE_CONNECTION_CLOSED_BY_APP_USER,"Connection closed by App user");
+                        })
+                        .setNegativeButton("No", (dialogInterface, i) -> {
+                            dialogInterface.dismiss();
+                        })
+                        .setCancelable(false)
+                        .show();
+
+
+            });
+
+            AppCompatTextView sensors = view.findViewById(R.id.sensors);
+            ExpandableLayout expandableLayout = view.findViewById(R.id.expandable_layout);
+
+            sensors.setOnClickListener(v->{
+                expandableLayout.toggle();
+                if(expandableLayout.isExpanded())
+                    sensors.setText("Hide");
+                else
+                    sensors.setText("sensors");
+            });
+
             return view;
 
 

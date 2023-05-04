@@ -1,57 +1,86 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="80dp"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
 
- <androidx.cardview.widget.CardView
-     android:layout_width="match_parent"
-     android:layout_height="match_parent"
-     android:layout_gravity="center"
-     android:layout_margin="8dp"
-     app:cardCornerRadius="10dp"
-     >
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:layout_margin="8dp"
+        app:cardCornerRadius="10dp">
 
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/sensor_name"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center|left"
-        android:layout_marginLeft="20dp"
-        android:padding="10dp"
-        android:text="sensor name here"
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="center|left"
+            android:orientation="horizontal">
 
-        />
+            <com.github.ybq.android.spinkit.SpinKitView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:layout_gravity="center"
+                app:SpinKit_Color="?attr/colorPrimaryVariant"
+                app:SpinKit_Style="Pulse" />
 
-    <RelativeLayout
-        android:layout_marginEnd="25dp"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_gravity="center|right"
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/client_address"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="Address"
+                />
 
-        >
 
+        </androidx.appcompat.widget.LinearLayoutCompat>
 
-        <com.github.ybq.android.spinkit.SpinKitView
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/close_connection"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:SpinKit_Style="Pulse"
-            android:layout_centerInParent="true"
-            app:SpinKit_Color="?attr/colorPrimaryVariant"
+            android:text="close"
+            android:layout_gravity="center|right"
+            android:layout_marginRight="20dp"
+            android:textSize="15sp"
+            android:textColor="?attr/colorPrimary"
             />
 
         <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/sensors"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:id="@+id/connection_count"
-            android:text="234"
-            android:textAlignment="center"
-            android:textSize="15sp"
+            android:layout_gravity="center|bottom"
+            android:text="sensors"
+            android:textSize="13sp"
+            android:textColor="?attr/colorPrimary"
+            android:paddingBottom="5dp"
+
             />
 
-    </RelativeLayout>
+    </androidx.cardview.widget.CardView>
 
- </androidx.cardview.widget.CardView>
+    <net.cachapa.expandablelayout.ExpandableLayout
+        android:id="@+id/expandable_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center|bottom"
+        app:el_duration="800"
+        app:el_expanded="false"
+        app:el_parallax="0.5">
 
-</FrameLayout>
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/sensors_detail"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="30dp"
+            android:padding="10dp"
+            android:textSize="15dp" />
+
+
+    </net.cachapa.expandablelayout.ExpandableLayout>
+
+
+
+</androidx.appcompat.widget.LinearLayoutCompat>
