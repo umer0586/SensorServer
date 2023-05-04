@@ -48,22 +48,22 @@ public class SensorWebSocketServer extends WebSocketServer implements SensorEven
     //Callbacks
     private ServerStartListener serverStartListener;
     private ServerStopListener serverStopListener;
-    private ConnectionInfoChangeListener connectionInfoChangeListener;
     private ServerErrorListener serverErrorListener;
-    private ConnectionCountChangeListener connectionCountChangeListener;
+    private ConnectionsChangeListener connectionsChangeListener;
+
 
     private boolean serverStartUpFailed = false;
     private boolean isRunning = false;
 
     //websocket close codes ranging 4000 - 4999 are for application's custom messages
-    private static final int CLOSE_CODE_SENSOR_NOT_FOUND = 4001;
-    private static final int CLOSE_CODE_UNSUPPORTED_REQUEST = 4002;
-    private static final int CLOSE_CODE_TYPE_PARAMETER_MISSING = 4003;
-    private static final int CLOSE_CODE_SERVER_STOPPED = 4004;
-    private static final int CLOSE_CODE_CONNECTION_CLOSED_BY_APP_USER = 4005;
-    private static final int CLOSE_CODE_INVALID_JSON_ARRAY = 4006;
-    private static final int CLOSE_CODE_TOO_FEW_SENSORS = 4007;
-    private static final int CLOSE_CODE_NO_SENSOR_SPECIFIED = 4008;
+    public static final int CLOSE_CODE_SENSOR_NOT_FOUND = 4001;
+    public static final int CLOSE_CODE_UNSUPPORTED_REQUEST = 4002;
+    public static final int CLOSE_CODE_TYPE_PARAMETER_MISSING = 4003;
+    public static final int CLOSE_CODE_SERVER_STOPPED = 4004;
+    public static final int CLOSE_CODE_CONNECTION_CLOSED_BY_APP_USER = 4005;
+    public static final int CLOSE_CODE_INVALID_JSON_ARRAY = 4006;
+    public static final int CLOSE_CODE_TOO_FEW_SENSORS = 4007;
+    public static final int CLOSE_CODE_NO_SENSOR_SPECIFIED = 4008;
 
 
     public SensorWebSocketServer(Context context, InetSocketAddress address)
@@ -104,7 +104,6 @@ public class SensorWebSocketServer extends WebSocketServer implements SensorEven
             clientWebsocket.close(CLOSE_CODE_UNSUPPORTED_REQUEST, errorMessage);
         }
 
-
     }
 
     /**
@@ -113,6 +112,11 @@ public class SensorWebSocketServer extends WebSocketServer implements SensorEven
     */
     private void handleMultiSensorRequest(Uri uri, WebSocket clientWebsocket)
     {
+        if(uri.getQueryParameter("types") == null)
+        {
+            clientWebsocket.close(CLOSE_CODE_TYPE_PARAMETER_MISSING,"<Types> parameter required");
+            return;
+        }
         List<String> requestedSensorTypes = JsonUtil.readJSONArray(uri.getQueryParameter("types"));
 
         if (requestedSensorTypes == null)
@@ -191,6 +195,7 @@ public class SensorWebSocketServer extends WebSocketServer implements SensorEven
 
         //At this point paramType is valid (e.g android.sensor.light etc..)
         registerSensor(requestedSensor,clientWebsocket);
+        notifyConnectionsChanged();
     }
 
     // Helper method used in handleMultiSensorRequest()
@@ -214,10 +219,8 @@ public class SensorWebSocketServer extends WebSocketServer implements SensorEven
 
                 //Update registry
                 registeredSensors.add(sensor);
+                notifyConnectionsChanged();
 
-                Log.i(TAG, "Connections : " + getConnectionCount());
-
-                notifyConnectionInfoList( );
                 // no need to call sensorManager.registerListener();
                 return;
             }
@@ -244,17 +247,10 @@ public class SensorWebSocketServer extends WebSocketServer implements SensorEven
 
                 // Update registry
                 registeredSensors.add(sensor);
+                notifyConnectionsChanged();
 
-             /*
-              Attach info with newly connected client
-              so that this Servers knows which client has requested which type of sensor
-              */
-                //clientWebsocket.setAttachment(sensors);
-                Log.i(TAG, "Total Connections : " + getConnectionCount());
             }
 
-
-            notifyConnectionInfoList();
 
         }
     }
@@ -280,10 +276,8 @@ public class SensorWebSocketServer extends WebSocketServer implements SensorEven
 
             //Update registry
             registeredSensors.add(requestedSensor);
+            notifyConnectionsChanged();
 
-            Log.i(TAG, "Connections : " + getConnectionCount());
-
-            notifyConnectionInfoList( );
             // no need to call sensorManager.registerListener();
             return;
         }
@@ -310,13 +304,9 @@ public class SensorWebSocketServer extends WebSocketServer implements SensorEven
 
             // Update registry
             registeredSensors.add(requestedSensor);
+            notifyConnectionsChanged();
 
-
-            Log.i(TAG, "Total Connections : " + getConnectionCount());
         }
-
-
-        notifyConnectionInfoList();
     }
 
     @Override
@@ -366,7 +356,8 @@ public class SensorWebSocketServer extends WebSocketServer implements SensorEven
         registeredSensors.remove(sensor);
 
         Log.i(TAG, "Total Connections : " + getConnectionCount());
-        notifyConnectionInfoList();
+        notifyConnectionsChanged();
+
     }
 
     @Override
@@ -481,7 +472,6 @@ public class SensorWebSocketServer extends WebSocketServer implements SensorEven
         // Loop through each connected client
         for( WebSocket webSocket : getConnections() )
         {
-
             // Send data as per sensor type requested by client
             if (webSocket.getAttachment() instanceof Sensor)
             {
@@ -539,29 +529,6 @@ public class SensorWebSocketServer extends WebSocketServer implements SensorEven
         return count;
     }
 
-    private List<InetSocketAddress> getClientsAddressBySensor(Sensor sensor)
-    {
-        List<InetSocketAddress> clientSocketAddresses = new ArrayList<>();
-
-        for(WebSocket webSocket : getConnections())
-        {
-            if(webSocket.getAttachment() instanceof Sensor)
-            {
-                if (((Sensor) webSocket.getAttachment()) != null)
-                    if (((Sensor) webSocket.getAttachment()).getType() == sensor.getType())
-                        clientSocketAddresses.add(webSocket.getRemoteSocketAddress());
-            }
-            if(webSocket.getAttachment() instanceof ArrayList)
-            {
-                for(Sensor sensorT : (List<Sensor>)webSocket.getAttachment())
-                    if(sensorT.getType() == sensor.getType())
-                        clientSocketAddresses.add(webSocket.getRemoteSocketAddress());
-            }
-
-        }
-
-        return clientSocketAddresses;
-    }
 
     public void setSamplingRate(int samplingRate)
     {
@@ -573,49 +540,12 @@ public class SensorWebSocketServer extends WebSocketServer implements SensorEven
         return samplingRate;
     }
 
-    /*
-        Each time client connects or disconnects,
-        we create a new ArrayList of ConnectionInfo and notify it to listener
-     */
-    private void notifyConnectionInfoList()
+
+    public void notifyConnectionsChanged()
     {
-        // registeredSensors (List) may contain duplicate entry (too keep track of sensor usage count) ,
-        // converting List to Set removes those duplicate entries
-        Set<Sensor> sensorsSet = new HashSet<Sensor>( new ArrayList<>(registeredSensors));
-
-        ArrayList<ConnectionInfo> connectionInfoArrayList = new ArrayList<>();
-
-        for(Sensor sensor : sensorsSet)
-            connectionInfoArrayList.add( new ConnectionInfo(sensor, getClientsAddressBySensor(sensor) ) );
-
-        if(connectionInfoChangeListener != null)
-            this.connectionInfoChangeListener.onConnectionInfoChanged(connectionInfoArrayList);
-
-
-        if( connectionCountChangeListener != null)
-        {
-            int totalConnections = 0;
-            for(ConnectionInfo connectionInfo : connectionInfoArrayList)
-                totalConnections += connectionInfo.getSensorConnectionCount();
-
-            connectionCountChangeListener.onConnectionCountChange(totalConnections);
-
-        }
-    }
-
-    public ArrayList<ConnectionInfo> getConnectionInfoList()
-    {
-        // registeredSensors (List) may contain duplicate entry (too keep track of sensor usage count) ,
-        // converting List to Set removes those duplicate entries
-        Set<Sensor> sensorsSet = new HashSet<Sensor>( new ArrayList<>(registeredSensors));
-
-        ArrayList<ConnectionInfo> connectionInfos = new ArrayList<>();
-
-        for(Sensor sensor : sensorsSet)
-            connectionInfos.add( new ConnectionInfo(sensor, getClientsAddressBySensor(sensor) ) );
-
-        return connectionInfos;
-
+        Log.d(TAG, "notifyConnectionsChanged() : " + getConnections().size());
+        if(connectionsChangeListener != null)
+            connectionsChangeListener.onConnectionsChanged(new ArrayList<>(getConnections()));
     }
 
     public int getConnectionCount()
@@ -629,29 +559,6 @@ public class SensorWebSocketServer extends WebSocketServer implements SensorEven
             webSocket.close(CLOSE_CODE_SERVER_STOPPED,"Server stopped");
     }
 
-    public void closeConnectionBySensor(Sensor sensor)
-    {
-        for(WebSocket webSocket : getConnections())
-        {
-           if(webSocket.getAttachment() instanceof Sensor)
-           {
-               if (webSocket.getAttachment() != null)
-               {
-                   if (((Sensor) webSocket.getAttachment()).getType() == sensor.getType())
-                       webSocket.close(CLOSE_CODE_CONNECTION_CLOSED_BY_APP_USER, "connection closed by app user");
-               }
-           }
-
-           if(webSocket.getAttachment() instanceof ArrayList)
-           {
-               for(Sensor sensorT : (List<Sensor>)webSocket.getAttachment())
-                   if(sensorT.getType() == sensor.getType())
-                       webSocket.close(CLOSE_CODE_CONNECTION_CLOSED_BY_APP_USER, "connection closed by app user");
-           }
-        }
-    }
-
-
     public void setServerStartListener(ServerStartListener serverStartListener)
     {
         this.serverStartListener = serverStartListener;
@@ -662,18 +569,13 @@ public class SensorWebSocketServer extends WebSocketServer implements SensorEven
         this.serverStopListener = serverStopListener;
     }
 
-    public void setConnectionInfoChangeListener(ConnectionInfoChangeListener connectionInfoChangeListener)
-    {
-        this.connectionInfoChangeListener = connectionInfoChangeListener;
-    }
-
     public void setServerErrorListener(ServerErrorListener serverErrorListener)
     {
         this.serverErrorListener = serverErrorListener;
     }
 
-    public void setConnectionCountChangeListener(ConnectionCountChangeListener connectionCountChangeListener)
+    public void setConnectionsChangeListener(ConnectionsChangeListener connectionsChangeListener)
     {
-        this.connectionCountChangeListener = connectionCountChangeListener;
+        this.connectionsChangeListener = connectionsChangeListener;
     }
 }

@@ -13,6 +13,8 @@ import android.util.Log;
 
 import androidx.core.app.NotificationCompat;
 
+import org.java_websocket.WebSocket;
+
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -20,9 +22,8 @@ import java.util.ArrayList;
 import github.umer0586.R;
 import github.umer0586.activity.FragmentNavigationActivity;
 import github.umer0586.broadcastreceiver.MessageReceiver;
-import github.umer0586.sensorserver.ConnectionCountChangeListener;
-import github.umer0586.sensorserver.ConnectionInfo;
-import github.umer0586.sensorserver.ConnectionInfoChangeListener;
+import github.umer0586.sensorserver.ConnectionsChangeListener;
+import github.umer0586.sensorserver.ConnectionsCountChangeListener;
 import github.umer0586.sensorserver.SensorWebSocketServer;
 import github.umer0586.sensorserver.ServerInfo;
 import github.umer0586.setting.AppSettings;
@@ -57,8 +58,8 @@ public class SensorService extends Service implements MessageReceiver.MessageLis
 
     private ServerStateListener serverStateListener;
 
-    private ConnectionInfoChangeListener connectionInfoChangeListener;
-    private ConnectionCountChangeListener connectionCountChangeListener;
+    private ConnectionsChangeListener connectionsChangeListener;
+    private ConnectionsCountChangeListener connectionsCountChangeListener;
 
     public interface ServerStateListener {
         void onServerStarted(ServerInfo serverInfo);
@@ -205,13 +206,12 @@ public class SensorService extends Service implements MessageReceiver.MessageLis
             stopForeground(true);
 
         });
-        sensorWebSocketServer.setConnectionCountChangeListener((totalConnections)->{
-                if(connectionCountChangeListener != null)
-                    connectionCountChangeListener.onConnectionCountChange(totalConnections);
-        });
-        sensorWebSocketServer.setConnectionInfoChangeListener((connectionInfoList)->{
-                if(connectionInfoChangeListener != null)
-                    connectionInfoChangeListener.onConnectionInfoChanged(connectionInfoList);
+
+        sensorWebSocketServer.setConnectionsChangeListener((webSockets)->{
+            if(connectionsChangeListener != null)
+                connectionsChangeListener.onConnectionsChanged(webSockets);
+            if(connectionsCountChangeListener != null)
+                connectionsCountChangeListener.onConnectionCountChange(webSockets.size());
         });
 
         sensorWebSocketServer.setSamplingRate(appSettings.getSamplingRate());
@@ -305,12 +305,7 @@ public class SensorService extends Service implements MessageReceiver.MessageLis
 
     public int getConnectionCount()
     {
-        return sensorWebSocketServer != null ? sensorWebSocketServer.getConnectionCount() : 0;
-    }
-
-    public ArrayList<ConnectionInfo> getConnectionInfoList()
-    {
-        return sensorWebSocketServer != null ? sensorWebSocketServer.getConnectionInfoList() : null;
+        return sensorWebSocketServer != null ? sensorWebSocketServer.getConnections().size() : 0;
     }
 
     public void isServerRunning()
@@ -325,6 +320,15 @@ public class SensorService extends Service implements MessageReceiver.MessageLis
             }
 
         }
+    }
+
+    public ArrayList<WebSocket> getConnectedClients()
+    {
+        if(sensorWebSocketServer != null)
+            return new ArrayList<>(sensorWebSocketServer.getConnections());
+
+        return null;
+
     }
 
 
@@ -342,18 +346,18 @@ public class SensorService extends Service implements MessageReceiver.MessageLis
     }
 
 
-    public void setConnectionCountChangeListener(ConnectionCountChangeListener connectionCountChangeListener)
-    {
-        this.connectionCountChangeListener = connectionCountChangeListener;
-    }
-
-    public void setConnectionInfoChangeListener(ConnectionInfoChangeListener connectionInfoChangeListener)
-    {
-       this.connectionInfoChangeListener = connectionInfoChangeListener;
-    }
-
     public void setServerStateListener(ServerStateListener serverStateListener)
     {
         this.serverStateListener = serverStateListener;
+    }
+
+    public void setConnectionsChangeListener(ConnectionsChangeListener connectionsChangeListener)
+    {
+        this.connectionsChangeListener = connectionsChangeListener;
+    }
+
+    public void setConnectionsCountChangeListener(ConnectionsCountChangeListener connectionsCountChangeListener)
+    {
+        this.connectionsCountChangeListener = connectionsCountChangeListener;
     }
 }
