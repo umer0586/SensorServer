@@ -21,7 +21,7 @@ import java.util.ArrayList;
 
 import github.umer0586.R;
 import github.umer0586.activity.FragmentNavigationActivity;
-import github.umer0586.broadcastreceiver.MessageReceiver;
+import github.umer0586.broadcastreceiver.BroadcastMessageReceiver;
 import github.umer0586.sensorserver.ConnectionsChangeListener;
 import github.umer0586.sensorserver.ConnectionsCountChangeListener;
 import github.umer0586.sensorserver.SensorWebSocketServer;
@@ -29,7 +29,7 @@ import github.umer0586.sensorserver.ServerInfo;
 import github.umer0586.setting.AppSettings;
 import github.umer0586.util.IpUtil;
 
-public class SensorService extends Service implements MessageReceiver.MessageListener {
+public class SensorService extends Service implements BroadcastMessageReceiver.MessageListener {
 
     private static final String TAG = SensorService.class.getSimpleName();
 
@@ -51,7 +51,7 @@ public class SensorService extends Service implements MessageReceiver.MessageLis
 
 
     //Intents broadcast by Fragment/Activity are received by this service via MessageReceiver (BroadCastReceiver)
-    private MessageReceiver messageReceiver;
+    private BroadcastMessageReceiver broadcastMessageReceiver;
 
 
     //Callbacks
@@ -79,9 +79,9 @@ public class SensorService extends Service implements MessageReceiver.MessageLis
         appSettings = new AppSettings(getApplicationContext());
 
 
-        messageReceiver = new MessageReceiver(getApplicationContext());
-        messageReceiver.setMessageListener(this);
-        messageReceiver.registerEvents();
+        broadcastMessageReceiver = new BroadcastMessageReceiver(getApplicationContext());
+        broadcastMessageReceiver.setMessageListener(this);
+        broadcastMessageReceiver.registerEvents();
     }
 
     @Override
@@ -287,7 +287,7 @@ public class SensorService extends Service implements MessageReceiver.MessageLis
                 }
         }
 
-        messageReceiver.unregisterEvents();
+        broadcastMessageReceiver.unregisterEvents();
 
 
     }

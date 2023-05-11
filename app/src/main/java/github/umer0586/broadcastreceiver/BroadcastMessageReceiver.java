@@ -10,9 +10,9 @@ import androidx.annotation.NonNull;
 import github.umer0586.service.SensorService;
 
 
-public class MessageReceiver extends BroadcastReceiver {
+public class BroadcastMessageReceiver extends BroadcastReceiver {
 
-    private static final String TAG = MessageReceiver.class.getSimpleName();
+    private static final String TAG = BroadcastMessageReceiver.class.getSimpleName();
 
     private MessageListener messageListener;
 
@@ -21,7 +21,7 @@ public class MessageReceiver extends BroadcastReceiver {
     private boolean isRegistered = false;
 
 
-    public MessageReceiver(@NonNull Context context)
+    public BroadcastMessageReceiver(@NonNull Context context)
     {
         this.context = context;
     }
