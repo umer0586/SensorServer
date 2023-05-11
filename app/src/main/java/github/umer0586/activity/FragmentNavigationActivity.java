@@ -19,7 +19,6 @@ import androidx.viewpager2.widget.ViewPager2;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
 
-
 import github.umer0586.R;
 import github.umer0586.fragments.AvailableSensorsFragment;
 import github.umer0586.fragments.ConnectionsFragment;
