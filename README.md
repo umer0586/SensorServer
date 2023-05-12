@@ -194,7 +194,7 @@ Make sure you have installed your android device driver and `adb devices` comman
 ## TODO
 - GPS
 
-# APK Download ⏬ ![version](https://img.shields.io/badge/version-3.0.0-blue) 
+# APK Download ⏬ ![version](https://img.shields.io/badge/version-3.1.0-blue) 
 Download latest *APK* from [Release page](https://github.com/umer0586/SensorServer/releases) *(requires Android 5.0 or above)* .
 ##
 _You can appreciate this work by buying me a coffee_ :coffee: [https://www.buymeacoffee.com/umerfarooq](https://www.buymeacoffee.com/umerfarooq) 
