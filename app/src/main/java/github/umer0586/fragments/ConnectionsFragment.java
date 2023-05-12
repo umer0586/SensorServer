@@ -1,33 +1,27 @@
 package github.umer0586.fragments;
-
 import android.content.ComponentName;
-import android.content.Context;
 import android.content.ServiceConnection;
-import android.hardware.Sensor;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.widget.AppCompatTextView;
-import androidx.fragment.app.ListFragment;
-
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-
-import net.cachapa.expandablelayout.ExpandableLayout;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import org.java_websocket.WebSocket;
 
 import java.util.ArrayList;
 
 import github.umer0586.R;
+import github.umer0586.fragments.customadapters.ConnectionsRecyclerViewAdapter;
 import github.umer0586.sensorserver.ConnectionsChangeListener;
-import github.umer0586.sensorserver.SensorWebSocketServer;
 import github.umer0586.service.SensorService;
 import github.umer0586.service.ServiceBindHelper;
 import github.umer0586.util.UIUtil;
@@ -35,13 +29,19 @@ import github.umer0586.util.UIUtil;
 /**
  * TODO: functionality to allow user to close all connections (using button in action bar)
  */
-public class ConnectionsFragment extends ListFragment
+public class ConnectionsFragment extends Fragment
         implements ServiceConnection, ConnectionsChangeListener {
 
-    private static final String TAG = ConnectionsFragment.class.getSimpleName();
+    private static final String TAG = github.umer0586.fragments.ConnectionsFragment.class.getSimpleName();
 
     private SensorService sensorService;
     private ServiceBindHelper serviceBindHelper;
+
+    private RecyclerView recyclerView;
+    private ConnectionsRecyclerViewAdapter connectionsRecyclerViewAdapter;
+    private ArrayList<WebSocket> webSockets = new ArrayList<>();
+
+    private TextView noConnectionsText;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
@@ -55,6 +55,13 @@ public class ConnectionsFragment extends ListFragment
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState)
     {
         super.onViewCreated(view, savedInstanceState);
+        recyclerView = view.findViewById(R.id.recycler_view);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        connectionsRecyclerViewAdapter = new ConnectionsRecyclerViewAdapter(webSockets);
+        recyclerView.setAdapter(connectionsRecyclerViewAdapter);
+
+        noConnectionsText = view.findViewById(R.id.no_connections_text);
+
         serviceBindHelper = new ServiceBindHelper(
                 getContext(),
                 this,
@@ -95,10 +102,12 @@ public class ConnectionsFragment extends ListFragment
         {
             sensorService.setConnectionsChangeListener(this);
 
-            ArrayList<WebSocket> webSockets = sensorService.getConnectedClients();
+            webSockets.clear();
+            webSockets.addAll(sensorService.getConnectedClients());
+            handleNoConnectionsText();
 
             if(webSockets != null)
-                setListAdapter( new ConnectionsListAdapter(getContext(),webSockets) );
+                connectionsRecyclerViewAdapter.notifyDataSetChanged();
 
         }
 
@@ -115,89 +124,23 @@ public class ConnectionsFragment extends ListFragment
     @Override
     public void onConnectionsChanged(ArrayList<WebSocket> webSockets)
     {
+
+        this.webSockets.clear();
+        this.webSockets.addAll(webSockets);
+        handleNoConnectionsText();
+
         UIUtil.runOnUiThread(()->{
-            setListAdapter( new ConnectionsListAdapter(getContext(),webSockets) );
+            connectionsRecyclerViewAdapter.notifyDataSetChanged();
         });
     }
 
-    private class ConnectionsListAdapter extends ArrayAdapter<WebSocket>{
-
-
-        public ConnectionsListAdapter(@NonNull Context context, ArrayList<WebSocket> webSockets)
-        {
-            super(context, R.layout.item_connection, webSockets);
-        }
-
-        @NonNull
-        @Override
-        public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent)
-        {
-
-            View view;
-            if (convertView == null)
-                view = getLayoutInflater().inflate(R.layout.item_connection, parent, false);
-            else
-                view = convertView;
-
-
-            WebSocket webSocket = getItem(position);
-            //if(webSocket.getRemoteSocketAddress() == null) return view;
-
-            AppCompatTextView clientAddress = view.findViewById(R.id.client_address);
-            clientAddress.setText(webSocket.getRemoteSocketAddress().toString());
-
-            AppCompatTextView sensorDetails = view.findViewById(R.id.sensors_detail);
-
-            if(webSocket.getAttachment() instanceof Sensor)
-                sensorDetails.setText( ((Sensor)webSocket.getAttachment()).getName() );
-
-            else if(webSocket.getAttachment() instanceof ArrayList)
-            {
-                String detail = "";
-                for(Sensor sensor : (ArrayList<Sensor>)webSocket.getAttachment() )
-                    detail += sensor.getName() + "\n";
-                sensorDetails.setText(detail.trim());
-            }
-
-            AppCompatTextView closeConnection = view.findViewById(R.id.close_connection);
-            closeConnection.setOnClickListener(v->{
-
-                new MaterialAlertDialogBuilder(getContext())
-                        .setTitle("Websocket Connection")
-                        .setMessage("Close Connection?")
-                        .setPositiveButton("Yes",(dialog, which) -> {
-                            webSocket.close(SensorWebSocketServer.CLOSE_CODE_CONNECTION_CLOSED_BY_APP_USER,"Connection closed by App user");
-                        })
-                        .setNegativeButton("No", (dialogInterface, i) -> {
-                            dialogInterface.dismiss();
-                        })
-                        .setCancelable(false)
-                        .show();
-
-
-            });
-
-            AppCompatTextView sensors = view.findViewById(R.id.sensors);
-            ExpandableLayout expandableLayout = view.findViewById(R.id.expandable_layout);
-
-            sensors.setOnClickListener(v->{
-                expandableLayout.toggle();
-                if(expandableLayout.isExpanded())
-                    sensors.setText("Hide");
-                else
-                    sensors.setText("sensors");
-            });
-
-            return view;
-
-
-        }
-
-
-
-
+    private void handleNoConnectionsText()
+    {
+        if(webSockets.size() > 0)
+            UIUtil.runOnUiThread(()-> noConnectionsText.setVisibility(View.INVISIBLE));
+        else
+            UIUtil.runOnUiThread(()-> noConnectionsText.setVisibility(View.VISIBLE));
     }
-
 
 
 }
