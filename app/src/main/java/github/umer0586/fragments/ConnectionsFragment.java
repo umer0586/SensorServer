@@ -101,9 +101,13 @@ public class ConnectionsFragment extends Fragment
         if(sensorService != null)
         {
             sensorService.setConnectionsChangeListener(this);
+            ArrayList<WebSocket> webSockets = sensorService.getConnectedClients();
 
-            webSockets.clear();
-            webSockets.addAll(sensorService.getConnectedClients());
+            if(webSockets != null)
+            {
+                this.webSockets.clear();
+                this.webSockets.addAll(webSockets);
+            }
             handleNoConnectionsText();
 
             if(webSockets != null)
