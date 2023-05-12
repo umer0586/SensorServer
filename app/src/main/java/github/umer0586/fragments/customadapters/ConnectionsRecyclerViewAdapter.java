@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.widget.AppCompatImageView;
 import androidx.appcompat.widget.AppCompatTextView;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -34,7 +35,7 @@ public class ConnectionsRecyclerViewAdapter extends RecyclerView.Adapter<Connect
         public AppCompatTextView closeConnection;
 
         //A text which user can tap to see associated sensors with websocket connection
-        public AppCompatTextView sensors;
+        public AppCompatImageView expand;
 
         // List of sensors associated with websocket connection
         public AppCompatTextView sensorDetails;
@@ -48,7 +49,7 @@ public class ConnectionsRecyclerViewAdapter extends RecyclerView.Adapter<Connect
             super(view);
 
             clientAddress = view.findViewById(R.id.client_address);
-            sensors = view.findViewById(R.id.sensors);
+            expand = view.findViewById(R.id.expand);
             sensorDetails = view.findViewById(R.id.sensors_detail);
             closeConnection = view.findViewById(R.id.close_connection);
             expandableLayout = view.findViewById(R.id.expandable_layout);
@@ -108,12 +109,12 @@ public class ConnectionsRecyclerViewAdapter extends RecyclerView.Adapter<Connect
 
         });
 
-        viewHolder.sensors.setOnClickListener(v->{
+        viewHolder.expand.setOnClickListener(v->{
             viewHolder.expandableLayout.toggle();
             if(viewHolder.expandableLayout.isExpanded())
-                viewHolder.sensors.setText("Hide");
+                viewHolder.expand.setImageResource(R.drawable.ic_expand_up);
             else
-                viewHolder.sensors.setText("sensors");
+                viewHolder.expand.setImageResource(R.drawable.ic_expand_down);
         });
 
 
