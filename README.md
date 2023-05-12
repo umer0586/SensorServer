@@ -195,7 +195,7 @@ Make sure you have installed your android device driver and `adb devices` comman
 - GPS
 
 # APK Download ⏬ ![version](https://img.shields.io/badge/version-3.1.0-blue) 
-Download latest *APK* from [Release page](https://github.com/umer0586/SensorServer/releases) *(requires Android 5.0 or above)* .
+Download latest *APK* from [Release page](https://github.com/umer0586/SensorServer/releases) *(requires Android 5.0 or above)* . You can also get this app from [F-Droid](https://f-droid.org/en/) by adding [https://apt.izzysoft.de/fdroid/repo](https://apt.izzysoft.de/fdroid/repo) repository in F-Droid client 
 ##
 _You can appreciate this work by buying me a coffee_ :coffee: [https://www.buymeacoffee.com/umerfarooq](https://www.buymeacoffee.com/umerfarooq) 
 
