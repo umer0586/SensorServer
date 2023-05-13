@@ -118,61 +118,11 @@ connect("ws://192.168.0.101:8080/sensor/connect?type=android.sensor.acceleromete
  *Your device's IP might be different when you tap start button, so make sure you are using correct IP address at client side*
  
 ## Using Multiple Sensors Over single Websocket Connection
-You can also connect to multiple sensors over single websocket connection. To use multiple sensors over single websocket connection use following **URL**.
+You can also use to multiple sensors over single websocket connection. To use multiple sensors over single websocket connection use following **URL**.
 
                  ws://<ip>:<port>/sensors/connect?types=["<type1>","<type2>","<type3>"...]
-                 
-By connecting using above URL you will recieve same JSON response as previous but with one addition
 
- ```json
-{
-  "accuracy": 2,
-  "timestamp": 3925657519043709,
-  "values": [0.31892395,-0.97802734,10.049896]
-  "type" : "<One of the sensor type you mentioned in connection URL>"
-}
- ```
-### Example
-
-```python
-import websocket
-import json
-
-
-def on_message(ws, message):
-    values = json.loads(message)['values']
-    type = json.loads(message)['type']
-    print("type = ", type)
-    print("values = ",values)
-
-def on_error(ws, error):
-    print("error occurred")
-    print(error)
-
-def on_close(ws, close_code, reason):
-    print("connection close")
-    print("close code : ", close_code)
-    print("reason : ", reason  )
-
-def on_open(ws):
-    print("connected")
-    
-
-def connect(url):
-    ws = websocket.WebSocketApp(url,
-                              on_open=on_open,
-                              on_message=on_message,
-                              on_error=on_error,
-                              on_close=on_close)
-
-    ws.run_forever()
- 
-
-connect('ws://192.168.0.101:8080/sensors/connect?types=["android.sensor.accelerometer","android.sensor.gyroscope","android.sensor.light","android.sensor.magnetic_field"]')  
-
-```
-
-
+By connecting using above URL you will receive JSON response containing sensor data along with a type of sensor. See complete example at [Using Multiple Sensors On Single Websocket Connection](https://github.com/umer0586/SensorServer/wiki/Using-Multiple-Sensors-On-Single-Websocket-Connection)
 
 ## Real Time plotting
 See [Real Time Plot of Accelerometer (Python)](https://github.com/umer0586/SensorServer/wiki/Real-Time-Plot-Example-(-Python)) using this app
