@@ -19,6 +19,7 @@ import org.java_websocket.WebSocket;
 import java.util.ArrayList;
 
 import github.umer0586.R;
+import github.umer0586.sensorserver.LocationRequestInfo;
 import github.umer0586.sensorserver.SensorWebSocketServer;
 
 public class ConnectionsRecyclerViewAdapter extends RecyclerView.Adapter<ConnectionsRecyclerViewAdapter.MyViewHolder> {
@@ -90,6 +91,10 @@ public class ConnectionsRecyclerViewAdapter extends RecyclerView.Adapter<Connect
                 detail += sensor.getName() + "\n";
             viewHolder.sensorDetails.setText(detail.trim());
         }
+
+        else if (webSocket.getAttachment() instanceof LocationRequestInfo)
+            viewHolder.sensorDetails.setText("location (" + ((LocationRequestInfo)webSocket.getAttachment()).getProvider() + " provider )" );
+
 
 
         viewHolder.closeConnection.setOnClickListener(v->{

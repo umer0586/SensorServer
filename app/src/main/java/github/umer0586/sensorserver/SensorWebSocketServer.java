@@ -1,14 +1,23 @@
 package github.umer0586.sensorserver;
 
+import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.util.Log;
+
+import androidx.annotation.NonNull;
 
 import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
@@ -25,13 +34,18 @@ import github.umer0586.util.JsonUtil;
 import github.umer0586.util.SensorUtil;
 
 
-public class SensorWebSocketServer extends WebSocketServer implements SensorEventListener {
+public class SensorWebSocketServer extends WebSocketServer implements SensorEventListener, LocationListener {
 
     private static final String TAG = SensorWebSocketServer.class.getName();
+
+
+    private Context context;
 
     private int samplingRate = 200000;//default value normal rate
     private static final String CONNECTION_PATH_SINGLE_SENSOR = "/sensor/connect";
     private static final String CONNECTION_PATH_MULTIPLE_SENSORS = "/sensors/connect";
+    private static final String CONNECTION_PATH_LOCATION = "/location";
+
     private static final HashMap<String, Object> response = new HashMap<>();
 
     private HandlerThread handlerThread;
@@ -56,17 +70,22 @@ public class SensorWebSocketServer extends WebSocketServer implements SensorEven
     //websocket close codes ranging 4000 - 4999 are for application's custom messages
     public static final int CLOSE_CODE_SENSOR_NOT_FOUND = 4001;
     public static final int CLOSE_CODE_UNSUPPORTED_REQUEST = 4002;
-    public static final int CLOSE_CODE_TYPE_PARAMETER_MISSING = 4003;
+    public static final int CLOSE_CODE_PARAMETER_MISSING = 4003;
     public static final int CLOSE_CODE_SERVER_STOPPED = 4004;
     public static final int CLOSE_CODE_CONNECTION_CLOSED_BY_APP_USER = 4005;
     public static final int CLOSE_CODE_INVALID_JSON_ARRAY = 4006;
     public static final int CLOSE_CODE_TOO_FEW_SENSORS = 4007;
     public static final int CLOSE_CODE_NO_SENSOR_SPECIFIED = 4008;
+    public static final int CLOSE_CODE_PERMISSION_DENIED = 4009;
+    public static final int CLOSE_CODE_INVALID_PROVIDER = 4010;
+    public static final int CLOSE_CODE_PROVIDER_NOT_FOUND = 4011;
+
 
 
     public SensorWebSocketServer(Context context, InetSocketAddress address)
     {
         super(address);
+        this.context = context;
         sensorManager = (SensorManager) context.getSystemService(context.SENSOR_SERVICE);
         sensorUtil = SensorUtil.getInstance(context);
         registeredSensors = new ArrayList<>();
@@ -84,23 +103,17 @@ public class SensorWebSocketServer extends WebSocketServer implements SensorEven
 
         // ws://host:port/sensor/connect?type=<sensorType>
         if (uri.getPath().equalsIgnoreCase(CONNECTION_PATH_SINGLE_SENSOR))
-        {
-            Log.i(TAG, "param type " + uri.getQueryParameter("type"));
             handleSingleSensorRequest(uri, clientWebsocket);
+            //ws://host:port/sensors/connect?types=["type1","type2"...]
+         else if (uri.getPath().equalsIgnoreCase(CONNECTION_PATH_MULTIPLE_SENSORS))
+            handleMultiSensorRequest(uri, clientWebsocket);
 
-          //ws://host:port/sensors/connect?types=["type1","type2"...]
-        } else if (uri.getPath().equalsIgnoreCase(CONNECTION_PATH_MULTIPLE_SENSORS))
-        {
-            Log.i(TAG, "param types " + uri.getQueryParameter("types"));
-            handleMultiSensorRequest(uri,clientWebsocket);
+         else if (uri.getPath().equalsIgnoreCase(CONNECTION_PATH_LOCATION))
+            handleLocationRequest(uri, clientWebsocket);
 
-        } else
-        {
-            String errorMessage = "Unsupported request \n , " +
-                    "use " + CONNECTION_PATH_SINGLE_SENSOR + "?type=<sensorType> for single sensor on single websocket connection and \n" +
-                    " " + CONNECTION_PATH_MULTIPLE_SENSORS + "?types=[\"type1\",\"type2\", . . . ] for multiple sensors on single websocket connection";
-            clientWebsocket.close(CLOSE_CODE_UNSUPPORTED_REQUEST, errorMessage);
-        }
+         else
+            clientWebsocket.close(CLOSE_CODE_UNSUPPORTED_REQUEST, "unsupported request");
+
 
     }
 
@@ -112,7 +125,7 @@ public class SensorWebSocketServer extends WebSocketServer implements SensorEven
     {
         if(uri.getQueryParameter("types") == null)
         {
-            clientWebsocket.close(CLOSE_CODE_TYPE_PARAMETER_MISSING,"<Types> parameter required");
+            clientWebsocket.close(CLOSE_CODE_PARAMETER_MISSING,"<Types> parameter required");
             return;
         }
         List<String> requestedSensorTypes = JsonUtil.readJSONArray(uri.getQueryParameter("types"));
@@ -167,7 +180,7 @@ public class SensorWebSocketServer extends WebSocketServer implements SensorEven
         //if type param doesn't exit in the query
         if(paramType == null)
         {
-            clientWebsocket.close(CLOSE_CODE_TYPE_PARAMETER_MISSING,"<type> param required");
+            clientWebsocket.close(CLOSE_CODE_PARAMETER_MISSING,"<type> param required");
             //do not proceed further
             return;
         }
@@ -307,6 +320,158 @@ public class SensorWebSocketServer extends WebSocketServer implements SensorEven
         }
     }
 
+    @SuppressLint("MissingPermission")
+    private void handleLocationRequest(Uri uri ,WebSocket clientWebsocket)
+    {
+        LocationManager locationManager = (LocationManager)context.getSystemService(Context.LOCATION_SERVICE);
+
+        if(!hasLocationPermission())
+        {
+            clientWebsocket.close(CLOSE_CODE_PERMISSION_DENIED,"App has No permission to access location");
+            return;
+        }
+
+        String provider = uri.getQueryParameter("provider");
+        Log.i(TAG, "handleLocationRequest() :  provider = " + provider);
+
+        if(provider == null)
+        {
+            clientWebsocket.close(CLOSE_CODE_PARAMETER_MISSING,"Provider parameter required");
+            return;
+        }
+
+
+        if(provider.equalsIgnoreCase("network"))
+        {
+            // if device supports network location provider
+            if (locationManager.getAllProviders().contains(LocationManager.NETWORK_PROVIDER))
+            {
+                //If some clients already connected for network location provider then no need to register this server for location updates for Network provider again
+                if(!locationProviderHasConnections(LocationManager.NETWORK_PROVIDER))
+                    locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, this, handlerThread.getLooper());
+
+                clientWebsocket.setAttachment(new LocationRequestInfo(LocationManager.NETWORK_PROVIDER));
+
+            }// if device does not support network location provider
+            else
+                clientWebsocket.close(CLOSE_CODE_PROVIDER_NOT_FOUND,"network provider not found");
+        }
+
+        else if(provider.equalsIgnoreCase("GPS"))
+        {
+            // if device supports GPS location provider
+            if (locationManager.getAllProviders().contains(LocationManager.GPS_PROVIDER))
+            {
+                //If some clients already connected for GPS location provider then no need to register this server for location updates for GPS provider again
+                if(!locationProviderHasConnections(LocationManager.GPS_PROVIDER))
+                    locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this, handlerThread.getLooper());
+
+                clientWebsocket.setAttachment(new LocationRequestInfo(LocationManager.GPS_PROVIDER));
+            }
+            else // if device does not support GPS location provider
+                clientWebsocket.close(CLOSE_CODE_PROVIDER_NOT_FOUND,"network provider not found");
+        }
+        else
+            clientWebsocket.close(CLOSE_CODE_INVALID_PROVIDER,"Provider must be either GPS or network");
+
+
+        notifyConnectionsChanged();
+
+    }
+
+    private boolean locationProviderHasConnections(String provider)
+    {
+        int providerConnectionCount = 0;
+
+        for(WebSocket websocket : getConnections())
+        {
+            if( websocket.getAttachment() instanceof LocationRequestInfo )
+            {
+                LocationRequestInfo locationRequestInfo = websocket.getAttachment();
+                if(locationRequestInfo.getProvider().equals(provider))
+                    providerConnectionCount++;
+            }
+        }
+
+        Log.i(TAG, "connection counts for " + provider + " location provider " + providerConnectionCount);
+        return providerConnectionCount > 0 ;
+    }
+
+    @Override
+    public void onLocationChanged(@NonNull Location location)
+    {
+
+        if(!locationProviderHasConnections(location.getProvider()))
+        {
+            Log.w(TAG, "onLocationChanged() :  " + "Location update received when no client with " + location.getProvider() + " connected" );
+        }
+
+        for(WebSocket websocket : getConnections())
+        {
+            if(websocket.getAttachment() instanceof LocationRequestInfo)
+            {
+                response.clear();
+                response.put("longitude",location.getLongitude());
+                response.put("latitude",location.getLatitude());
+                response.put("altitude",location.getAltitude());
+                response.put("bearing",location.getBearing());
+                response.put("accuracy",location.getAccuracy());
+                response.put("speed",location.getSpeed());
+                response.put("time",location.getTime());
+                response.put("provider",location.getProvider());
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+                {
+                    response.put("speedAccuracyMetersPerSecond",location.getSpeedAccuracyMetersPerSecond());
+                    response.put("bearingAccuracyDegrees",location.getBearingAccuracyDegrees());
+                    response.put("elapsedRealtimeNanos",location.getElapsedRealtimeNanos());
+                    response.put("verticalAccuracyMeters",location.getVerticalAccuracyMeters());
+
+                }
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
+                {
+                    response.put("elapsedRealtimeAgeMillis",location.getElapsedRealtimeAgeMillis());
+                }
+
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
+                {
+                    response.put("time",location.getElapsedRealtimeUncertaintyNanos());
+                }
+
+
+                LocationRequestInfo locationRequestInfo = websocket.getAttachment();
+
+                if(locationRequestInfo.getProvider().equals(location.getProvider()))
+                    websocket.send( JsonUtil.toJSON(response) );
+            }
+        }
+    }
+
+    @Override
+    public void onProviderDisabled(@NonNull String provider)
+    {
+        Log.i(TAG, "onProviderDisabled() " + provider);
+    }
+
+    @Override
+    public void onProviderEnabled(@NonNull String provider)
+    {
+        Log.i(TAG, "onProviderEnabled() " + provider);
+    }
+
+    private boolean hasLocationPermission()
+    {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+        {
+            return context.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
+        }
+
+        //prior to android marshmallow dangerous permission are prompt at install time
+        return true;
+    }
+
     @Override
     public void onClose(WebSocket clientWebsocket, int code, String reason, boolean remote)
     {
@@ -325,6 +490,19 @@ public class SensorWebSocketServer extends WebSocketServer implements SensorEven
             for(Sensor sensor : sensors)
                 unregisterSensor(sensor);
         }
+        else if(clientWebsocket.getAttachment() instanceof LocationRequestInfo)
+        {
+
+            LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+            LocationRequestInfo locationRequestInfo = clientWebsocket.getAttachment();
+
+            // unregister this server for location updates from specific provider ...
+            // when there are no clients associated with that provider
+            if(!locationProviderHasConnections(locationRequestInfo.getProvider()))
+                locationManager.removeUpdates(this);
+
+        }
+        notifyConnectionsChanged();
 
 
     }
@@ -423,6 +601,9 @@ public class SensorWebSocketServer extends WebSocketServer implements SensorEven
     public void stop() throws IOException, InterruptedException
    {
         closeAllConnections();
+       LocationManager locationManager = (LocationManager)context.getSystemService(Context.LOCATION_SERVICE);
+       locationManager.removeUpdates(this);
+
         super.stop();
         Log.d(TAG, "stop() called");
 
