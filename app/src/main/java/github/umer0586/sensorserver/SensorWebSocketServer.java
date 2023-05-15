@@ -381,7 +381,7 @@ public class SensorWebSocketServer extends WebSocketServer implements SensorEven
 
     private boolean locationProviderHasConnections(String provider)
     {
-        int providerConnectionCount = 0;
+        int locationProviderConnectionCount = 0;
 
         for(WebSocket websocket : getConnections())
         {
@@ -389,12 +389,12 @@ public class SensorWebSocketServer extends WebSocketServer implements SensorEven
             {
                 LocationRequestInfo locationRequestInfo = websocket.getAttachment();
                 if(locationRequestInfo.getProvider().equals(provider))
-                    providerConnectionCount++;
+                    locationProviderConnectionCount++;
             }
         }
 
-        Log.i(TAG, "connection counts for " + provider + " location provider " + providerConnectionCount);
-        return providerConnectionCount > 0 ;
+        Log.i(TAG, "connection counts for " + provider + " location provider " + locationProviderConnectionCount);
+        return locationProviderConnectionCount > 0 ;
     }
 
     @Override
