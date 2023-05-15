@@ -327,7 +327,7 @@ public class SensorWebSocketServer extends WebSocketServer implements SensorEven
 
         if(!hasLocationPermission())
         {
-            clientWebsocket.close(CLOSE_CODE_PERMISSION_DENIED,"App has No permission to access location");
+            clientWebsocket.close(CLOSE_CODE_PERMISSION_DENIED,"App has No permission to access location. Go to your device's installed apps settings and allow location permission to Sensor Server app");
             return;
         }
 
