@@ -1,0 +1,1 @@
+stream phone's motion sensors to websocket clients
