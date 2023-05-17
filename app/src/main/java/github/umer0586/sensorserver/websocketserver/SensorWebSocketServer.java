@@ -598,7 +598,7 @@ public class SensorWebSocketServer extends WebSocketServer implements SensorEven
     }
 
    @Override
-    public void stop() throws IOException, InterruptedException
+    public void stop() throws InterruptedException
    {
         closeAllConnections();
        LocationManager locationManager = (LocationManager)context.getSystemService(Context.LOCATION_SERVICE);
