@@ -1,4 +1,4 @@
-package github.umer0586.sensorserver;
+package github.umer0586.websocketserver;
 
 import org.java_websocket.WebSocket;
 

@@ -24,7 +24,7 @@ import github.umer0586.fragments.AvailableSensorsFragment;
 import github.umer0586.fragments.ConnectionsFragment;
 import github.umer0586.fragments.ServerFragment;
 import github.umer0586.fragments.SettingsFragment;
-import github.umer0586.sensorserver.ConnectionsCountChangeListener;
+import github.umer0586.websocketserver.ConnectionsCountChangeListener;
 import github.umer0586.service.SensorService;
 import github.umer0586.service.ServiceBindHelper;
 

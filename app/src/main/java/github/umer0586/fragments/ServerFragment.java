@@ -27,7 +27,7 @@ import java.net.BindException;
 import java.net.UnknownHostException;
 
 import github.umer0586.R;
-import github.umer0586.sensorserver.ServerInfo;
+import github.umer0586.websocketserver.ServerInfo;
 import github.umer0586.service.SensorService;
 import github.umer0586.service.ServiceBindHelper;
 import github.umer0586.setting.AppSettings;

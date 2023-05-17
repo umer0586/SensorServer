@@ -11,6 +11,7 @@ import androidx.appcompat.widget.AppCompatTextView;
 import github.umer0586.BuildConfig;
 import github.umer0586.R;
 
+
 public class AboutActivity extends AppCompatActivity {
 
     @Override

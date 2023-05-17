@@ -19,8 +19,8 @@ import org.java_websocket.WebSocket;
 import java.util.ArrayList;
 
 import github.umer0586.R;
-import github.umer0586.sensorserver.LocationRequestInfo;
-import github.umer0586.sensorserver.SensorWebSocketServer;
+import github.umer0586.websocketserver.LocationRequestInfo;
+import github.umer0586.websocketserver.SensorWebSocketServer;
 
 public class ConnectionsRecyclerViewAdapter extends RecyclerView.Adapter<ConnectionsRecyclerViewAdapter.MyViewHolder> {
 

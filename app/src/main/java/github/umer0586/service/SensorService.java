@@ -22,10 +22,10 @@ import java.util.ArrayList;
 import github.umer0586.R;
 import github.umer0586.activity.FragmentNavigationActivity;
 import github.umer0586.broadcastreceiver.BroadcastMessageReceiver;
-import github.umer0586.sensorserver.ConnectionsChangeListener;
-import github.umer0586.sensorserver.ConnectionsCountChangeListener;
-import github.umer0586.sensorserver.SensorWebSocketServer;
-import github.umer0586.sensorserver.ServerInfo;
+import github.umer0586.websocketserver.ConnectionsChangeListener;
+import github.umer0586.websocketserver.ConnectionsCountChangeListener;
+import github.umer0586.websocketserver.SensorWebSocketServer;
+import github.umer0586.websocketserver.ServerInfo;
 import github.umer0586.setting.AppSettings;
 import github.umer0586.util.IpUtil;
 

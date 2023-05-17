@@ -21,7 +21,7 @@ import java.util.ArrayList;
 
 import github.umer0586.R;
 import github.umer0586.fragments.customadapters.ConnectionsRecyclerViewAdapter;
-import github.umer0586.sensorserver.ConnectionsChangeListener;
+import github.umer0586.websocketserver.ConnectionsChangeListener;
 import github.umer0586.service.SensorService;
 import github.umer0586.service.ServiceBindHelper;
 import github.umer0586.util.UIUtil;
