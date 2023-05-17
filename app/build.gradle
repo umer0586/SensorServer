@@ -6,7 +6,7 @@ android {
     compileSdk 33
 
     defaultConfig {
-        applicationId "github.umer0586"
+        applicationId 'github.umer0586.sensorserver'
         minSdk 21
         targetSdk 33
         multiDexEnabled true
