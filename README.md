@@ -124,6 +124,27 @@ You can also use to multiple sensors over single websocket connection. To use mu
 
 By connecting using above URL you will receive JSON response containing sensor data along with a type of sensor. See complete example at [Using Multiple Sensors On Single Websocket Connection](https://github.com/umer0586/SensorServer/wiki/Using-Multiple-Sensors-On-Single-Websocket-Connection)
 
+## Getting Device Location Using GPS and Network Provider
+You access device location using following url.
+
+                 ws://<ip>:<port>/location?provider=<location provider type>
+                 
+Where a `provider` could be `gps` or `network`. In Android, both GPS and Network providers can be used to get location information. However, the accuracy and precision of each provider may vary depending on various factors. GPS is a satellite-based system that provides more accurate location information than the Network provider. GPS provides location information based on satellite signals, which can be affected by various factors such as weather conditions, buildings, and other obstacles that can block the signal. On the other hand, Network provider determines the location based on the cell tower and Wi-Fi signals in the area. Network provider can provide a faster location fix than GPS, but its accuracy may not be as precise as GPS.
+
+JSON response contains following key fields.
+
+| Key      | Description |
+| ----------- | ----------- |
+| longitude   | longitude in degrees       |
+| latitude    | latitude in degrees        |
+| altitude    | The altitude of location in meters above the WGS84 reference ellipsoid             |
+| bearing     | bearing at the time of this location in degrees. Bearing is the horizontal direction of travel of this device and is unrelated to the device orientation. The bearing is guaranteed to be in the range [0, 360).            |
+| accuracy    | Estimated horizontal accuracy radius in meters of this location at the 68th percentile confidence level.             |
+| speed       | Speed at the time of this location in meters per second            |
+| time        | the Unix epoch time of this location fix, in milliseconds since the start of the Unix epoch (00:00:00 January 1, 1970 UTC).            |
+| provider    | Name of the provider associated with this location |            
+
+
 ## Real Time plotting
 See [Real Time Plot of Accelerometer (Python)](https://github.com/umer0586/SensorServer/wiki/Real-Time-Plot-Example-(-Python)) using this app
 
@@ -141,10 +162,8 @@ To connect over USB make sure `USB debugging` option is enable in your phone and
 
 Make sure you have installed your android device driver and `adb devices` command detects your connected android phone.
 
-## TODO
-- GPS
 
-# APK Download ⏬ ![version](https://img.shields.io/badge/version-3.1.0-blue) 
+# APK Download ⏬ ![version](https://img.shields.io/badge/version-3.2.0-blue) 
 Download latest *APK* from [Release page](https://github.com/umer0586/SensorServer/releases) *(requires Android 5.0 or above)* . You can also get this app from [F-Droid](https://f-droid.org/en/) by adding [https://apt.izzysoft.de/fdroid/repo](https://apt.izzysoft.de/fdroid/repo) repository in F-Droid client 
 ##
 _You can appreciate this work by buying me a coffee_ :coffee: [https://www.buymeacoffee.com/umerfarooq](https://www.buymeacoffee.com/umerfarooq) 
