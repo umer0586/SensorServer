@@ -1,2 +1,4 @@
 /build
-/google-services.json
+/release/app-release.apk
+/src/debug/ic_launcher-playstore.png
+/release/output-metadata.json
