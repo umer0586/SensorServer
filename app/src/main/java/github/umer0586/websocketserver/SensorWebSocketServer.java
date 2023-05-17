@@ -437,7 +437,7 @@ public class SensorWebSocketServer extends WebSocketServer implements SensorEven
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
                 {
-                    response.put("time",location.getElapsedRealtimeUncertaintyNanos());
+                    response.put("elapsedRealtimeUncertaintyNanos",location.getElapsedRealtimeUncertaintyNanos());
                 }
 
 
