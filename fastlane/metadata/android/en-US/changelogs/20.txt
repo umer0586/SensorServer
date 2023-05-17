@@ -1,0 +1,2 @@
+Location feature added
+App can now stream device location to clients using GPS and network provider
