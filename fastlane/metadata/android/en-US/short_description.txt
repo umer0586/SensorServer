@@ -1,1 +1,1 @@
-stream phone's motion sensors to websocket clients
+App which let you stream various phone's sensors to websocket clients
