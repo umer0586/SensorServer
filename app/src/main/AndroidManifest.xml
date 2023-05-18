@@ -19,7 +19,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.SensorServer">
         <activity
-            android:name=".activity.AboutActivity"
+            android:name=".activities.AboutActivity"
             android:theme="@style/Theme.SensorServer.NoActionBar"
             android:exported="false">
             <meta-data
@@ -33,7 +33,7 @@
             android:exported="false" />
 
         <activity
-            android:name=".activity.FragmentNavigationActivity"
+            android:name=".activities.FragmentNavigationActivity"
             android:exported="true"
             android:launchMode="singleTask"
             android:screenOrientation="portrait">

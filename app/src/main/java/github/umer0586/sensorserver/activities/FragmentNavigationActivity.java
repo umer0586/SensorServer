@@ -1,4 +1,4 @@
-package github.umer0586.sensorserver.activity;
+package github.umer0586.sensorserver.activities;
 
 import android.content.ComponentName;
 import android.content.Intent;

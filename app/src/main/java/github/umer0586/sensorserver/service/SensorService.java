@@ -20,7 +20,7 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 
 import github.umer0586.sensorserver.R;
-import github.umer0586.sensorserver.activity.FragmentNavigationActivity;
+import github.umer0586.sensorserver.activities.FragmentNavigationActivity;
 import github.umer0586.sensorserver.broadcastreceiver.BroadcastMessageReceiver;
 import github.umer0586.sensorserver.websocketserver.ConnectionsChangeListener;
 import github.umer0586.sensorserver.websocketserver.ConnectionsCountChangeListener;
