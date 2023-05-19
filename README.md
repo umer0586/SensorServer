@@ -1,5 +1,6 @@
 # SensorServer
  
+### Effortlessly stream real-time sensor data from your phone to any application, allowing you to monitor the device's movement, environment, position, and location in real-time.
 
 ![server](https://user-images.githubusercontent.com/35717992/146649500-f4f1aadf-60e0-4305-81bc-f7db21540bd7.gif)    ![connections](https://user-images.githubusercontent.com/35717992/146649573-9b86ff77-565c-46ef-900b-63350f4eac3b.gif)    ![sensors](https://user-images.githubusercontent.com/35717992/146649578-adb5f0eb-4a7a-462a-9e16-264f4599903f.gif)
 
@@ -8,7 +9,7 @@
 
 
 
-Android app which let you stream real-time sensor data from your phone to Websocket clients. Clients, including web browsers and other applications running on PCs or mobile devices, are able to receive streamed data through the WebSocket client API. Since this application functions as a Websocket Server, you will require a Websocket Client API to establish a connection with the application. To obtain a Websocket library for your preferred programming language click [here](https://github.com/facundofarias/awesome-websockets). With this app, you can effortlessly stream real-time sensor data from your phone to any application, allowing you to monitor the device's movement, environment, and position in real-time.
+Android app which let you stream real-time sensor data from your phone to Websocket clients. Clients, including web browsers and other applications, are able to receive streamed data through the WebSocket client API. Since this application functions as a Websocket Server, you will require a Websocket Client API to establish a connection with the application. To obtain a Websocket library for your preferred programming language click [here](https://github.com/facundofarias/awesome-websockets). 
  
  
  
@@ -129,7 +130,7 @@ You access device location using following url.
 
                  ws://<ip>:<port>/location?provider=<location provider type>
                  
-Where a `provider` could be `gps` or `network`. In Android, both GPS and Network providers can be used to get location information. However, the accuracy and precision of each provider may vary depending on various factors. GPS is a satellite-based system that provides more accurate location information than the Network provider. GPS provides location information based on satellite signals, which can be affected by various factors such as weather conditions, buildings, and other obstacles that can block the signal. On the other hand, Network provider determines the location based on the cell tower and Wi-Fi signals in the area. Network provider can provide a faster location fix than GPS, but its accuracy may not be as precise as GPS.
+Where a `provider` could be `gps` or `network`. In Android, both GPS and Network providers can be used to get location information. However, the accuracy and precision of each provider may vary depending on various factors. GPS is a satellite-based system that provides more accurate location information than the Network provider. GPS provides location information based on satellite signals, which can be affected by various factors such as weather conditions, buildings, and other obstacles that can block the signal. On the other hand, Network provider determines the location based on the cell tower and Wi-Fi signals in the area. Network provider can provide a faster location fix than GPS, but its accuracy may not be as precise as GPS. The network provider will be removed in future releases since it's not useful in the context of this app.
 
 JSON response contains following key fields.
 
@@ -142,7 +143,16 @@ JSON response contains following key fields.
 | accuracy    | Estimated horizontal accuracy radius in meters of this location at the 68th percentile confidence level.             |
 | speed       | Speed at the time of this location in meters per second            |
 | time        | the Unix epoch time of this location fix, in milliseconds since the start of the Unix epoch (00:00:00 January 1, 1970 UTC).            |
-| provider    | Name of the provider associated with this location |            
+| provider    | Name of the provider associated with this location |
+
+Field only for Android 8.0 and above
+| Key      | Description |
+| ----------- | ----------- | 
+| speedAccuracyMetersPerSecond |Estimated speed accuracy in meters per second of this location at the 68th percentile confidence level
+| bearingAccuracyDegrees | Estimated bearing accuracy in degrees of this location at the 68th percentile confidence level. |
+| elapsedRealtimeNanos | Time of this fix in nanoseconds of elapsed realtime since system boot |
+| verticalAccuracyMeters | the Estimated altitude accuracy in meters of this location at the 68th percentile confidence level. |
+
 
 
 ## Real Time plotting
