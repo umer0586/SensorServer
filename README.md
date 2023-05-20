@@ -1,6 +1,6 @@
 # SensorServer
  
-### Effortlessly stream real-time sensor data from your phone to any application, allowing you to monitor the device's movement, environment, position, and location in real-time.
+### Effortlessly stream real-time sensor data from your phone to multiple WebSocket clients, enabling them to monitor the device's movement, environment, and position in real-time.
 
 ![server](https://user-images.githubusercontent.com/35717992/146649500-f4f1aadf-60e0-4305-81bc-f7db21540bd7.gif)    ![connections](https://user-images.githubusercontent.com/35717992/146649573-9b86ff77-565c-46ef-900b-63350f4eac3b.gif)    ![sensors](https://user-images.githubusercontent.com/35717992/146649578-adb5f0eb-4a7a-462a-9e16-264f4599903f.gif)
 
@@ -130,28 +130,32 @@ You access device location using following url.
 
                  ws://<ip>:<port>/location?provider=<location provider type>
                  
-Where a `provider` could be `gps` or `network`. In Android, both GPS and Network providers can be used to get location information. However, the accuracy and precision of each provider may vary depending on various factors. GPS is a satellite-based system that provides more accurate location information than the Network provider. GPS provides location information based on satellite signals, which can be affected by various factors such as weather conditions, buildings, and other obstacles that can block the signal. On the other hand, Network provider determines the location based on the cell tower and Wi-Fi signals in the area. Network provider can provide a faster location fix than GPS, but its accuracy may not be as precise as GPS. The network provider will be removed in future releases since it's not useful in the context of this app.
+Where a `provider` could be `gps` or `network`. In Android, both GPS and Network providers can be used to get location information. However, the accuracy and precision of each provider may vary depending on various factors. GPS is a satellite-based system that provides more accurate location information than the Network provider. GPS provides location information based on satellite signals, which can be affected by various factors such as weather conditions, buildings, and other obstacles that can block the signal. On the other hand, Network provider determines the location based on the cell tower and Wi-Fi signals in the area. Network provider can provide a faster location fix than GPS, but its accuracy may not be as precise as GPS. The network provider will be removed in future releases since it's not useful in the context of this app. Also, please ensure that you have granted location permission to the app through your phone's installed app settings.
 
 JSON response contains following key fields.
+```json
+{
+"longitude": "longitude in degrees",
+"latitude": "latitude in degrees",
+"altitude": "The altitude of location in meters above the WGS84 reference ellipsoid",
+"bearing": "bearing at the time of this location in degrees. Bearing is the horizontal direction of travel of this device and is unrelated to the device orientation. The bearing is guaranteed to be in the range [0, 360)",
+"accuracy": "Estimated horizontal accuracy radius in meters of this location at the 68th percentile confidence level",
+"speed": "Speed at the time of this location in meters per second",
+"time": "the Unix epoch time of this location fix, in milliseconds since the start of the Unix epoch (00:00:00 January 1, 1970 UTC)"
+}
+```
 
-| Key      | Description |
-| ----------- | ----------- |
-| longitude   | longitude in degrees       |
-| latitude    | latitude in degrees        |
-| altitude    | The altitude of location in meters above the WGS84 reference ellipsoid             |
-| bearing     | bearing at the time of this location in degrees. Bearing is the horizontal direction of travel of this device and is unrelated to the device orientation. The bearing is guaranteed to be in the range [0, 360).            |
-| accuracy    | Estimated horizontal accuracy radius in meters of this location at the 68th percentile confidence level.             |
-| speed       | Speed at the time of this location in meters per second            |
-| time        | the Unix epoch time of this location fix, in milliseconds since the start of the Unix epoch (00:00:00 January 1, 1970 UTC).            |
-| provider    | Name of the provider associated with this location |
+Fields only for Android 8.0 and above.
 
-Field only for Android 8.0 and above
-| Key      | Description |
-| ----------- | ----------- | 
-| speedAccuracyMetersPerSecond |Estimated speed accuracy in meters per second of this location at the 68th percentile confidence level
-| bearingAccuracyDegrees | Estimated bearing accuracy in degrees of this location at the 68th percentile confidence level. |
-| elapsedRealtimeNanos | Time of this fix in nanoseconds of elapsed realtime since system boot |
-| verticalAccuracyMeters | the Estimated altitude accuracy in meters of this location at the 68th percentile confidence level. |
+```json
+
+{
+"speedAccuracyMetersPerSecond": "Estimated speed accuracy in meters per second of this location at the 68th percentile confidence level",
+"bearingAccuracyDegrees": "Estimated bearing accuracy in degrees of this location at the 68th percentile confidence level",
+"elapsedRealtimeNanos": "Time of this fix in nanoseconds of elapsed realtime since system boot",
+"verticalAccuracyMeters": "The estimated altitude accuracy in meters of this location at the 68th percentile confidence level"
+}
+```
 
 
 
