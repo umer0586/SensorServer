@@ -1,0 +1,2 @@
+App Id changed from github.umer0586 to github.umer0586.sensorserver
+App namspace changed from github.umer to github.umer0586.sensorserver
