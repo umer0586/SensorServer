@@ -1,4 +1,5 @@
 # SensorServer
+![GitHub](https://img.shields.io/github/license/umer0586/SensorServer) ![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/umer0586/SensorServer) ![GitHub all releases](https://img.shields.io/github/downloads/umer0586/SensorServer/total)
  
 ### Effortlessly stream real-time sensor data from your phone to multiple WebSocket clients, enabling them to monitor the device's movement, environment, and position in real-time.
 
@@ -177,7 +178,7 @@ To connect over USB make sure `USB debugging` option is enable in your phone and
 Make sure you have installed your android device driver and `adb devices` command detects your connected android phone.
 
 
-# APK Download ⏬ ![version](https://img.shields.io/badge/version-3.2.1-blue) 
+# APK Download ⏬
 Download latest *APK* from [Release page](https://github.com/umer0586/SensorServer/releases) *(requires Android 5.0 or above)* . You can also get this app from [F-Droid](https://f-droid.org/en/) by adding [https://apt.izzysoft.de/fdroid/repo](https://apt.izzysoft.de/fdroid/repo) repository in F-Droid client 
 ##
 _You can appreciate this work by buying me a coffee_ :coffee: [https://www.buymeacoffee.com/umerfarooq](https://www.buymeacoffee.com/umerfarooq) 
