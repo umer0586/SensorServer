@@ -69,9 +69,9 @@ Some Android devices have additional sensors like **Coarse Motion Classifier** `
 
 ## Supports multiple connections to multiple sensors simultaneously
 
- **Many Websocket clients** can connect to one `type` of a Sensor. So connecting to **`/sensor/connect?type=android.sensor.accelerometer`** three times will create three different connections to the accelerometer sensor and each connected client will then receive accelerometer data at the same time.
- 
-Moreover, from one or different machines you can connect to different types of sensors as well i-e one **Websocket Client object** could connect to accelerometer and other **Websocket Client object** to gyroscope. All active connections can be viewed by selecting **Connections** navigation button.
+Multiple WebSocket clients can connect to a specific type of sensor. For example, by connecting to `/sensor/connect?type=android.sensor.accelerometer` multiple times, separate connections to the accelerometer sensor are created. Each connected client will receive accelerometer data simultaneously.
+
+Additionally, it is possible to connect to different types of sensors from either the same or different machines. For instance, one WebSocket client object can connect to the accelerometer, while another WebSocket client object can connect to the gyroscope. To view all active connections, you can select the "Connections" navigation button.
  
 ## Test with Websocket testing tools 
 You can test this app with any websocket testing tools available on the web or playstore. You can use http://livepersoninc.github.io/ws-test-page/ for testing purpose. Use multiple tabs for multiple websocket connections
