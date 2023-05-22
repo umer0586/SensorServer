@@ -1,5 +1,5 @@
 # SensorServer
-![GitHub](https://img.shields.io/github/license/umer0586/SensorServer) ![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/umer0586/SensorServer) ![GitHub all releases](https://img.shields.io/github/downloads/umer0586/SensorServer/total)
+![GitHub](https://img.shields.io/github/license/umer0586/SensorServer) ![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/umer0586/SensorServer) ![GitHub all releases](https://img.shields.io/github/downloads/umer0586/SensorServer/total) ![Android](https://img.shields.io/badge/Android%205.0+-3DDC84?style=flat&logo=android&logoColor=white) ![Websocket](https://img.shields.io/badge/protocol-websocket-green)
  
 ### Effortlessly stream real-time sensor data from your phone to multiple WebSocket clients, enabling them to monitor the device's movement, environment, and position in real-time.
 
