@@ -22,7 +22,7 @@ public class AppSettings {
     {
         sharedPreferences.edit()
                 .putInt(context.getString(R.string.pref_key_port_no),portNo)
-                .commit();
+                .apply();
     }
 
     public int getPortNo()
@@ -34,7 +34,7 @@ public class AppSettings {
     {
         sharedPreferences.edit()
                 .putInt(context.getString(R.string.pref_key_sampling_rate),samplingRate)
-                .commit();
+                .apply();
     }
 
     public int getSamplingRate()
@@ -46,7 +46,7 @@ public class AppSettings {
     {
         sharedPreferences.edit()
                 .putBoolean(context.getString(R.string.pref_key_localhost),state)
-                .commit();
+                .apply();
     }
 
     public boolean isLocalHostOptionEnable()
@@ -58,7 +58,7 @@ public class AppSettings {
     {
         sharedPreferences.edit()
                 .putBoolean(context.getString(R.string.pref_key_hotspot), state)
-                .commit();
+                .apply();
     }
 
     public boolean isHotspotOptionEnabled()
