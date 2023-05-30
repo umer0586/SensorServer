@@ -8,11 +8,6 @@
         android:title="Server" />
 
     <item
-        android:id="@+id/navigation_settings"
-        android:icon="@drawable/ic_settings"
-        android:title="@string/title_settings" />
-
-    <item
         android:id="@+id/navigation_connections"
         android:icon="@drawable/ic_connections"
         android:title="@string/title_connections" />
