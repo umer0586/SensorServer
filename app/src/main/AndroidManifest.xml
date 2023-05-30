@@ -7,9 +7,9 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.ACTIVITY_RECOGNITION" />
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
-    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
 
     <application
         android:allowBackup="true"
@@ -19,12 +19,30 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.SensorServer">
         <activity
-            android:name=".activities.AboutActivity"
-            android:theme="@style/Theme.SensorServer.NoActionBar"
+            android:name=".DeviceAxisActivity"
             android:exported="false">
             <meta-data
                 android:name="android.app.lib_name"
                 android:value="" />
+        </activity>
+        <activity
+            android:name=".activities.SettingsActivity"
+            android:exported="false"
+            android:label="Settings">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
+        <activity
+            android:theme="@style/Theme.SensorServer.FullScreen"
+            android:name=".activities.AboutActivity"
+            android:exported="false">
+        </activity>
+
+        <activity
+            android:theme="@style/Theme.SensorServer.FullScreen"
+            android:name=".activities.DeviceAxisActivity"
+            android:exported="false">
         </activity>
 
         <service
