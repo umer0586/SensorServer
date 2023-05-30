@@ -1,1 +1,1 @@
-App which let you stream various phone's sensors to websocket clients
+Stream phone's sensors to websocket clients
