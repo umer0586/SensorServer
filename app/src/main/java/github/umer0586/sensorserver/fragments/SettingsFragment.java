@@ -118,7 +118,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
                     appSettings.savePortNo(portNo);
                     return true;
                 }
-                 else {
+                else {
                     showAlertDialog("Please Select valid port No");
                     return false;
                 }
@@ -137,10 +137,10 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         EditTextPreference samplingRatePref = findPreference(getString(R.string.pref_key_sampling_rate));
         String dialogText =
                 "The data delay (or sampling rate) controls the interval at which sensor events are sent to application. Change this value before starting a Server<br><br>" +
-                "<font color=\"#689f38\"><b>Note : </b></font> <i>The delay that you specify is only a suggested delay. The Android system and other applications can alter this delay.</i><br><br>"+
-                "Normal Rate : <font color=\"#5c6bc0\"><b>200000</b>μs</font><br>" +
-                "Fastest Rate : <font color=\"#5c6bc0\"><b>0</b>μs</font><br><br>" +
-                "Enter value in <font color=\"#5c6bc0\"><b>Microseconds</b></font>";
+                        "<font color=\"#689f38\"><b>Note : </b></font> <i>The delay that you specify is only a suggested delay. The Android system and other applications can alter this delay.</i><br><br>"+
+                        "Normal Rate : <font color=\"#5c6bc0\"><b>200000</b>μs</font><br>" +
+                        "Fastest Rate : <font color=\"#5c6bc0\"><b>0</b>μs</font><br><br>" +
+                        "Enter value in <font color=\"#5c6bc0\"><b>Microseconds</b></font>";
         samplingRatePref.setDialogMessage(Html.fromHtml(dialogText));
 
         samplingRatePref.setOnBindEditTextListener(editText -> {
@@ -153,7 +153,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
 
             try {
 
-                 if(newValue.toString().trim().isEmpty())
+                if(newValue.toString().trim().isEmpty())
                     return false;
 
                 int samplingRate = Integer.parseInt(newValue.toString());
@@ -174,7 +174,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
 
 
                 appSettings.saveSamplingRate(samplingRate);
-                    return true;
+                return true;
 
             } catch (NumberFormatException e) {
                 e.printStackTrace();
@@ -199,8 +199,8 @@ public class SettingsFragment extends PreferenceFragmentCompat {
     private void showAlertDialog(CharSequence message)
     {
 
-         new AlertDialog.Builder(getContext())
-                 .setTitle("Invalid Port No")
+        new AlertDialog.Builder(getContext())
+                .setTitle("Invalid Port No")
                 .setMessage(message)
                 .setCancelable(false)
                 .setPositiveButton("Okay", (dialog, id) -> {
