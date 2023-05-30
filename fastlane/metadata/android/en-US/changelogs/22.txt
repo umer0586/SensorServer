@@ -1,0 +1,4 @@
+* A navigation drawer has been added.
+* The settings option has been removed from the bottom navigation bar.
+* A screen showing the device axis has been added.
+* Settings can now be accessed through the navigation drawer.
