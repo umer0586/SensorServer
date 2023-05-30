@@ -19,7 +19,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.SensorServer">
         <activity
-            android:name=".DeviceAxisActivity"
+            android:name=".activities.DeviceAxisActivity"
             android:exported="false">
             <meta-data
                 android:name="android.app.lib_name"
