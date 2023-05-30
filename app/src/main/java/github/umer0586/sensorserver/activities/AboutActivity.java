@@ -19,7 +19,6 @@ public class AboutActivity extends AppCompatActivity {
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_about);
-        getSupportActionBar().hide();
 
         findViewById(R.id.donationBtn).setOnClickListener(view->{
             openLink("http://www.buymeacoffee.com/umerfarooq");
