@@ -3,7 +3,6 @@ package github.umer0586.sensorserver.activities;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
@@ -12,8 +11,6 @@ import android.view.MenuItem;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.AppCompatImageView;
-import androidx.appcompat.widget.AppCompatTextView;
 import androidx.appcompat.widget.Toolbar;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
@@ -34,7 +31,7 @@ import github.umer0586.sensorserver.service.SensorService;
 import github.umer0586.sensorserver.service.ServiceBindHelper;
 
 
-public class FragmentNavigationActivity extends AppCompatActivity
+public class MainActivity extends AppCompatActivity
         implements NavigationBarView.OnItemSelectedListener,
         ServiceConnection, ConnectionsCountChangeListener {
 
@@ -42,7 +39,7 @@ public class FragmentNavigationActivity extends AppCompatActivity
     private ActionBarDrawerToggle actionBarDrawerToggle;
     private Toolbar toolbar;
 
-    private static final String TAG = FragmentNavigationActivity.class.getSimpleName();
+    private static final String TAG = MainActivity.class.getSimpleName();
     private ViewPager2 viewPager;
 
     private ServiceBindHelper serviceBindHelper;

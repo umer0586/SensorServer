@@ -20,7 +20,7 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 
 import github.umer0586.sensorserver.R;
-import github.umer0586.sensorserver.activities.FragmentNavigationActivity;
+import github.umer0586.sensorserver.activities.MainActivity;
 import github.umer0586.sensorserver.broadcastreceiver.BroadcastMessageReceiver;
 import github.umer0586.sensorserver.websocketserver.ConnectionsChangeListener;
 import github.umer0586.sensorserver.websocketserver.ConnectionsCountChangeListener;
@@ -170,7 +170,7 @@ public class SensorService extends Service implements BroadcastMessageReceiver.M
           if(serverStateListener != null)
               serverStateListener.onServerStarted(serverInfo);
 
-            Intent notificationIntent = new Intent(this, FragmentNavigationActivity.class);
+            Intent notificationIntent = new Intent(this, MainActivity.class);
             PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_IMMUTABLE);
 
             NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(getApplicationContext(), CHANNEL_ID)
