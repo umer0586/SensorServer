@@ -1,5 +1,6 @@
 plugins {
     id 'com.android.application'
+    id 'org.jetbrains.kotlin.android'
 }
 
 android {
@@ -27,6 +28,11 @@ android {
         sourceCompatibility JavaVersion.VERSION_11
         targetCompatibility JavaVersion.VERSION_11
     }
+
+    kotlinOptions {
+        jvmTarget = "11"
+    }
+
     namespace 'github.umer0586.sensorserver'
 /*    buildFeatures {
         viewBinding true
@@ -51,6 +57,9 @@ dependencies {
     implementation 'com.github.ybq:Android-SpinKit:1.4.0'
 
     implementation 'com.github.cachapa:ExpandableLayout:2.9.2'
+    implementation 'androidx.core:core-ktx:1.10.1'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:1.8.20"
+
 
 }
 

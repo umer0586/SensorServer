@@ -1,0 +1,318 @@
+package github.umer0586.sensorserver.service
+
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
+import android.app.Service
+import android.content.Intent
+import android.os.*
+import android.util.Log
+import androidx.core.app.NotificationCompat
+import github.umer0586.sensorserver.R
+import github.umer0586.sensorserver.activities.MainActivity
+import github.umer0586.sensorserver.broadcastreceiver.BroadcastMessageReceiver
+import github.umer0586.sensorserver.broadcastreceiver.BroadcastMessageReceiver.MessageListener
+import github.umer0586.sensorserver.setting.AppSettings
+import github.umer0586.sensorserver.util.IpUtil
+import github.umer0586.sensorserver.websocketserver.*
+import org.java_websocket.WebSocket
+import java.net.InetSocketAddress
+import java.net.UnknownHostException
+
+interface ServerStateListener
+{
+
+
+    fun onServerStarted(serverInfo: ServerInfo)
+    fun onServerStopped()
+    fun onServerError(ex: Exception?)
+    fun onServerAlreadyRunning(serverInfo: ServerInfo)
+}
+
+class SensorService : Service(), MessageListener
+{
+
+
+    private var sensorWebSocketServer: SensorWebSocketServer? = null
+
+    private var stateListener: ServerStateListener? = null
+    var connectionsChangeListener: ((List<WebSocket>) -> Unit)? = null
+    var connectionsCountChangeListener: ((Int) -> Unit)? = null
+
+    private lateinit var appSettings: AppSettings
+
+    // Binder given to clients
+    private val binder: IBinder = LocalBinder()
+
+    //Intents broadcast by Fragment/Activity are received by this service via MessageReceiver (BroadCastReceiver)
+    private lateinit var broadcastMessageReceiver: BroadcastMessageReceiver
+
+    companion object
+    {
+
+
+        private val TAG: String = SensorService::class.java.getSimpleName()
+        const val CHANNEL_ID = "ForegroundServiceChannel"
+
+        // cannot be zero
+        const val ON_GOING_NOTIFICATION_ID = 332
+        private const val TEMP_NOTIFICATION_ID = 421
+
+        // Broadcast intent action (published by other app's component) to stop server thread
+        val ACTION_STOP_SERVER = "ACTION_STOP_SERVER_" + SensorService::class.java.getName()
+    }
+
+
+    override fun onCreate()
+    {
+        super.onCreate()
+        Log.d(TAG, "onCreate()")
+        createNotificationChannel()
+        appSettings = AppSettings(applicationContext)
+        broadcastMessageReceiver = BroadcastMessageReceiver(applicationContext)
+        broadcastMessageReceiver.setMessageListener(this)
+        broadcastMessageReceiver.registerEvents()
+    }
+
+    override fun onMessage(intent: Intent)
+    {
+        Log.d(TAG, "onMessage() called with: intent = [$intent]")
+        if (intent.action == ACTION_STOP_SERVER)
+        {
+            if (sensorWebSocketServer != null && sensorWebSocketServer!!.isRunning)
+            {
+                try
+                {
+                    sensorWebSocketServer!!.stop()
+                    stopForeground(true)
+                }
+                catch (e: Exception)
+                {
+                    e.printStackTrace()
+                }
+            }
+        }
+    }
+
+    override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int
+    {
+        Log.d(TAG, "onStartCommand()")
+        handleAndroid8andAbove()
+
+
+        sensorWebSocketServer = if (appSettings.isHotspotOptionEnabled())
+        {
+            val hotspotIpAddress = IpUtil.getHotspotIPAddress(applicationContext)
+            if (hotspotIpAddress != null)
+            {
+                SensorWebSocketServer(
+                    applicationContext,
+                    InetSocketAddress(hotspotIpAddress, appSettings.getPortNo())
+                )
+            }
+            else
+            {
+
+                stateListener?.onServerError(UnknownHostException("Unable to obtain hotspot IP"))
+
+                stopForeground(true)
+                return START_NOT_STICKY
+            }
+        }
+        else if (appSettings.isLocalHostOptionEnable())
+        {
+            SensorWebSocketServer(
+                applicationContext,
+                InetSocketAddress("127.0.0.1", appSettings.getPortNo())
+            )
+        }
+        else
+        {
+            val wifiIpAddress = IpUtil.getWifiIpAddress(applicationContext)
+            if (wifiIpAddress != null)
+            {
+                SensorWebSocketServer(
+                    applicationContext,
+                    InetSocketAddress(wifiIpAddress, appSettings.getPortNo())
+                )
+            }
+            else
+            {
+
+                stateListener?.onServerError(UnknownHostException("Unable to obtain IP"))
+
+                stopForeground(true)
+                return START_NOT_STICKY
+            }
+        }
+        sensorWebSocketServer?.onStartListener = { serverInfo ->
+
+            stateListener?.onServerStarted(serverInfo)
+
+            val notificationIntent = Intent(this, MainActivity::class.java)
+            val pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_IMMUTABLE)
+
+            val notificationBuilder = NotificationCompat.Builder(applicationContext, CHANNEL_ID)
+                .apply {
+                    setSmallIcon(R.drawable.ic_radar_signal)
+                    setContentTitle("Sensor Server Running...")
+                    setContentText("ws://" + serverInfo.ipAddress + ":" + serverInfo.port)
+                    setPriority(NotificationCompat.PRIORITY_DEFAULT) // Set the intent that will fire when the user taps the notification
+                    setContentIntent(pendingIntent) // don't cancel notification when user taps it
+                    setAutoCancel(false)
+                }
+
+
+            val notification = notificationBuilder.build()
+            startForeground(ON_GOING_NOTIFICATION_ID, notification)
+
+        }
+        sensorWebSocketServer?.onStopListener = {
+
+            stateListener?.onServerStopped()
+
+            //remove the service from foreground but don't stop (destroy) the service
+            stopForeground(true)
+        }
+
+        sensorWebSocketServer?.onErrorListener = { exception ->
+
+            stateListener?.onServerError(exception)
+            stopForeground(true)
+        }
+
+        sensorWebSocketServer?.connectionsChangeListener = { webSockets ->
+
+            connectionsChangeListener?.invoke(webSockets)
+            connectionsCountChangeListener?.invoke(webSockets.size)
+
+        }
+        sensorWebSocketServer?.samplingRate = appSettings.getSamplingRate()
+        sensorWebSocketServer?.run()
+
+        return START_NOT_STICKY
+    }
+
+    private fun createNotificationChannel()
+    {
+        // Create the NotificationChannel, but only on API 26+ because
+        // the NotificationChannel class is new and not in the support library
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+        {
+            Log.d(TAG, "createNotificationChannel() called")
+            val name: CharSequence = "Sensor-Server"
+            val description = "Notifications from SensorServer"
+            val importance = NotificationManager.IMPORTANCE_DEFAULT
+            val channel = NotificationChannel(CHANNEL_ID, name, importance)
+            channel.description = description
+            // Register the channel with the system; you can't change the importance
+            // or other notification behaviors after this
+            val notificationManager = getSystemService( NotificationManager::class.java )
+            notificationManager.createNotificationChannel(channel)
+        }
+    }
+
+    /*
+     * For Android 8 and above there is a framework restriction which required service.startForeground()
+     * method to be called within five seconds after call to Context.startForegroundService()
+     * so make sure we call this method even if we are returning from service.onStartCommand() without calling
+     * service.startForeground()
+     *
+     * */
+    private fun handleAndroid8andAbove()
+    {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+        {
+            val tempNotification = NotificationCompat.Builder(
+                applicationContext, CHANNEL_ID
+            )
+                .setSmallIcon(R.drawable.ic_signal)
+                .setContentTitle("")
+                .setContentText("").build()
+            startForeground(TEMP_NOTIFICATION_ID, tempNotification)
+            stopForeground(true)
+        }
+    }
+
+    override fun onDestroy()
+    {
+        super.onDestroy()
+        Log.d(TAG, "onDestroy()")
+
+
+        sensorWebSocketServer?.let { server ->
+            try
+            {
+                Log.d(TAG, "calling server.stop()")
+                server.stop()
+            }
+            catch (e: Exception)
+            {
+                e.printStackTrace()
+            }
+        }
+
+        broadcastMessageReceiver.unregisterEvents()
+
+    }
+
+    override fun onBind(intent: Intent): IBinder
+    {
+        return binder
+    }
+
+    fun getConnectionCount() : Int
+    {
+        sensorWebSocketServer?.let {
+            return it.connections.size
+        }
+
+        return 0
+    }
+
+    fun checkState()
+    {
+        sensorWebSocketServer?.let { server ->
+
+            if (server.isRunning)
+            {
+                stateListener?.let { listener ->
+
+                    listener.onServerAlreadyRunning( ServerInfo(server.address.hostName,server.port))
+                }
+            }
+
+        }
+    }
+
+    fun getConnectedClients(): List<WebSocket>
+    {
+        sensorWebSocketServer?.let { server ->
+
+            return server.connections.toList()
+        }
+
+        return emptyList();
+
+    }
+
+    /**
+     * Class used for the client Binder.  Because we know this service always
+     * runs in the same process as its clients, we don't need to deal with IPC.
+     */
+    inner class LocalBinder : Binder()
+    {
+        
+        // Return this instance of LocalService so clients can call public methods
+        val service: SensorService
+            get() = this@SensorService // Return this instance of LocalService so clients can call public methods
+
+    }
+
+    fun setServerStateListener(serverStateListener: ServerStateListener?)
+    {
+        this.stateListener = serverStateListener
+    }
+
+
+}
