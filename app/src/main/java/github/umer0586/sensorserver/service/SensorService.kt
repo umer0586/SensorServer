@@ -84,7 +84,7 @@ class SensorService : Service(), MessageListener
                 try
                 {
                     sensorWebSocketServer!!.stop()
-                    stopForeground(true)
+                    stopForeground()
                 }
                 catch (e: Exception)
                 {
@@ -115,7 +115,7 @@ class SensorService : Service(), MessageListener
 
                 stateListener?.onServerError(UnknownHostException("Unable to obtain hotspot IP"))
 
-                stopForeground(true)
+                stopForeground()
                 return START_NOT_STICKY
             }
         }
@@ -141,7 +141,7 @@ class SensorService : Service(), MessageListener
 
                 stateListener?.onServerError(UnknownHostException("Unable to obtain IP"))
 
-                stopForeground(true)
+                stopForeground()
                 return START_NOT_STICKY
             }
         }
@@ -172,13 +172,15 @@ class SensorService : Service(), MessageListener
             stateListener?.onServerStopped()
 
             //remove the service from foreground but don't stop (destroy) the service
-            stopForeground(true)
+            //stopForeground(true)
+            stopForeground()
         }
 
         sensorWebSocketServer?.onErrorListener = { exception ->
 
             stateListener?.onServerError(exception)
-            stopForeground(true)
+            //stopForeground(true)
+            stopForeground()
         }
 
         sensorWebSocketServer?.connectionsChangeListener = { webSockets ->
@@ -230,8 +232,26 @@ class SensorService : Service(), MessageListener
                 .setContentTitle("")
                 .setContentText("").build()
             startForeground(TEMP_NOTIFICATION_ID, tempNotification)
-            stopForeground(true)
+            //stopForeground(true)
+            stopForeground()
         }
+    }
+
+    private fun stopForeground()
+    {
+        /*
+        If the device is running an older version of Android,
+        we fallback to stopForeground(true) to remove the service from the foreground and dismiss the ongoing notification.
+        Although it shows as deprecated, it should still work as expected on API level 21 (Android 5).
+         */
+
+        // for Android 7 and above
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
+            stopForeground(STOP_FOREGROUND_REMOVE)
+        else
+        // This method was deprecated in API level 33.
+        // Ignore deprecation message as there is no other alternative method for Android 6 and lower
+            stopForeground(true)
     }
 
     override fun onDestroy()
@@ -302,7 +322,7 @@ class SensorService : Service(), MessageListener
      */
     inner class LocalBinder : Binder()
     {
-        
+
         // Return this instance of LocalService so clients can call public methods
         val service: SensorService
             get() = this@SensorService // Return this instance of LocalService so clients can call public methods
