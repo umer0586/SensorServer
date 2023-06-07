@@ -2,12 +2,11 @@ package github.umer0586.sensorserver.fragments
 
 import android.content.DialogInterface
 import android.os.Bundle
-import android.text.Html
 import android.text.InputType
 import android.widget.EditText
 import androidx.appcompat.app.AlertDialog
+import androidx.core.text.HtmlCompat
 import androidx.preference.EditTextPreference
-import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.SwitchPreferenceCompat
 import com.google.android.material.snackbar.Snackbar
@@ -130,14 +129,20 @@ class SettingsFragment : PreferenceFragmentCompat()
     private fun handleSamplingRatePreference()
     {
         val samplingRatePref = findPreference<EditTextPreference>(getString(R.string.pref_key_sampling_rate))
-        val dialogText =
-            "The data delay (or sampling rate) controls the interval at which sensor events are sent to application. Change this value before starting a Server<br><br>" +
-                    "<font color=\"#689f38\"><b>Note : </b></font> <i>The delay that you specify is only a suggested delay. The Android system and other applications can alter this delay.</i><br><br>" +
-                    "Normal Rate : <font color=\"#5c6bc0\"><b>200000</b>μs</font><br>" +
-                    "Fastest Rate : <font color=\"#5c6bc0\"><b>0</b>μs</font><br><br>" +
-                    "Enter value in <font color=\"#5c6bc0\"><b>Microseconds</b></font>"
-        samplingRatePref!!.dialogMessage = Html.fromHtml(dialogText)
-        samplingRatePref.setOnBindEditTextListener { editText: EditText ->
+        val dialogText = """
+                The data delay (or sampling rate) controls the interval at which sensor events are sent to application. Change this value before starting a Server
+                <br><br>
+                <font color="#689f38"><b>Note : </b></font> <i>The delay that you specify is only a suggested delay. The Android system and other applications can alter this delay.</i>
+                <br><br>
+                 Normal Rate : <font color="#5c6bc0"><b>200000</b>μs</font>
+                <br>
+                 Fastest Rate : <font color="#5c6bc0"><b>0</b>μs</font>
+                <br><br>
+                 Enter value in <font color="#5c6bc0"><b>Microseconds</b></font>
+                """.trimIndent()
+
+        samplingRatePref?.dialogMessage = HtmlCompat.fromHtml(dialogText,HtmlCompat.FROM_HTML_MODE_LEGACY)
+        samplingRatePref?.setOnBindEditTextListener { editText: EditText ->
             editText.inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_SIGNED
         }
 
