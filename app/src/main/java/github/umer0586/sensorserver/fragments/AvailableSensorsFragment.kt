@@ -3,13 +3,13 @@ package github.umer0586.sensorserver.fragments
 import android.content.*
 import android.hardware.Sensor
 import android.os.Bundle
-import android.text.Html
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.appcompat.widget.AppCompatTextView
+import androidx.core.text.HtmlCompat
 import androidx.fragment.app.ListFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import github.umer0586.sensorserver.R
@@ -63,8 +63,7 @@ class AvailableSensorsFragment : ListFragment()
             sensor?.let {
 
                 sensorName.text = sensor.name
-                sensorType.text =
-                    Html.fromHtml("<font color=\"#5c6bc0\"><b>Type = </b></font>" + sensor.stringType)
+                sensorType.text = HtmlCompat.fromHtml("<font color=\"#5c6bc0\"><b>Type = </b></font>" + sensor.stringType,HtmlCompat.FROM_HTML_MODE_LEGACY)
 
             }
 
