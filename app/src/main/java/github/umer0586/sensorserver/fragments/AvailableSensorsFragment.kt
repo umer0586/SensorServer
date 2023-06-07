@@ -13,7 +13,7 @@ import androidx.appcompat.widget.AppCompatTextView
 import androidx.fragment.app.ListFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import github.umer0586.sensorserver.R
-import github.umer0586.sensorserver.fragments.AvailableSensorsFragment
+import github.umer0586.sensorserver.customextensions.detail
 import github.umer0586.sensorserver.util.SensorUtil
 
 class AvailableSensorsFragment : ListFragment()
@@ -43,50 +43,9 @@ class AvailableSensorsFragment : ListFragment()
 
         val sensor = v.tag as Sensor
 
-        var sensorInfo = ""
-        sensorInfo += """
-            Name : ${sensor.name}
-           
-            """.trimIndent()
-        sensorInfo += """
-            MinDelay : ${sensor.minDelay}μs
-            
-            """.trimIndent()
-        sensorInfo += """
-            MaxDelay : ${sensor.maxDelay}μs
-            
-            """.trimIndent()
-        sensorInfo += """
-            MaxRange : ${sensor.maximumRange}
-            
-            """.trimIndent()
-        sensorInfo += """
-            Resolution : ${sensor.resolution}
-            
-            """.trimIndent()
-        sensorInfo += """
-            Reporting Mode : ${getSensorReportingModeString(sensor.reportingMode)}
-            
-            """.trimIndent()
-        sensorInfo += """
-            Power : ${sensor.power}mA
-            
-            """.trimIndent()
-        sensorInfo += """
-            Vendor : ${sensor.vendor}
-            
-            """.trimIndent()
-        sensorInfo += """
-            Version : ${sensor.version}
-            
-            """.trimIndent()
-        sensorInfo += """
-            WakeUp sensor : ${sensor.isWakeUpSensor}
-            
-            """.trimIndent()
         MaterialAlertDialogBuilder(requireContext())
             .setTitle("Sensor Info")
-            .setMessage(sensorInfo)
+            .setMessage(sensor.detail())
             .show()
     }
 
@@ -118,17 +77,7 @@ class AvailableSensorsFragment : ListFragment()
     {
 
         private val TAG: String = AvailableSensorsFragment::class.java.getSimpleName()
-        private fun getSensorReportingModeString(reportingMode: Int): String
-        {
-            var reportingModeString = ""
-            when (reportingMode)
-            {
-                Sensor.REPORTING_MODE_CONTINUOUS -> reportingModeString = "Continuous"
-                Sensor.REPORTING_MODE_ON_CHANGE -> reportingModeString = "On Change"
-                Sensor.REPORTING_MODE_ONE_SHOT -> reportingModeString = "One Shot"
-                Sensor.REPORTING_MODE_SPECIAL_TRIGGER -> reportingModeString = "Special Trigger"
-            }
-            return reportingModeString
-        }
+
     }
 }
+
