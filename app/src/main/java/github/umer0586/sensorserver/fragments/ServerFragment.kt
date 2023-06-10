@@ -9,15 +9,12 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import android.widget.Toast
-import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import com.github.ybq.android.spinkit.SpinKitView
-import com.google.android.material.button.MaterialButton
 import com.google.android.material.snackbar.Snackbar
 import github.umer0586.sensorserver.R
+import github.umer0586.sensorserver.databinding.FragmentServerBinding
 import github.umer0586.sensorserver.service.SensorService
 import github.umer0586.sensorserver.service.SensorService.LocalBinder
 import github.umer0586.sensorserver.service.ServerStateListener
@@ -36,24 +33,17 @@ class ServerFragment : Fragment(), ServiceConnection, ServerStateListener
     private lateinit var serviceBindHelper: ServiceBindHelper
     private lateinit var appSettings: AppSettings
 
-    // Button at center to start/stop server
-    private lateinit var startButton: MaterialButton
-
-    // Address of server (ws://192.168.2.1:8081)
-    private lateinit var serverAddress: TextView
-
-    // card view which holds serverAddress
-    private lateinit var cardView: CardView
-
-    //Ripple animation behind startButton
-    private lateinit var pulseAnimation: SpinKitView
+    private var _binding : FragmentServerBinding? = null
+    // This property is only valid between onCreateView and
+    // onDestroyView.
+    private val binding get() = _binding!!
 
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View?
     {
-        Log.i(TAG, "onCreateView: ")
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_server, container, false)
+        _binding = FragmentServerBinding.inflate(inflater, container, false)
+        val view = binding.root
+        return view
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?)
@@ -62,12 +52,6 @@ class ServerFragment : Fragment(), ServiceConnection, ServerStateListener
         Log.i(TAG, "onViewCreated: ")
 
 
-        startButton = view.findViewById(R.id.start_button)
-        serverAddress = view.findViewById(R.id.server_address)
-        pulseAnimation = view.findViewById(R.id.loading_animation)
-
-
-        cardView = view.findViewById(R.id.card_view)
         appSettings = AppSettings(context)
 
 
@@ -82,19 +66,21 @@ class ServerFragment : Fragment(), ServiceConnection, ServerStateListener
         hideServerAddress()
 
         // we will use tag to determine last state of button
-        startButton.setOnClickListener { v ->
+        binding.startButton.setOnClickListener { v ->
             if (v.tag == "stopped")
                 startServer()
             else if (v.tag == "started")
                 stopServer()
         }
+
+
     }
 
     private fun showServerAddress(address: String)
     {
-        cardView.visibility = View.VISIBLE
-        serverAddress.visibility = View.VISIBLE
-        serverAddress.text = address
+        binding.cardView.visibility = View.VISIBLE
+        binding.serverAddress.visibility = View.VISIBLE
+        binding.serverAddress.text = address
         showPulseAnimation()
     }
 
@@ -156,8 +142,8 @@ class ServerFragment : Fragment(), ServiceConnection, ServerStateListener
             showServerAddress("ws://" + serverInfo.ipAddress + ":" + serverInfo.port)
             showPulseAnimation()
 
-            startButton.tag = "started"
-            startButton.text = "STOP"
+            binding.startButton.tag = "started"
+            binding.startButton.text = "STOP"
 
             showMessage("Server started")
         }
@@ -172,8 +158,8 @@ class ServerFragment : Fragment(), ServiceConnection, ServerStateListener
             hideServerAddress()
             hidePulseAnimation()
 
-            startButton.tag = "stopped"
-            startButton.text = "START"
+            binding.startButton.tag = "stopped"
+            binding.startButton.text = "START"
 
             showMessage("Server Stopped")
         }
@@ -190,8 +176,8 @@ class ServerFragment : Fragment(), ServiceConnection, ServerStateListener
             else showMessage("Failed to start server")
             Log.w(TAG, "onServerError() called")
 
-            startButton.tag = "stopped"
-            startButton.text = "START"
+            binding.startButton.tag = "stopped"
+            binding.startButton.text = "START"
 
             hideServerAddress()
             hidePulseAnimation()
@@ -204,25 +190,26 @@ class ServerFragment : Fragment(), ServiceConnection, ServerStateListener
         UIUtil.runOnUiThread {
             showServerAddress("ws://" + serverInfo.ipAddress + ":" + serverInfo.port)
             Toast.makeText(context, "service running", Toast.LENGTH_SHORT).show()
-            startButton.tag = "started"
-            startButton.text = "STOP"
+            binding.startButton.tag = "started"
+            binding.startButton.text = "STOP"
         }
     }
 
     private fun showPulseAnimation()
     {
-        pulseAnimation.visibility = View.VISIBLE
+        binding.pulseAnimation.visibility = View.VISIBLE
+
     }
 
     private fun hidePulseAnimation()
     {
-        pulseAnimation.visibility = View.INVISIBLE
+        binding.pulseAnimation.visibility = View.INVISIBLE
     }
 
     private fun hideServerAddress()
     {
-        cardView.visibility = View.GONE
-        serverAddress.visibility = View.GONE
+        binding.cardView.visibility = View.GONE
+        binding.serverAddress.visibility = View.GONE
     }
 
     override fun onServiceConnected(name: ComponentName, service: IBinder)
@@ -245,6 +232,11 @@ class ServerFragment : Fragment(), ServiceConnection, ServerStateListener
         lifecycle.removeObserver(serviceBindHelper)
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+
     private fun showMessage(message: String)
     {
 
@@ -252,7 +244,7 @@ class ServerFragment : Fragment(), ServiceConnection, ServerStateListener
 
             Snackbar.make(it, message, Snackbar.LENGTH_SHORT).apply{
                 //R.id.nav_bar is in FragmentNavigationActivity
-                setAnchorView(R.id.nav_bar)
+                setAnchorView(R.id.bottom_nav_view)
 
             }.show()
 

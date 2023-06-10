@@ -34,9 +34,10 @@ android {
     }
 
     namespace 'github.umer0586.sensorserver'
-/*    buildFeatures {
+
+    buildFeatures {
         viewBinding true
-    }*/
+    }
 }
 
 dependencies {

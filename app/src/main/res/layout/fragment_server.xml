@@ -49,7 +49,7 @@
 
 
     <com.github.ybq.android.spinkit.SpinKitView
-        android:id="@+id/loading_animation"
+        android:id="@+id/pulse_animation"
         android:layout_width="160dp"
         android:layout_height="160dp"
         android:layout_centerInParent="true"

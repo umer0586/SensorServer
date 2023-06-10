@@ -8,18 +8,15 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import github.umer0586.sensorserver.R
+import github.umer0586.sensorserver.databinding.FragmentConnectionsBinding
 import github.umer0586.sensorserver.fragments.customadapters.ConnectionsRecyclerViewAdapter
 import github.umer0586.sensorserver.service.SensorService
 import github.umer0586.sensorserver.service.SensorService.LocalBinder
 import github.umer0586.sensorserver.service.ServiceBindHelper
 import github.umer0586.sensorserver.util.UIUtil
 import org.java_websocket.WebSocket
-import java.util.*
 
 /**
  * TODO: functionality to allow user to close all connections (using button in action bar)
@@ -29,29 +26,32 @@ class ConnectionsFragment : Fragment(), ServiceConnection
 
     private var sensorService: SensorService? = null
     private lateinit var serviceBindHelper: ServiceBindHelper
-    private lateinit var recyclerView: RecyclerView
+
     private lateinit var connectionsRecyclerViewAdapter: ConnectionsRecyclerViewAdapter
     private val webSockets = ArrayList<WebSocket>()
-    private lateinit var noConnectionsText: TextView
+
+
+    private var _binding : FragmentConnectionsBinding? = null
+    private val binding get() = _binding!!
 
     override fun onCreateView( inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle? ): View?
     {
         Log.d(TAG, "onCreateView()")
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_connections, container, false)
+
+        _binding = FragmentConnectionsBinding.inflate(inflater, container, false)
+        val view = binding.root
+
+        return view
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?)
     {
         super.onViewCreated(view, savedInstanceState)
-        recyclerView = view.findViewById(R.id.recycler_view)
-        recyclerView.setLayoutManager(LinearLayoutManager(context))
+
+        binding.recyclerView.setLayoutManager(LinearLayoutManager(context))
 
         connectionsRecyclerViewAdapter = ConnectionsRecyclerViewAdapter(webSockets)
-        recyclerView.setAdapter(connectionsRecyclerViewAdapter)
-
-
-        noConnectionsText = view.findViewById(R.id.no_connections_text)
+        binding.recyclerView.setAdapter(connectionsRecyclerViewAdapter)
 
 
         serviceBindHelper = ServiceBindHelper(
@@ -113,13 +113,18 @@ class ConnectionsFragment : Fragment(), ServiceConnection
     {
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+
 
     private fun handleNoConnectionsText()
     {
         if (webSockets.size > 0) UIUtil.runOnUiThread {
-            noConnectionsText.visibility = View.INVISIBLE
+            binding.noConnectionsText.visibility = View.INVISIBLE
         }
-        else UIUtil.runOnUiThread { noConnectionsText.visibility = View.VISIBLE }
+        else UIUtil.runOnUiThread { binding.noConnectionsText.visibility = View.VISIBLE }
     }
 
     companion object

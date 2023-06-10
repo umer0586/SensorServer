@@ -16,12 +16,14 @@
         <!-- The ActionBar displayed at the top -->
         <include
             layout="@layout/toolbar"
+            android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
 
         <include
             layout="@layout/dashboard"
+            android:id="@+id/dashboard"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 
