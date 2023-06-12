@@ -4,17 +4,23 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
+import android.content.Context
 import android.content.Intent
-import android.os.*
+import android.net.wifi.WifiManager
+import android.os.Binder
+import android.os.Build
+import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import github.umer0586.sensorserver.R
 import github.umer0586.sensorserver.activities.MainActivity
 import github.umer0586.sensorserver.broadcastreceiver.BroadcastMessageReceiver
 import github.umer0586.sensorserver.broadcastreceiver.BroadcastMessageReceiver.MessageListener
+import github.umer0586.sensorserver.customextensions.getHotspotIp
+import github.umer0586.sensorserver.customextensions.getIp
 import github.umer0586.sensorserver.setting.AppSettings
-import github.umer0586.sensorserver.util.IpUtil
-import github.umer0586.sensorserver.websocketserver.*
+import github.umer0586.sensorserver.websocketserver.SensorWebSocketServer
+import github.umer0586.sensorserver.websocketserver.ServerInfo
 import org.java_websocket.WebSocket
 import java.net.InetSocketAddress
 import java.net.UnknownHostException
@@ -99,10 +105,12 @@ class SensorService : Service(), MessageListener
         Log.d(TAG, "onStartCommand()")
         handleAndroid8andAbove()
 
+        val wifiManager = applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
+
 
         sensorWebSocketServer = if (appSettings.isHotspotOptionEnabled())
         {
-            val hotspotIpAddress = IpUtil.getHotspotIPAddress(applicationContext)
+            val hotspotIpAddress = wifiManager.getHotspotIp()
             if (hotspotIpAddress != null)
             {
                 SensorWebSocketServer(
@@ -128,7 +136,7 @@ class SensorService : Service(), MessageListener
         }
         else
         {
-            val wifiIpAddress = IpUtil.getWifiIpAddress(applicationContext)
+            val wifiIpAddress = wifiManager.getIp()
             if (wifiIpAddress != null)
             {
                 SensorWebSocketServer(

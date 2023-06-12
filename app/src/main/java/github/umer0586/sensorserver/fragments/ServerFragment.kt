@@ -1,8 +1,10 @@
 package github.umer0586.sensorserver.fragments
 
 import android.content.ComponentName
+import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
+import android.net.wifi.WifiManager
 import android.os.Bundle
 import android.os.IBinder
 import android.util.Log
@@ -14,6 +16,7 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.google.android.material.snackbar.Snackbar
 import github.umer0586.sensorserver.R
+import github.umer0586.sensorserver.customextensions.isHotSpotEnabled
 import github.umer0586.sensorserver.databinding.FragmentServerBinding
 import github.umer0586.sensorserver.service.SensorService
 import github.umer0586.sensorserver.service.SensorService.LocalBinder
@@ -21,7 +24,6 @@ import github.umer0586.sensorserver.service.ServerStateListener
 import github.umer0586.sensorserver.service.ServiceBindHelper
 import github.umer0586.sensorserver.setting.AppSettings
 import github.umer0586.sensorserver.util.UIUtil
-import github.umer0586.sensorserver.util.WifiUtil
 import github.umer0586.sensorserver.websocketserver.ServerInfo
 import java.net.BindException
 import java.net.UnknownHostException
@@ -88,9 +90,11 @@ class ServerFragment : Fragment(), ServiceConnection, ServerStateListener
     {
         Log.d(TAG, "startServer() called")
 
+        val wifiManager = requireContext().applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
+
         if (appSettings.isHotspotOptionEnabled())
         {
-            if (WifiUtil.isHotspotEnabled(context))
+            if (wifiManager.isHotSpotEnabled())
             {
                 val intent = Intent(context, SensorService::class.java)
                 ContextCompat.startForegroundService(requireContext(), intent)
@@ -107,7 +111,7 @@ class ServerFragment : Fragment(), ServiceConnection, ServerStateListener
         }
         else
         {
-            if (WifiUtil.isWifiEnabled(context))
+            if (wifiManager.isWifiEnabled())
             {
                 val intent = Intent(context, SensorService::class.java)
                 ContextCompat.startForegroundService(requireContext(), intent)

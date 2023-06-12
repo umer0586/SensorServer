@@ -1,6 +1,8 @@
 package github.umer0586.sensorserver.fragments
 
+import android.content.Context
 import android.content.DialogInterface
+import android.net.wifi.WifiManager
 import android.os.Bundle
 import android.text.InputType
 import android.widget.EditText
@@ -11,9 +13,9 @@ import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.SwitchPreferenceCompat
 import com.google.android.material.snackbar.Snackbar
 import github.umer0586.sensorserver.R
+import github.umer0586.sensorserver.customextensions.getHotspotIp
+import github.umer0586.sensorserver.customextensions.isHotSpotEnabled
 import github.umer0586.sensorserver.setting.AppSettings
-import github.umer0586.sensorserver.util.IpUtil
-import github.umer0586.sensorserver.util.WifiUtil
 
 class SettingsFragment : PreferenceFragmentCompat()
 {
@@ -35,7 +37,8 @@ class SettingsFragment : PreferenceFragmentCompat()
     override fun onResume()
     {
         super.onResume()
-        if (!WifiUtil.isHotspotEnabled(context))
+        val wifiManager = requireContext().applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
+        if (wifiManager.isHotSpotEnabled())
         {
             val hotspotPref = findPreference<SwitchPreferenceCompat>(getString(R.string.pref_key_hotspot))
             hotspotPref?.isChecked = false
@@ -45,6 +48,8 @@ class SettingsFragment : PreferenceFragmentCompat()
 
     private fun handleHotspotPref()
     {
+        val wifiManager = requireContext().applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
+
         val hotspotPref = findPreference<SwitchPreferenceCompat>(getString(R.string.pref_key_hotspot))
 
         hotspotPref?.setOnPreferenceChangeListener { _, newValue ->
@@ -59,10 +64,10 @@ class SettingsFragment : PreferenceFragmentCompat()
             }
             if (newState == true)
             {
-                if (WifiUtil.isHotspotEnabled(context))
+                if (wifiManager.isHotSpotEnabled())
                 {
                     appSettings.enableHotspotOption(true)
-                    hotspotPref.summary = IpUtil.getHotspotIPAddress(context)
+                    hotspotPref.summary = wifiManager.getHotspotIp()
                     return@setOnPreferenceChangeListener true
                 }
                 else
