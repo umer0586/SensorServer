@@ -656,15 +656,7 @@ class SensorWebSocketServer(private val context: Context, address: InetSocketAdd
     private fun notifyConnectionsChanged()
     {
         Log.d(TAG, "notifyConnectionsChanged() : " + connections.size)
-/*        if (connectionsChangeListener != null) connectionsChangeListener!!.onConnectionsChanged(
-            ArrayList(
-                connections
-            )
-        )*/
-
-        connectionsChangeListener?.apply {
-            invoke(ArrayList(connections))
-        }
+        connectionsChangeListener?.invoke(ArrayList(connections))
     }
 
     fun getConnectionCount(): Int
