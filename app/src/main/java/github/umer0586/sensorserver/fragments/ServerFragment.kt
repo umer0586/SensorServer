@@ -136,7 +136,7 @@ class ServerFragment : Fragment(), ServiceConnection, ServerStateListener
         super.onPause()
         Log.d(TAG, "onPause()")
 
-        sensorService?.setServerStateListener(null)
+        sensorService?.serverStateListener = null
     }
 
     override fun onServerStarted(serverInfo: ServerInfo)
@@ -221,7 +221,7 @@ class ServerFragment : Fragment(), ServiceConnection, ServerStateListener
         val localBinder = service as LocalBinder
         sensorService = localBinder.service
 
-        sensorService?.setServerStateListener(this)
+        sensorService?.serverStateListener = this
         sensorService?.checkState() // this callbacks onServerAlreadyRunning()
 
     }

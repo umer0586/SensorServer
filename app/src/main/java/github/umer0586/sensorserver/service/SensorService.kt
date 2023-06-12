@@ -41,7 +41,7 @@ class SensorService : Service(), MessageListener
 
     private var sensorWebSocketServer: SensorWebSocketServer? = null
 
-    private var stateListener: ServerStateListener? = null
+    var serverStateListener: ServerStateListener? = null
     var connectionsChangeListener: ((List<WebSocket>) -> Unit)? = null
     var connectionsCountChangeListener: ((Int) -> Unit)? = null
 
@@ -130,7 +130,7 @@ class SensorService : Service(), MessageListener
             else
             {
 
-                stateListener?.onServerError(UnknownHostException("Unable to obtain hotspot IP"))
+                serverStateListener?.onServerError(UnknownHostException("Unable to obtain hotspot IP"))
 
                 stopForeground()
                 return START_NOT_STICKY
@@ -156,7 +156,7 @@ class SensorService : Service(), MessageListener
             else
             {
 
-                stateListener?.onServerError(UnknownHostException("Unable to obtain IP"))
+                serverStateListener?.onServerError(UnknownHostException("Unable to obtain IP"))
 
                 stopForeground()
                 return START_NOT_STICKY
@@ -164,7 +164,7 @@ class SensorService : Service(), MessageListener
         }
         sensorWebSocketServer?.onStartListener = { serverInfo ->
 
-            stateListener?.onServerStarted(serverInfo)
+            serverStateListener?.onServerStarted(serverInfo)
 
             val notificationIntent = Intent(this, MainActivity::class.java)
             val pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_IMMUTABLE)
@@ -186,7 +186,7 @@ class SensorService : Service(), MessageListener
         }
         sensorWebSocketServer?.onStopListener = {
 
-            stateListener?.onServerStopped()
+            serverStateListener?.onServerStopped()
 
             //remove the service from foreground but don't stop (destroy) the service
             //stopForeground(true)
@@ -195,7 +195,7 @@ class SensorService : Service(), MessageListener
 
         sensorWebSocketServer?.onErrorListener = { exception ->
 
-            stateListener?.onServerError(exception)
+            serverStateListener?.onServerError(exception)
             //stopForeground(true)
             stopForeground()
         }
@@ -306,7 +306,7 @@ class SensorService : Service(), MessageListener
 
             if (server.isRunning)
             {
-                stateListener?.onServerAlreadyRunning( ServerInfo(server.address.hostName,server.port) )
+                serverStateListener?.onServerAlreadyRunning( ServerInfo(server.address.hostName,server.port) )
             }
 
         }
@@ -336,10 +336,6 @@ class SensorService : Service(), MessageListener
 
     }
 
-    fun setServerStateListener(serverStateListener: ServerStateListener?)
-    {
-        this.stateListener = serverStateListener
-    }
 
 
 }
