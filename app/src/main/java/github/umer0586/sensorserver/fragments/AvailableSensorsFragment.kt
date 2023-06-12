@@ -2,6 +2,7 @@ package github.umer0586.sensorserver.fragments
 
 import android.content.*
 import android.hardware.Sensor
+import android.hardware.SensorManager
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -14,7 +15,7 @@ import androidx.fragment.app.ListFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import github.umer0586.sensorserver.R
 import github.umer0586.sensorserver.customextensions.detail
-import github.umer0586.sensorserver.util.SensorUtil
+import github.umer0586.sensorserver.customextensions.getAvailableSensors
 
 class AvailableSensorsFragment : ListFragment()
 {
@@ -31,7 +32,8 @@ class AvailableSensorsFragment : ListFragment()
         super.onViewCreated(view, savedInstanceState)
         Log.i(TAG, "onViewCreated: ")
 
-        val availableSensors: List<Sensor> = SensorUtil.getInstance( context )!!.availableSensors
+        val sensorManager = requireContext().getSystemService(Context.SENSOR_SERVICE) as SensorManager
+        val availableSensors: List<Sensor> = sensorManager.getAvailableSensors()
 
         val sensorsListAdapter = SensorsListAdapter(requireContext(), availableSensors)
         listView.adapter = sensorsListAdapter
