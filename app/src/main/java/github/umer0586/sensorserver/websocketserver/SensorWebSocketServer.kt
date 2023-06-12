@@ -32,8 +32,10 @@ class SensorWebSocketServer(private val context: Context, address: InetSocketAdd
 {
 
     var samplingRate = 200000 //default value normal rate
-    private var handlerThread: HandlerThread? = null
-    private var handler: Handler? = null
+
+    private var handlerThread: HandlerThread = HandlerThread("Handler Thread")
+    private lateinit var handler: Handler
+
     private val sensorManager: SensorManager
 
     //To track the list of sensors registered
@@ -592,9 +594,9 @@ class SensorWebSocketServer(private val context: Context, address: InetSocketAdd
         Thread { super.run() }.start()
 
         // see https://stackoverflow.com/questions/23209804/android-sensor-registerlistener-in-a-separate-thread
-        handlerThread = HandlerThread("Handler Thread")
-        handlerThread!!.start()
-        handler = Handler(handlerThread!!.looper)
+
+        handlerThread.start()
+        handler = Handler(handlerThread.looper)
     }
 
     override fun onSensorChanged(sensorEvent: SensorEvent)
