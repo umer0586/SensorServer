@@ -85,19 +85,28 @@ class SensorService : Service(), MessageListener
         Log.d(TAG, "onMessage() called with: intent = [$intent]")
         if (intent.action == ACTION_STOP_SERVER)
         {
-            if (sensorWebSocketServer != null && sensorWebSocketServer!!.isRunning)
-            {
-                try
+
+            sensorWebSocketServer?.let { server ->
+
+                if(server.isRunning)
                 {
-                    sensorWebSocketServer!!.stop()
-                    stopForeground()
+                    try
+                    {
+                        server.stop()
+                        stopForeground()
+                    }
+                    catch (e: Exception)
+                    {
+                        e.printStackTrace()
+                    }
                 }
-                catch (e: Exception)
-                {
-                    e.printStackTrace()
-                }
+
             }
+
+
         }
+
+
     }
 
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int
@@ -289,14 +298,7 @@ class SensorService : Service(), MessageListener
         return binder
     }
 
-    fun getConnectionCount() : Int
-    {
-        sensorWebSocketServer?.let {
-            return it.connections.size
-        }
-
-        return 0
-    }
+    fun getConnectionCount()  =  sensorWebSocketServer?.connections?.size ?: 0
 
     fun checkState()
     {
