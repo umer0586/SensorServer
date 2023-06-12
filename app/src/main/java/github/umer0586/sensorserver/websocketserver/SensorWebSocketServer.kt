@@ -14,8 +14,8 @@ import android.location.LocationManager
 import android.net.Uri
 import android.os.*
 import android.util.Log
+import github.umer0586.sensorserver.customextensions.getSensorFromStringType
 import github.umer0586.sensorserver.util.JsonUtil
-import github.umer0586.sensorserver.util.SensorUtil
 import org.java_websocket.WebSocket
 import org.java_websocket.handshake.ClientHandshake
 import org.java_websocket.server.WebSocketServer
@@ -35,7 +35,6 @@ class SensorWebSocketServer(private val context: Context, address: InetSocketAdd
     private var handlerThread: HandlerThread? = null
     private var handler: Handler? = null
     private val sensorManager: SensorManager
-    private val sensorUtil: SensorUtil?
 
     //To track the list of sensors registered
     private val registeredSensors: MutableList<Sensor?>
@@ -54,7 +53,6 @@ class SensorWebSocketServer(private val context: Context, address: InetSocketAdd
     init
     {
         sensorManager = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
-        sensorUtil = SensorUtil.getInstance(context)
         registeredSensors = ArrayList()
     }
 
@@ -142,9 +140,10 @@ class SensorWebSocketServer(private val context: Context, address: InetSocketAdd
         }
         Log.i(TAG, "requested sensors : $requestedSensorTypes")
         val requestedSensorList: MutableList<Sensor> = ArrayList()
+
         for (requestedSensorType in requestedSensorTypes)
         {
-            val sensor = sensorUtil!!.getSensorFromStringType(requestedSensorType)
+            val sensor = sensorManager.getSensorFromStringType(requestedSensorType)
             if (sensor == null)
             {
                 clientWebsocket.close(
@@ -181,8 +180,8 @@ class SensorWebSocketServer(private val context: Context, address: InetSocketAdd
         }
         paramType = paramType.lowercase(Locale.getDefault())
 
-        // sensorUtil.getSensorFromStringType(String) returns null when invalid sensor type is passed or when sensor type is not supported by the device
-        val requestedSensor = sensorUtil!!.getSensorFromStringType(paramType)
+        // sensorManager.getSensorFromStringType(String) returns null when invalid sensor type is passed or when sensor type is not supported by the device
+        val requestedSensor = sensorManager.getSensorFromStringType(paramType)
 
         //If client has requested invalid or unsupported sensor
         // then close client Websocket connection and return ( i-e do not proceed further)
