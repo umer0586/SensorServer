@@ -54,7 +54,7 @@ class ServerFragment : Fragment(), ServiceConnection, ServerStateListener
         Log.i(TAG, "onViewCreated: ")
 
 
-        appSettings = AppSettings(context)
+        appSettings = AppSettings(requireContext())
 
 
         serviceBindHelper = ServiceBindHelper(

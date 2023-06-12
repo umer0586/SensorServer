@@ -26,7 +26,7 @@ class SettingsFragment : PreferenceFragmentCompat()
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?)
     {
         setPreferencesFromResource(R.xml.settings_preference, rootKey)
-        appSettings = AppSettings(context)
+        appSettings = AppSettings(requireContext())
 
         handlePortNoPreference()
         handleLocalHostPreference()

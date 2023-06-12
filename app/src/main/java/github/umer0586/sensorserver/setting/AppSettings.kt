@@ -4,7 +4,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import github.umer0586.sensorserver.R
 
-class AppSettings(context: Context?)
+class AppSettings(context: Context)
 {
 
 
@@ -13,7 +13,7 @@ class AppSettings(context: Context?)
 
     init
     {
-        this.context = context!!.applicationContext
+        this.context = context.applicationContext
         sharedPreferences = context.getSharedPreferences(
             context.getString(R.string.shared_pref_file),
             Context.MODE_PRIVATE
