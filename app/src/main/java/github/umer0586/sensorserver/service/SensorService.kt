@@ -306,10 +306,7 @@ class SensorService : Service(), MessageListener
 
             if (server.isRunning)
             {
-                stateListener?.let { listener ->
-
-                    listener.onServerAlreadyRunning( ServerInfo(server.address.hostName,server.port))
-                }
+                stateListener?.onServerAlreadyRunning( ServerInfo(server.address.hostName,server.port) )
             }
 
         }
