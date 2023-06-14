@@ -27,7 +27,7 @@ data class ServerInfo(val ipAddress: String, val port: Int)
 data class LocationRequestInfo(val provider: String)
 
 
-class SensorWebSocketServer(private val context: Context, address: InetSocketAddress?) :
+class SensorWebSocketServer(private val context: Context, address: InetSocketAddress) :
     WebSocketServer(address), SensorEventListener, LocationListener
 {
 
@@ -36,10 +36,11 @@ class SensorWebSocketServer(private val context: Context, address: InetSocketAdd
     private var handlerThread: HandlerThread = HandlerThread("Handler Thread")
     private lateinit var handler: Handler
 
-    private val sensorManager: SensorManager
+    private val sensorManager = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
+    private val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
 
     //To track the list of sensors registered
-    private val registeredSensors: MutableList<Sensor?>
+    private val registeredSensors = mutableListOf<Sensor>()
 
     //Callbacks
     var onStartListener: ((ServerInfo) -> Unit)? = null
@@ -52,12 +53,6 @@ class SensorWebSocketServer(private val context: Context, address: InetSocketAdd
     var isRunning = false
         private set
 
-    init
-    {
-        sensorManager = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
-        registeredSensors = ArrayList()
-    }
-
     companion object
     {
 
@@ -65,7 +60,7 @@ class SensorWebSocketServer(private val context: Context, address: InetSocketAdd
         private const val CONNECTION_PATH_SINGLE_SENSOR = "/sensor/connect"
         private const val CONNECTION_PATH_MULTIPLE_SENSORS = "/sensors/connect"
         private const val CONNECTION_PATH_LOCATION = "/location"
-        private val response = HashMap<String, Any?>()
+        private val response = mutableMapOf<String,Any>()
 
         //websocket close codes ranging 4000 - 4999 are for application's custom messages
         const val CLOSE_CODE_SENSOR_NOT_FOUND = 4001
@@ -86,9 +81,9 @@ class SensorWebSocketServer(private val context: Context, address: InetSocketAdd
         Log.i(TAG, "New connection" + clientWebsocket.remoteSocketAddress + " Resource descriptor : " + clientWebsocket.resourceDescriptor)
 
         //Parse uri so that we can read parameters from query
-        val uri = Uri.parse(clientWebsocket.resourceDescriptor)
+        val requestUri = Uri.parse(clientWebsocket.resourceDescriptor)
 
-        uri.let { uri ->
+        requestUri.let { uri ->
 
             uri.path?.lowercase().let { path ->
 
@@ -119,44 +114,39 @@ class SensorWebSocketServer(private val context: Context, address: InetSocketAdd
             return
         }
         val requestedSensorTypes = JsonUtil.readJSONArray(uri.getQueryParameter("types"))
-        if (requestedSensorTypes == null)
-        {
-            clientWebsocket.close(
-                CLOSE_CODE_INVALID_JSON_ARRAY,
-                "Syntax error : " + uri.getQueryParameter("types") + " is not valid JSON array"
-            )
-            return
-        }
-        if (requestedSensorTypes.size == 1)
-        {
-            clientWebsocket.close(
-                CLOSE_CODE_TOO_FEW_SENSORS,
-                "At least two sensor types must be specified"
-            )
-            return
-        }
-        if (requestedSensorTypes.isEmpty())
-        {
-            clientWebsocket.close(CLOSE_CODE_NO_SENSOR_SPECIFIED, " No sensor specified")
-            return
-        }
-        Log.i(TAG, "requested sensors : $requestedSensorTypes")
-        val requestedSensorList: MutableList<Sensor> = ArrayList()
 
-        for (requestedSensorType in requestedSensorTypes)
-        {
+        when {
+            requestedSensorTypes == null -> {
+                clientWebsocket.close( CLOSE_CODE_INVALID_JSON_ARRAY,"Syntax error : " + uri.getQueryParameter("types") + " is not valid JSON array" )
+                return
+            }
+            requestedSensorTypes.size == 1 -> {
+                clientWebsocket.close( CLOSE_CODE_TOO_FEW_SENSORS,"At least two sensor types must be specified" )
+                return
+            }
+            requestedSensorTypes.isEmpty() -> {
+                clientWebsocket.close(CLOSE_CODE_NO_SENSOR_SPECIFIED, " No sensor specified")
+                return
+            }
+
+        }
+
+        Log.i(TAG, "requested sensors : $requestedSensorTypes")
+
+        val requestedSensorList = mutableListOf<Sensor>()
+
+        requestedSensorTypes?.forEach { requestedSensorType ->
+
             val sensor = sensorManager.getSensorFromStringType(requestedSensorType)
             if (sensor == null)
             {
-                clientWebsocket.close(
-                    CLOSE_CODE_SENSOR_NOT_FOUND,
-                    "sensor of type $requestedSensorType not found"
-                )
+                clientWebsocket.close(CLOSE_CODE_SENSOR_NOT_FOUND,"sensor of type $requestedSensorType not found" )
                 requestedSensorList.clear()
                 return
             }
             requestedSensorList.add(sensor)
         }
+
         registerMultipleSensors(requestedSensorList, clientWebsocket)
     }
 
@@ -168,19 +158,29 @@ class SensorWebSocketServer(private val context: Context, address: InetSocketAdd
     {
         var paramType = uri.getQueryParameter("type")
 
-        //if type param doesn't exit in the query
-        if (paramType == null)
-        {
-            clientWebsocket.close(CLOSE_CODE_PARAMETER_MISSING, "<type> param required")
-            //do not proceed further
-            return
+        when {
+
+            //if type param doesn't exit in the query
+            paramType == null -> {
+
+                clientWebsocket.close(CLOSE_CODE_PARAMETER_MISSING, "<type> param required")
+                return
+            }
+
+            paramType.isEmpty() -> {
+
+                clientWebsocket.close(CLOSE_CODE_NO_SENSOR_SPECIFIED, "No sensor specified")
+                return
+
+            }
+
+            else ->{
+                paramType = paramType.lowercase(Locale.getDefault())
+            }
+
         }
-        if (paramType.isEmpty())
-        {
-            clientWebsocket.close(CLOSE_CODE_NO_SENSOR_SPECIFIED, "No sensor specified")
-            return
-        }
-        paramType = paramType.lowercase(Locale.getDefault())
+
+
 
         // sensorManager.getSensorFromStringType(String) returns null when invalid sensor type is passed or when sensor type is not supported by the device
         val requestedSensor = sensorManager.getSensorFromStringType(paramType)
@@ -189,10 +189,7 @@ class SensorWebSocketServer(private val context: Context, address: InetSocketAdd
         // then close client Websocket connection and return ( i-e do not proceed further)
         if (requestedSensor == null)
         {
-            clientWebsocket.close(
-                CLOSE_CODE_SENSOR_NOT_FOUND,
-                "Sensor of type " + uri.getQueryParameter("type") + " not found"
-            )
+            clientWebsocket.close(CLOSE_CODE_SENSOR_NOT_FOUND,"Sensor of type " + uri.getQueryParameter("type") + " not found" )
             return
         }
 
@@ -207,6 +204,7 @@ class SensorWebSocketServer(private val context: Context, address: InetSocketAdd
 
         //for new requesting client attach a tag of requested sensor type with client
         clientWebsocket.setAttachment(sensors)
+
         for (sensor in sensors)
         {
 
@@ -216,10 +214,7 @@ class SensorWebSocketServer(private val context: Context, address: InetSocketAdd
         */
             if (registeredSensors.contains(sensor))
             {
-                Log.i(
-                    TAG,
-                    "Sensor " + sensor.stringType + " already registered, skipping registration"
-                )
+                Log.i(TAG, "Sensor " + sensor.stringType + " already registered, skipping registration")
 
                 //Update registry
                 registeredSensors.add(sensor)
@@ -266,12 +261,10 @@ class SensorWebSocketServer(private val context: Context, address: InetSocketAdd
         /*
             if this WebSocket Server has already registered itself for some type of sensor (e.g android.sensor.light)
             then we don't have to registered this Server for the same sensor again
-        */if (registeredSensors.contains(requestedSensor))
-    {
-        Log.i(
-            TAG,
-            "Sensor " + requestedSensor!!.stringType + " already registered, skipping registration"
-        )
+        */
+        if (registeredSensors.contains(requestedSensor))
+        {
+        Log.i( TAG, "Sensor " + requestedSensor!!.stringType + " already registered, skipping registration" )
 
         //Update registry
         registeredSensors.add(requestedSensor)
@@ -304,10 +297,10 @@ class SensorWebSocketServer(private val context: Context, address: InetSocketAdd
         }
     }
 
+
     @SuppressLint("MissingPermission")
     private fun handleLocationRequest(uri: Uri, clientWebsocket: WebSocket)
     {
-        val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
         if (!hasLocationPermission())
         {
             clientWebsocket.close(
@@ -329,12 +322,13 @@ class SensorWebSocketServer(private val context: Context, address: InetSocketAdd
             if (locationManager.allProviders.contains(LocationManager.NETWORK_PROVIDER))
             {
                 //If some clients already connected for network location provider then no need to register this server for location updates for Network provider again
-                if (!locationProviderHasConnections(LocationManager.NETWORK_PROVIDER)) locationManager.requestLocationUpdates(
+                if (!locationProviderHasConnections(LocationManager.NETWORK_PROVIDER))
+                    locationManager.requestLocationUpdates(
                     LocationManager.NETWORK_PROVIDER,
                     0,
                     0f,
                     this,
-                    handlerThread!!.looper
+                    handlerThread.looper
                 )
                 clientWebsocket.setAttachment(LocationRequestInfo(LocationManager.NETWORK_PROVIDER))
             } // if device does not support network location provider
@@ -346,22 +340,20 @@ class SensorWebSocketServer(private val context: Context, address: InetSocketAdd
             if (locationManager.allProviders.contains(LocationManager.GPS_PROVIDER))
             {
                 //If some clients already connected for GPS location provider then no need to register this server for location updates for GPS provider again
-                if (!locationProviderHasConnections(LocationManager.GPS_PROVIDER)) locationManager.requestLocationUpdates(
+                if (!locationProviderHasConnections(LocationManager.GPS_PROVIDER))
+                    locationManager.requestLocationUpdates(
                     LocationManager.GPS_PROVIDER,
                     0,
                     0f,
                     this,
-                    handlerThread!!.looper
+                    handlerThread.looper
                 )
                 clientWebsocket.setAttachment(LocationRequestInfo(LocationManager.GPS_PROVIDER))
             }
             else  // if device does not support GPS location provider
                 clientWebsocket.close(CLOSE_CODE_PROVIDER_NOT_FOUND, "network provider not found")
         }
-        else clientWebsocket.close(
-            CLOSE_CODE_INVALID_PROVIDER,
-            "Provider must be either GPS or network"
-        )
+        else clientWebsocket.close( CLOSE_CODE_INVALID_PROVIDER,"Provider must be either GPS or network" )
         notifyConnectionsChanged()
     }
 
@@ -387,51 +379,42 @@ class SensorWebSocketServer(private val context: Context, address: InetSocketAdd
     {
         if (!locationProviderHasConnections(location.provider))
         {
-            Log.w(
-                TAG,
-                "onLocationChanged() :  " + "Location update received when no client with " + location.provider + " connected"
-            )
+            Log.w( TAG, "onLocationChanged() :  " + "Location update received when no client with " + location.provider + " connected" )
         }
         for (websocket in connections)
         {
             if (websocket.getAttachment<Any>() is LocationRequestInfo)
             {
                 response.clear()
-                response.put("longitude", location.longitude)
-                response.put("latitude", location.latitude)
-                response.put("altitude", location.altitude)
-                response.put("bearing", location.bearing)
-                response.put("accuracy", location.accuracy)
-                response.put("speed", location.speed)
-                response.put("time", location.time)
-                response.put("provider", location.provider)
+                response["longitude"] = location.longitude
+                response["latitude"] = location.latitude
+                response["altitude"] = location.altitude
+                response["bearing"] = location.bearing
+                response["accuracy"] = location.accuracy
+                response["speed"] = location.speed
+                response["time"] = location.time
+
+                location.provider?.let { response.put("provider", it) }
+
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
                 {
-                    response.put(
-                        "speedAccuracyMetersPerSecond",
-                        location.speedAccuracyMetersPerSecond
-                    )
-                    response.put("bearingAccuracyDegrees", location.bearingAccuracyDegrees)
-                    response.put("elapsedRealtimeNanos", location.elapsedRealtimeNanos)
-                    response.put("verticalAccuracyMeters", location.verticalAccuracyMeters)
+                    response["speedAccuracyMetersPerSecond"] = location.speedAccuracyMetersPerSecond
+                    response["bearingAccuracyDegrees"] = location.bearingAccuracyDegrees
+                    response["elapsedRealtimeNanos"] = location.elapsedRealtimeNanos
+                    response["verticalAccuracyMeters"] = location.verticalAccuracyMeters
                 }
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
                 {
-                    response.put("elapsedRealtimeAgeMillis", location.elapsedRealtimeAgeMillis)
+                    response["elapsedRealtimeAgeMillis"] = location.elapsedRealtimeAgeMillis
                 }
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
                 {
-                    response.put(
-                        "elapsedRealtimeUncertaintyNanos",
-                        location.elapsedRealtimeUncertaintyNanos
-                    )
+                    response["elapsedRealtimeUncertaintyNanos"] = location.elapsedRealtimeUncertaintyNanos
                 }
                 val locationRequestInfo = websocket.getAttachment<LocationRequestInfo>()
-                if (locationRequestInfo.provider == location.provider) websocket.send(
-                    JsonUtil.toJSON(
-                        response
-                    )
-                )
+
+                if (locationRequestInfo.provider == location.provider)
+                    websocket.send( JsonUtil.toJSON(response) )
             }
         }
     }
@@ -459,10 +442,8 @@ class SensorWebSocketServer(private val context: Context, address: InetSocketAdd
 
     override fun onClose(clientWebsocket: WebSocket, code: Int, reason: String, remote: Boolean)
     {
-        Log.i(
-            TAG,
-            "Connection closed " + clientWebsocket.remoteSocketAddress + " with exit code " + code + " additional info: " + reason
-        )
+        Log.i(TAG,"Connection closed ${clientWebsocket.remoteSocketAddress}  with exit code  $code  additional info: $reason")
+
         if (clientWebsocket.getAttachment<Any>() is Sensor)
         {
             // Get sensor type of recently closed client
@@ -476,15 +457,13 @@ class SensorWebSocketServer(private val context: Context, address: InetSocketAdd
         }
         else if (clientWebsocket.getAttachment<Any>() is LocationRequestInfo)
         {
-            val locationManager =
-                context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+
             val locationRequestInfo = clientWebsocket.getAttachment<LocationRequestInfo>()
 
             // unregister this server for location updates from specific provider ...
             // when there are no clients associated with that provider
-            if (!locationProviderHasConnections(locationRequestInfo.provider)) locationManager.removeUpdates(
-                this
-            )
+            if (!locationProviderHasConnections(locationRequestInfo.provider))
+                locationManager.removeUpdates( this )
         }
         notifyConnectionsChanged()
     }
@@ -530,7 +509,8 @@ class SensorWebSocketServer(private val context: Context, address: InetSocketAdd
     override fun onError(conn: WebSocket, ex: Exception)
     {
         // error occurred on websocket conn (we don't notify anything to the user about this for now)
-        if (conn != null) Log.e(TAG, "an error occurred on connection " + conn.remoteSocketAddress)
+        if (conn != null)
+            Log.e(TAG, "an error occurred on connection " + conn.remoteSocketAddress)
 
         // if conn is null than we have error related to server
         if (conn == null)
@@ -545,8 +525,9 @@ class SensorWebSocketServer(private val context: Context, address: InetSocketAdd
 
             onErrorListener?.invoke(ex)
 
-            serverStartUpFailed =
-                true // we will use this in stop() method to check if there was an exception during server startup
+            // we will use this in stop() method to check if there was an exception during server startup
+            serverStartUpFailed = true
+
         }
         ex.printStackTrace()
     }
@@ -557,7 +538,7 @@ class SensorWebSocketServer(private val context: Context, address: InetSocketAdd
         onStartListener?.invoke(ServerInfo(address.hostName, port))
 
         isRunning = true
-        Log.i(TAG, "server started successfully " + address)
+        Log.i(TAG, "server started successfully $address")
         Log.i(TAG, "sampling rate $samplingRate")
     }
 
@@ -565,7 +546,7 @@ class SensorWebSocketServer(private val context: Context, address: InetSocketAdd
     override fun stop()
     {
         closeAllConnections()
-        val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+
         locationManager.removeUpdates(this)
 
         super.stop()
@@ -580,7 +561,9 @@ class SensorWebSocketServer(private val context: Context, address: InetSocketAdd
         }
 
 
-        if (handlerThread!!.isAlive) handlerThread!!.quitSafely()
+        if (handlerThread.isAlive)
+            handlerThread.quitSafely()
+
         isRunning = false
     }
 
@@ -603,10 +586,9 @@ class SensorWebSocketServer(private val context: Context, address: InetSocketAdd
     {
         // Log.i(TAG, "onSensorChanged: Thread " + Thread.currentThread().getName());
         // Log.i(TAG, "onSensorChanged: Sensor " + sensorEvent.sensor.getStringType());
-        if (getConnectionCount() == 0) Log.e(
-            TAG,
-            " Sensor event reported when no client in connected"
-        )
+        if (getConnectionCount() == 0)
+            Log.e( TAG," Sensor event reported when no client in connected" )
+
         response.clear()
 
         // Loop through each connected client
@@ -616,20 +598,22 @@ class SensorWebSocketServer(private val context: Context, address: InetSocketAdd
             if (webSocket.getAttachment<Any>() is Sensor)
             {
                 val clientAssociatedSensor = webSocket.getAttachment<Sensor>()
+
                 if (clientAssociatedSensor != null) if (clientAssociatedSensor.type == sensorEvent.sensor.type && !webSocket.isClosing)
                 {
-                    response.put("values", sensorEvent.values)
-                    response.put("timestamp", sensorEvent.timestamp)
-                    response.put("accuracy", sensorEvent.accuracy)
+                    response["values"] = sensorEvent.values
+                    response["timestamp"] = sensorEvent.timestamp
+                    response["accuracy"] = sensorEvent.accuracy
                     webSocket.send(JsonUtil.toJSON(response))
                 }
             }
             else if (webSocket.getAttachment<Any>() is ArrayList<*>)
             {
                 val clientAssociatedSensors = webSocket.getAttachment<List<Sensor>>()
+
                 for (clientAssociatedSensor in clientAssociatedSensors)
                 {
-                    if (clientAssociatedSensor != null) if (clientAssociatedSensor.type == sensorEvent.sensor.type && !webSocket.isClosing)
+                    if (clientAssociatedSensor.type == sensorEvent.sensor.type && !webSocket.isClosing)
                     {
                         response.put("values", sensorEvent.values)
                         response.put("timestamp", sensorEvent.timestamp)
@@ -649,7 +633,10 @@ class SensorWebSocketServer(private val context: Context, address: InetSocketAdd
     private fun getSensorConnectionCount(sensor: Sensor): Int
     {
         var count = 0
-        for (registeredSensor in registeredSensors) if (registeredSensor!!.type == sensor.type) count++
+        for (registeredSensor in registeredSensors)
+            if (registeredSensor.type == sensor.type)
+                count++
+
         return count
     }
 
