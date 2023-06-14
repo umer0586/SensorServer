@@ -615,10 +615,10 @@ class SensorWebSocketServer(private val context: Context, address: InetSocketAdd
                 {
                     if (clientAssociatedSensor.type == sensorEvent.sensor.type && !webSocket.isClosing)
                     {
-                        response.put("values", sensorEvent.values)
-                        response.put("timestamp", sensorEvent.timestamp)
-                        response.put("accuracy", sensorEvent.accuracy)
-                        response.put("type", sensorEvent.sensor.stringType)
+                        response["values"] = sensorEvent.values
+                        response["timestamp"] = sensorEvent.timestamp
+                        response["accuracy"] = sensorEvent.accuracy
+                        response["type"] = sensorEvent.sensor.stringType
                         webSocket.send(JsonUtil.toJSON(response))
                     }
                 }
@@ -653,7 +653,11 @@ class SensorWebSocketServer(private val context: Context, address: InetSocketAdd
 
     fun closeAllConnections()
     {
-        for (webSocket in connections) webSocket.close(CLOSE_CODE_SERVER_STOPPED, "Server stopped")
+
+        connections.forEach { webSocket ->
+            webSocket.close(CLOSE_CODE_SERVER_STOPPED, "Server stopped")
+        }
+
     }
 
 
