@@ -91,6 +91,8 @@ class SensorWebSocketServer(private val context: Context, address: InetSocketAdd
                 {
                     CONNECTION_PATH_SINGLE_SENSOR -> handleSingleSensorRequest(uri, clientWebsocket)
                     CONNECTION_PATH_MULTIPLE_SENSORS -> handleMultiSensorRequest(uri, clientWebsocket)
+
+                    // TODO : handleLocationRequest(uri,websocket) never gets called when app has no location permission
                     CONNECTION_PATH_LOCATION -> handleLocationRequest(uri, clientWebsocket)
                     else -> clientWebsocket.close(CLOSE_CODE_UNSUPPORTED_REQUEST, "unsupported request")
 
