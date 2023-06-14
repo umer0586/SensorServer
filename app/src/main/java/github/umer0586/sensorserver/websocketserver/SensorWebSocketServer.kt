@@ -204,100 +204,81 @@ class SensorWebSocketServer(private val context: Context, address: InetSocketAdd
     private fun registerMultipleSensors(sensors: List<Sensor>, clientWebsocket: WebSocket)
     {
 
-        //for new requesting client attach a tag of requested sensor type with client
+        // For new requesting client, attach a tag of requested sensor type with client
         clientWebsocket.setAttachment(sensors)
 
         for (sensor in sensors)
         {
 
             /*
-            if this WebSocket Server has already registered itself for some type of sensor (e.g android.sensor.light)
+            If this WebSocket Server has already registered itself for some type of sensor (e.g android.sensor.light),
             then we don't have to registered this Server for the same sensor again
-        */
+            */
             if (registeredSensors.contains(sensor))
             {
-                Log.i(TAG, "Sensor " + sensor.stringType + " already registered, skipping registration")
 
-                //Update registry
-                registeredSensors.add(sensor)
-                notifyConnectionsChanged()
-
-                // no need to call sensorManager.registerListener();
-                return
-            }
-            if (sensor != null)
-            {
-                /*
-              Register requested sensor
-              sensor events will be reported to main thread if handler is not provided
-              see https://stackoverflow.com/questions/23209804/android-sensor-registerlistener-in-a-separate-thread
-              and https://pastebin.com/QuHd0LNU
-            */
-                sensorManager.registerListener(this, sensor, samplingRate, handler)
-
-                /*
-            TODO:
-             android offical docs say (https://developer.android.com/reference/android/hardware/SensorManager)
-             Note: Don't use this method (registerListener) with a one shot trigger sensor such as Sensor#TYPE_SIGNIFICANT_MOTION.
-             Use requestTriggerSensor(android.hardware.TriggerEventListener, android.hardware.Sensor) instead.
-
-             */
-
+                // Log the sensor type and that it is already registered
+                Log.i(TAG, "Sensor ${sensor.stringType} already registered, skipping registration")
 
                 // Update registry
                 registeredSensors.add(sensor)
                 notifyConnectionsChanged()
+
+                // No need to call sensorManager.registerListener()
+                return
             }
+
+
+            // Register the requested sensor
+            // Sensor events will be reported to the main thread if a handler is not provided
+            sensorManager.registerListener(this, sensor, samplingRate, handler)
+
+            // Update registry
+            registeredSensors.add(sensor)
+            notifyConnectionsChanged()
+
         }
     }
 
+
     // Helper method used in  handleSingleSensorRequest()
-    private fun registerSensor(requestedSensor: Sensor?, clientWebsocket: WebSocket)
-    {
-        /*
-        Attach info with newly connected client
-        so that this Servers knows which client has requested which type of sensor
-         */
+    private fun registerSensor(requestedSensor: Sensor, clientWebsocket: WebSocket) {
+
+        // Attach info with newly connected client
+        // so that this Servers knows which client has requested which type of sensor
         clientWebsocket.setAttachment(requestedSensor)
 
-        /*
-            if this WebSocket Server has already registered itself for some type of sensor (e.g android.sensor.light)
-            then we don't have to registered this Server for the same sensor again
-        */
+        // if this WebSocket Server has already registered itself for some type of sensor (e.g android.sensor.light)
+        // then we don't have to registered this Server for the same sensor again
         if (registeredSensors.contains(requestedSensor))
         {
-        Log.i( TAG, "Sensor " + requestedSensor!!.stringType + " already registered, skipping registration" )
 
-        //Update registry
-        registeredSensors.add(requestedSensor)
-        notifyConnectionsChanged()
-
-        // no need to call sensorManager.registerListener();
-        return
-    }
-        if (requestedSensor != null)
-        {
-            /*
-              Register requested sensor
-              sensor events will be reported to main thread if handler is not provided
-              see https://stackoverflow.com/questions/23209804/android-sensor-registerlistener-in-a-separate-thread
-              and https://pastebin.com/QuHd0LNU
-            */
-            sensorManager.registerListener(this, requestedSensor, samplingRate, handler)
-
-            /*
-            TODO:
-             android offical docs say (https://developer.android.com/reference/android/hardware/SensorManager)
-             Note: Don't use this method (registerListener) with a one shot trigger sensor such as Sensor#TYPE_SIGNIFICANT_MOTION.
-             Use requestTriggerSensor(android.hardware.TriggerEventListener, android.hardware.Sensor) instead.
-
-             */
+            // Log the sensor type and that it is already registered
+            Log.i(TAG, "Sensor ${requestedSensor.stringType} already registered, skipping registration")
 
             // Update registry
             registeredSensors.add(requestedSensor)
             notifyConnectionsChanged()
+
+            // No need to call sensorManager.registerListener()
+            return
         }
+
+            // Register the requested sensor
+            // Sensor events will be reported to the main thread if a handler is not provided
+            sensorManager.registerListener(this, requestedSensor, samplingRate, handler)
+
+            // TODO:
+            // Android official docs say (https://developer.android.com/reference/android/hardware/SensorManager)
+            // "Note: Don't use this method (registerListener) with a one shot trigger sensor such as Sensor#TYPE_SIGNIFICANT_MOTION.
+            // Use requestTriggerSensor(android.hardware.TriggerEventListener, android.hardware.Sensor) instead."
+
+            // Update registry
+            registeredSensors.add(requestedSensor)
+            notifyConnectionsChanged()
+
     }
+
 
 
     @SuppressLint("MissingPermission")
