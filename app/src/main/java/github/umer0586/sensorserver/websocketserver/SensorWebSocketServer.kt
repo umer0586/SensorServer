@@ -442,7 +442,7 @@ class SensorWebSocketServer(private val context: Context, address: InetSocketAdd
      * @param conn Can be null if there error does not belong to one specific websocket. For example if the servers port could not be bound.
      * @param ex The exception causing this error
      */
-    override fun onError(conn: WebSocket, ex: Exception)
+    override fun onError(conn: WebSocket?, ex: Exception)
     {
         // error occurred on websocket conn (we don't notify anything to the user about this for now)
         if (conn != null)
