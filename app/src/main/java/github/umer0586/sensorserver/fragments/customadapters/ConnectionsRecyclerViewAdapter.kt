@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import github.umer0586.sensorserver.R
 import github.umer0586.sensorserver.fragments.customadapters.ConnectionsRecyclerViewAdapter.MyViewHolder
-import github.umer0586.sensorserver.websocketserver.LocationRequestInfo
+import github.umer0586.sensorserver.websocketserver.GPS
 import github.umer0586.sensorserver.websocketserver.SensorWebSocketServer
 import net.cachapa.expandablelayout.ExpandableLayout
 import org.java_websocket.WebSocket
@@ -71,8 +71,8 @@ class ConnectionsRecyclerViewAdapter(private val webSockets: List<WebSocket>) : 
 
             viewHolder.sensorDetails.setText(detail.trim { it <= ' ' })
         }
-        else if (webSocket.getAttachment<Any>() is LocationRequestInfo)
-            viewHolder.sensorDetails.text =  "location (" + (webSocket.getAttachment<Any>() as LocationRequestInfo).provider + " provider )"
+        else if (webSocket.getAttachment<Any>() is GPS)
+            viewHolder.sensorDetails.text =  "GPS"
 
         viewHolder.closeConnection.setOnClickListener { v ->
             MaterialAlertDialogBuilder(v.context)
@@ -92,10 +92,11 @@ class ConnectionsRecyclerViewAdapter(private val webSockets: List<WebSocket>) : 
         }
         viewHolder.expand.setOnClickListener {
             viewHolder.expandableLayout.toggle()
-            if (viewHolder.expandableLayout.isExpanded) viewHolder.expand.setImageResource(R.drawable.ic_expand_up)
-            else viewHolder.expand.setImageResource(
-                R.drawable.ic_expand_down
-            )
+
+            if (viewHolder.expandableLayout.isExpanded)
+                viewHolder.expand.setImageResource(R.drawable.ic_expand_up)
+            else
+                viewHolder.expand.setImageResource(R.drawable.ic_expand_down)
         }
     }
 

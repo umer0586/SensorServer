@@ -24,7 +24,7 @@ import java.nio.ByteBuffer
 import java.util.*
 
 data class ServerInfo(val ipAddress: String, val port: Int)
-data class LocationRequestInfo(val provider: String)
+class GPS
 
 
 class SensorWebSocketServer(private val context: Context, address: InetSocketAddress) :
@@ -59,7 +59,7 @@ class SensorWebSocketServer(private val context: Context, address: InetSocketAdd
         private val TAG: String = SensorWebSocketServer::class.java.getName()
         private const val CONNECTION_PATH_SINGLE_SENSOR = "/sensor/connect"
         private const val CONNECTION_PATH_MULTIPLE_SENSORS = "/sensors/connect"
-        private const val CONNECTION_PATH_LOCATION = "/location"
+        private const val CONNECTION_PATH_GPS = "/gps"
         private val response = mutableMapOf<String,Any>()
 
         //websocket close codes ranging 4000 - 4999 are for application's custom messages
@@ -72,8 +72,7 @@ class SensorWebSocketServer(private val context: Context, address: InetSocketAdd
         const val CLOSE_CODE_TOO_FEW_SENSORS = 4007
         const val CLOSE_CODE_NO_SENSOR_SPECIFIED = 4008
         const val CLOSE_CODE_PERMISSION_DENIED = 4009
-        const val CLOSE_CODE_INVALID_PROVIDER = 4010
-        const val CLOSE_CODE_PROVIDER_NOT_FOUND = 4011
+
     }
 
     override fun onOpen(clientWebsocket: WebSocket, handshake: ClientHandshake)
@@ -92,8 +91,8 @@ class SensorWebSocketServer(private val context: Context, address: InetSocketAdd
                     CONNECTION_PATH_SINGLE_SENSOR -> handleSingleSensorRequest(uri, clientWebsocket)
                     CONNECTION_PATH_MULTIPLE_SENSORS -> handleMultiSensorRequest(uri, clientWebsocket)
 
-                    // TODO : handleLocationRequest(uri,websocket) never gets called when app has no location permission
-                    CONNECTION_PATH_LOCATION -> handleLocationRequest(uri, clientWebsocket)
+                    // TODO : handleGPSRequest(websocket) never gets called when app has no location permission
+                    CONNECTION_PATH_GPS -> handleGPSRequest(clientWebsocket)
                     else -> clientWebsocket.close(CLOSE_CODE_UNSUPPORTED_REQUEST, "unsupported request")
 
                 }
@@ -282,7 +281,7 @@ class SensorWebSocketServer(private val context: Context, address: InetSocketAdd
 
 
     @SuppressLint("MissingPermission")
-    private fun handleLocationRequest(uri: Uri, clientWebsocket: WebSocket)
+    private fun handleGPSRequest(clientWebsocket: WebSocket)
     {
         if (!hasLocationPermission())
         {
@@ -292,81 +291,39 @@ class SensorWebSocketServer(private val context: Context, address: InetSocketAdd
             )
             return
         }
-        val provider = uri.getQueryParameter("provider")
-        Log.i(TAG, "handleLocationRequest() :  provider = $provider")
-        if (provider == null)
-        {
-            clientWebsocket.close(CLOSE_CODE_PARAMETER_MISSING, "Provider parameter required")
-            return
-        }
-        if (provider.equals("network", ignoreCase = true))
-        {
-            // if device supports network location provider
-            if (locationManager.allProviders.contains(LocationManager.NETWORK_PROVIDER))
-            {
-                //If some clients already connected for network location provider then no need to register this server for location updates for Network provider again
-                if (!locationProviderHasConnections(LocationManager.NETWORK_PROVIDER))
-                    locationManager.requestLocationUpdates(
-                    LocationManager.NETWORK_PROVIDER,
-                    0,
-                    0f,
-                    this,
-                    handlerThread.looper
-                )
-                clientWebsocket.setAttachment(LocationRequestInfo(LocationManager.NETWORK_PROVIDER))
-            } // if device does not support network location provider
-            else clientWebsocket.close(CLOSE_CODE_PROVIDER_NOT_FOUND, "network provider not found")
-        }
-        else if (provider.equals("GPS", ignoreCase = true))
-        {
-            // if device supports GPS location provider
-            if (locationManager.allProviders.contains(LocationManager.GPS_PROVIDER))
-            {
-                //If some clients already connected for GPS location provider then no need to register this server for location updates for GPS provider again
-                if (!locationProviderHasConnections(LocationManager.GPS_PROVIDER))
-                    locationManager.requestLocationUpdates(
-                    LocationManager.GPS_PROVIDER,
-                    0,
-                    0f,
-                    this,
-                    handlerThread.looper
-                )
-                clientWebsocket.setAttachment(LocationRequestInfo(LocationManager.GPS_PROVIDER))
-            }
-            else  // if device does not support GPS location provider
-                clientWebsocket.close(CLOSE_CODE_PROVIDER_NOT_FOUND, "network provider not found")
-        }
-        else clientWebsocket.close( CLOSE_CODE_INVALID_PROVIDER,"Provider must be either GPS or network" )
+
+
+        locationManager.requestLocationUpdates(
+            LocationManager.GPS_PROVIDER,
+            0,
+            0f,
+            this,
+            handlerThread.looper
+        )
+
+        clientWebsocket.setAttachment( GPS() )
+
+
+
         notifyConnectionsChanged()
     }
 
-    private fun locationProviderHasConnections(provider: String?): Boolean
+    private fun getGPSConnectionCount() : Int
     {
-        var locationProviderConnectionCount = 0
-        for (websocket in connections)
-        {
-            if (websocket.getAttachment<Any>() is LocationRequestInfo)
-            {
-                val locationRequestInfo = websocket.getAttachment<LocationRequestInfo>()
-                if (locationRequestInfo.provider == provider) locationProviderConnectionCount++
-            }
-        }
-        Log.i(
-            TAG,
-            "connection counts for $provider location provider $locationProviderConnectionCount"
-        )
-        return locationProviderConnectionCount > 0
+        return connections.filter{
+            it.getAttachment<Any>() is GPS
+        }.size
     }
 
     override fun onLocationChanged(location: Location)
     {
-        if (!locationProviderHasConnections(location.provider))
+        if (getGPSConnectionCount() > 0)
         {
-            Log.w( TAG, "onLocationChanged() :  " + "Location update received when no client with " + location.provider + " connected" )
+            Log.w( TAG, "onLocationChanged() :  " + "Location update received when no client with connected with GPS" )
         }
         for (websocket in connections)
         {
-            if (websocket.getAttachment<Any>() is LocationRequestInfo)
+            if (websocket.getAttachment<Any>() is GPS)
             {
                 response.clear()
                 response["longitude"] = location.longitude
@@ -377,7 +334,6 @@ class SensorWebSocketServer(private val context: Context, address: InetSocketAdd
                 response["speed"] = location.speed
                 response["time"] = location.time
 
-                location.provider?.let { response.put("provider", it) }
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
                 {
@@ -394,10 +350,8 @@ class SensorWebSocketServer(private val context: Context, address: InetSocketAdd
                 {
                     response["elapsedRealtimeUncertaintyNanos"] = location.elapsedRealtimeUncertaintyNanos
                 }
-                val locationRequestInfo = websocket.getAttachment<LocationRequestInfo>()
 
-                if (locationRequestInfo.provider == location.provider)
-                    websocket.send( JsonUtil.toJSON(response) )
+                websocket.send( JsonUtil.toJSON(response) )
             }
         }
     }
@@ -436,16 +390,15 @@ class SensorWebSocketServer(private val context: Context, address: InetSocketAdd
         else if (clientWebsocket.getAttachment<Any>() is ArrayList<*>)
         {
             val sensors = clientWebsocket.getAttachment<List<Sensor>>()
-            for (sensor in sensors) unregisterSensor(sensor)
+            for (sensor in sensors)
+                unregisterSensor(sensor)
         }
-        else if (clientWebsocket.getAttachment<Any>() is LocationRequestInfo)
+        else if (clientWebsocket.getAttachment<Any>() is GPS)
         {
 
-            val locationRequestInfo = clientWebsocket.getAttachment<LocationRequestInfo>()
-
-            // unregister this server for location updates from specific provider ...
-            // when there are no clients associated with that provider
-            if (!locationProviderHasConnections(locationRequestInfo.provider))
+            // unregister this server for location updates from GPS ...
+            // when there are no clients associated with GPS
+            if (getGPSConnectionCount() == 0)
                 locationManager.removeUpdates( this )
         }
         notifyConnectionsChanged()
