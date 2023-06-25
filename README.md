@@ -72,9 +72,6 @@ Multiple WebSocket clients can connect to a specific type of sensor. For example
 
 Additionally, it is possible to connect to different types of sensors from either the same or different machines. For instance, one WebSocket client object can connect to the accelerometer, while another WebSocket client object can connect to the gyroscope. To view all active connections, you can select the "Connections" navigation button.
  
-## Test with Websocket testing tools 
-You can test this app with any websocket testing tools available on the web or playstore. You can use http://livepersoninc.github.io/ws-test-page/ for testing purpose. Use multiple tabs for multiple websocket connections
-
 ## Example: Websocket client (Python) 
 Here is a simple websocket client in python using [websocket-client api](https://github.com/websocket-client/websocket-client) which receives live data from accelerometer sensor.
 
