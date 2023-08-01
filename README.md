@@ -122,12 +122,11 @@ You can also use to multiple sensors over single websocket connection. To use mu
 
 By connecting using above URL you will receive JSON response containing sensor data along with a type of sensor. See complete example at [Using Multiple Sensors On Single Websocket Connection](https://github.com/umer0586/SensorServer/wiki/Using-Multiple-Sensors-On-Single-Websocket-Connection)
 
-## Getting Device Location Using GPS and Network Provider
-You access device location using following url.
+## Getting Device Location Using GPS
+You can access device location through GPS using following URL.
 
-                 ws://<ip>:<port>/location?provider=<location provider type>
+                 ws://<ip>:<port>/gps
                  
-Where a `provider` could be `gps` or `network`. In Android, both GPS and Network providers can be used to get location information. However, the accuracy and precision of each provider may vary depending on various factors. GPS is a satellite-based system that provides more accurate location information than the Network provider. GPS provides location information based on satellite signals, which can be affected by various factors such as weather conditions, buildings, and other obstacles that can block the signal. On the other hand, Network provider determines the location based on the cell tower and Wi-Fi signals in the area. Network provider can provide a faster location fix than GPS, but its accuracy may not be as precise as GPS. The network provider will be removed in future releases since it's not useful in the context of this app. Also, please ensure that you have granted location permission to the app through your phone's installed app settings.
 
 JSON response contains following key fields.
 ```json
