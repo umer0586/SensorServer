@@ -3,20 +3,22 @@ package github.umer0586.sensorserver.activities
 import android.os.Bundle
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.Toolbar
 import github.umer0586.sensorserver.R
+import github.umer0586.sensorserver.databinding.ActivitySettingsBinding
 import github.umer0586.sensorserver.fragments.SettingsFragment
 
 class SettingsActivity : AppCompatActivity()
 {
 
+    private lateinit var binding : ActivitySettingsBinding
     override fun onCreate(savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_settings)
+        binding = ActivitySettingsBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        val toolbar = findViewById<Toolbar>(R.id.toolbar)
-        setSupportActionBar(toolbar)
+
+        setSupportActionBar(binding.toolbar.root)
 
         if (savedInstanceState == null)
         {
@@ -34,7 +36,7 @@ class SettingsActivity : AppCompatActivity()
         {
             android.R.id.home ->
             {
-                onBackPressed()
+                onBackPressedDispatcher.onBackPressed()
                 return true
             }
         }
