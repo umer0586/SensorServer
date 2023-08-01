@@ -92,19 +92,18 @@ class ConnectionsFragment : Fragment(), ServiceConnection
         }
 
 
-        handleNoConnectionsText()
-
 
         sensorService?.getConnectedClients().let { webSockets ->
-            this.webSockets.clear()
-            if (webSockets != null)
-            {
-                this.webSockets.addAll(webSockets)
-            }
 
-          connectionsRecyclerViewAdapter.notifyDataSetChanged()
+            this.webSockets.clear()
+            webSockets?.let{this.webSockets.addAll(it)}
+
+            connectionsRecyclerViewAdapter.notifyDataSetChanged()
 
         }
+
+        handleNoConnectionsText()
+
 
 
     }
