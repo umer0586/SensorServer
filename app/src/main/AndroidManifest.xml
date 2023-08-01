@@ -20,8 +20,11 @@
         android:name=".MyApplication"
         android:theme="@style/Theme.SensorServer">
 
+        <!-- android:windowSoftInputMode="adjustPan" fixes toolbar expansion when keyboard gets focus-->
+        <!--https://stackoverflow.com/a/30767524/9193164-->
         <activity
             android:name=".activities.SettingsActivity"
+            android:windowSoftInputMode="adjustPan"
             android:exported="false"
             android:label="Settings">
             <meta-data
