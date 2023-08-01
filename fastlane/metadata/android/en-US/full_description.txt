@@ -1,8 +1,8 @@
-Android app which let you stream real-time sensor data from your phone to Websocket clients. Clients, including web browsers and other applications, are able to receive streamed data through the WebSocket client API. Since this application functions as a Websocket Server, you will require a Websocket Client API to establish a connection with the application.
+Android app which let you stream real-time sensor data from your phone to Websocket clients. Clients, including web browsers and other applications, are able to receive streamed data through the WebSocket client API.
 
 To receive sensor data, Websocket client must connect to the app using following URL.
 
-        ws://<ip>:<port>/sensor/connect?type=<sensor type here> 
+        ws://[ip]:[port]/sensor/connect?type=[sensor type here] 
 
 Once connected, client will receive sensor data in JSON Array (float type values) through websocket.onMessage.
 
