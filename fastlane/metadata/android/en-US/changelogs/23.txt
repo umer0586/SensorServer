@@ -1,0 +1,5 @@
+* Whole codebase migrated to kotlin
+* Crash reporting via email added
+* Network location provider removed
+* Fixed : Toolbar expansion issued fix
+* Fixed : App crashes on devices with dark theme enabled
