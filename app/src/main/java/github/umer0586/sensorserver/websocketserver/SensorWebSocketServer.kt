@@ -405,9 +405,9 @@ class SensorWebSocketServer(private val context: Context, address: InetSocketAdd
     }
 
     // This method is used in OnClose()
-    private fun unregisterSensor(sensor: Sensor?)
+    private fun unregisterSensor(sensor: Sensor)
     {
-        if (sensor == null) return
+
         // When client has closed connection, how many clients receiving same sensor data from this server
         val sensorConnectionCount = getSensorConnectionCount(sensor).toLong()
         Log.i(TAG, "Sensor : " + sensor.stringType + " Connections : " + sensorConnectionCount)
@@ -420,9 +420,12 @@ class SensorWebSocketServer(private val context: Context, address: InetSocketAdd
         */
 
         //  Unregister sensor if and only if one client is using it
-        if (sensorConnectionCount == 1L) sensorManager.unregisterListener(this, sensor)
+        if (sensorConnectionCount == 1L)
+            sensorManager.unregisterListener(this, sensor)
+
         registeredSensors.remove(sensor)
         Log.i(TAG, "Total Connections : " + getConnectionCount())
+
         notifyConnectionsChanged()
     }
 
