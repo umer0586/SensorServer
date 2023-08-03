@@ -160,6 +160,12 @@ See [Real Time Plot of Accelerometer (Python)](https://github.com/umer0586/Senso
 
 ![result](https://user-images.githubusercontent.com/35717992/208961337-0f69757e-e85b-4637-8c39-fa5554d85921.gif)
 
+
+
+https://github.com/umer0586/SensorServer/assets/35717992/2ebf865d-529e-4702-8254-347df98dc795
+
+
+
 ## Connecting over Hotspot :fire:
 If you don't have Wifi network at your work place you can directly connect websocket clients to the app by enabling **Hotspot Option** from settings. Just make sure that websocket clients are connected to your phone's hotspot
 
