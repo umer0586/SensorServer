@@ -136,7 +136,8 @@ class ServerFragment : Fragment(), ServiceConnection, ServerStateListener
         super.onPause()
         Log.d(TAG, "onPause()")
 
-        sensorService?.serverStateListener = null
+        // To prevent memory leak
+        sensorService?.setServerStateListener(null)
     }
 
     override fun onServerStarted(serverInfo: ServerInfo)
@@ -221,7 +222,7 @@ class ServerFragment : Fragment(), ServiceConnection, ServerStateListener
         val localBinder = service as LocalBinder
         sensorService = localBinder.service
 
-        sensorService?.serverStateListener = this
+        sensorService?.setServerStateListener(this)
         sensorService?.checkState() // this callbacks onServerAlreadyRunning()
 
     }

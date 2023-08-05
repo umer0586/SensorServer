@@ -5,13 +5,12 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.util.Log
-import github.umer0586.sensorserver.broadcastreceiver.BroadcastMessageReceiver
 import github.umer0586.sensorserver.service.SensorService
 
 class BroadcastMessageReceiver(private val context: Context) : BroadcastReceiver()
 {
 
-    private var messageListener: MessageListener? = null
+    private var broadcastMessageListener: BroadcastMessageListener? = null
     private var isRegistered = false
 
     companion object
@@ -24,12 +23,12 @@ class BroadcastMessageReceiver(private val context: Context) : BroadcastReceiver
         Log.d(TAG, "onReceive() called with: context = [$context], intent = [$intent]")
 
         // Dispatch received broadcast intent via MessageListener Interface
-        if (messageListener != null) messageListener?.onMessage(intent)
+        if (broadcastMessageListener != null) broadcastMessageListener?.onMessage(intent)
     }
 
-    fun setMessageListener(messageListener: MessageListener?)
+    fun setBroadcastMessageListener(broadcastMessageListener: BroadcastMessageListener?)
     {
-        this.messageListener = messageListener
+        this.broadcastMessageListener = broadcastMessageListener
     }
 
     fun registerEvents()
@@ -67,7 +66,7 @@ class BroadcastMessageReceiver(private val context: Context) : BroadcastReceiver
         }
     }
 
-    interface MessageListener
+    interface BroadcastMessageListener
     {
         fun onMessage(intent: Intent)
     }

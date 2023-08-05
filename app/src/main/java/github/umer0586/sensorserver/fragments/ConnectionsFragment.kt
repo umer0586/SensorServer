@@ -67,7 +67,8 @@ class ConnectionsFragment : Fragment(), ServiceConnection
         super.onPause()
         Log.d(TAG, "onPause()")
 
-        sensorService?.connectionsChangeListener = null
+        // To prevent memory leak
+        sensorService?.onConnectionsChange( callBack = null)
     }
 
     override fun onDestroy()
@@ -82,7 +83,7 @@ class ConnectionsFragment : Fragment(), ServiceConnection
         sensorService = localBinder.service
 
 
-        sensorService?.connectionsChangeListener = { webSockets ->
+        sensorService?.onConnectionsChange{ webSockets ->
 
             this.webSockets.clear()
             this.webSockets.addAll(webSockets)

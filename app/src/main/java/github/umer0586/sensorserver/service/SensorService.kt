@@ -15,7 +15,7 @@ import androidx.core.app.NotificationCompat
 import github.umer0586.sensorserver.R
 import github.umer0586.sensorserver.activities.MainActivity
 import github.umer0586.sensorserver.broadcastreceiver.BroadcastMessageReceiver
-import github.umer0586.sensorserver.broadcastreceiver.BroadcastMessageReceiver.MessageListener
+import github.umer0586.sensorserver.broadcastreceiver.BroadcastMessageReceiver.BroadcastMessageListener
 import github.umer0586.sensorserver.customextensions.getHotspotIp
 import github.umer0586.sensorserver.customextensions.getIp
 import github.umer0586.sensorserver.setting.AppSettings
@@ -35,15 +35,15 @@ interface ServerStateListener
     fun onServerAlreadyRunning(serverInfo: ServerInfo)
 }
 
-class SensorService : Service(), MessageListener
+class SensorService : Service(), BroadcastMessageListener
 {
 
 
     private var sensorWebSocketServer: SensorWebSocketServer? = null
 
-    var serverStateListener: ServerStateListener? = null
-    var connectionsChangeListener: ((List<WebSocket>) -> Unit)? = null
-    var connectionsCountChangeListener: ((Int) -> Unit)? = null
+    private var serverStateListener: ServerStateListener? = null
+    private var connectionsChangeCallBack: ((List<WebSocket>) -> Unit)? = null
+    private var connectionsCountChangeCallBack: ((Int) -> Unit)? = null
 
     private lateinit var appSettings: AppSettings
 
@@ -76,7 +76,7 @@ class SensorService : Service(), MessageListener
         createNotificationChannel()
         appSettings = AppSettings(applicationContext)
         broadcastMessageReceiver = BroadcastMessageReceiver(applicationContext)
-        broadcastMessageReceiver.setMessageListener(this)
+        broadcastMessageReceiver.setBroadcastMessageListener(this)
         broadcastMessageReceiver.registerEvents()
     }
 
@@ -162,7 +162,7 @@ class SensorService : Service(), MessageListener
                 return START_NOT_STICKY
             }
         }
-        sensorWebSocketServer?.onStartListener = { serverInfo ->
+        sensorWebSocketServer?.onStart { serverInfo ->
 
             serverStateListener?.onServerStarted(serverInfo)
 
@@ -184,7 +184,7 @@ class SensorService : Service(), MessageListener
             startForeground(ON_GOING_NOTIFICATION_ID, notification)
 
         }
-        sensorWebSocketServer?.onStopListener = {
+        sensorWebSocketServer?.onStop {
 
             serverStateListener?.onServerStopped()
 
@@ -193,17 +193,17 @@ class SensorService : Service(), MessageListener
             stopForeground()
         }
 
-        sensorWebSocketServer?.onErrorListener = { exception ->
+        sensorWebSocketServer?.onError { exception ->
 
             serverStateListener?.onServerError(exception)
             //stopForeground(true)
             stopForeground()
         }
 
-        sensorWebSocketServer?.connectionsChangeListener = { webSockets ->
+        sensorWebSocketServer?.onConnectionsChange { webSockets ->
 
-            connectionsChangeListener?.invoke(webSockets)
-            connectionsCountChangeListener?.invoke(webSockets.size)
+            connectionsChangeCallBack?.invoke(webSockets)
+            connectionsCountChangeCallBack?.invoke(webSockets.size)
 
         }
         sensorWebSocketServer?.samplingRate = appSettings.getSamplingRate()
@@ -321,6 +321,20 @@ class SensorService : Service(), MessageListener
 
         return emptyList();
 
+    }
+
+
+    fun setServerStateListener(serverStateListener: ServerStateListener?)
+    {
+        this.serverStateListener = serverStateListener
+    }
+    fun onConnectionsChange(callBack: ((List<WebSocket>) -> Unit)?)
+    {
+        connectionsChangeCallBack = callBack
+    }
+    fun onConnectionsCountChange(callBack: ((Int) -> Unit)?)
+    {
+        connectionsCountChangeCallBack = callBack
     }
 
     /**

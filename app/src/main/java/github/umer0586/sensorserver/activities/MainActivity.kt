@@ -112,7 +112,7 @@ class MainActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedListen
 
         sensorService?.let{ setConnectionCountBadge( it.getConnectionCount() ) }
 
-        sensorService?.connectionsCountChangeListener = { count ->
+        sensorService?.onConnectionsCountChange { count ->
 
             runOnUiThread { setConnectionCountBadge(count) }
         }
@@ -127,7 +127,9 @@ class MainActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedListen
     {
         super.onPause()
         Log.d(TAG, "onPause()")
-        sensorService?.connectionsCountChangeListener = null
+
+        // To prevent memory leak
+        sensorService?.onConnectionsCountChange(callBack = null)
     }
 
     override fun onDestroy()

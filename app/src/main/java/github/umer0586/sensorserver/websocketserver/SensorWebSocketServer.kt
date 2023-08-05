@@ -43,15 +43,16 @@ class SensorWebSocketServer(private val context: Context, address: InetSocketAdd
     private val registeredSensors = mutableListOf<Sensor>()
 
     //Callbacks
-    var onStartListener: ((ServerInfo) -> Unit)? = null
-    var onStopListener: (() -> Unit)? = null
-    var onErrorListener: ((Exception?) -> Unit)? = null
-    var connectionsChangeListener: ((List<WebSocket>) -> Unit)? = null
+    private var onStartCallBack: ((ServerInfo) -> Unit)? = null
+    private var onStopCallBack: (() -> Unit)? = null
+    private var onErrorCallBack: ((Exception?) -> Unit)? = null
+    private var connectionsChangeCallBack: ((List<WebSocket>) -> Unit)? = null
 
     private var serverStartUpFailed = false
 
     var isRunning = false
         private set
+
 
     companion object
     {
@@ -462,7 +463,7 @@ class SensorWebSocketServer(private val context: Context, address: InetSocketAdd
 
             //    if (serverErrorListener != null) serverErrorListener!!.onServerError(ex) // listener must filter exception by itself
 
-            onErrorListener?.invoke(ex)
+            onErrorCallBack?.invoke(ex)
 
             // we will use this in stop() method to check if there was an exception during server startup
             serverStartUpFailed = true
@@ -474,7 +475,7 @@ class SensorWebSocketServer(private val context: Context, address: InetSocketAdd
     override fun onStart()
     {
 
-        onStartListener?.invoke(ServerInfo(address.hostName, port))
+        onStartCallBack?.invoke(ServerInfo(address.hostName, port))
 
         isRunning = true
         Log.i(TAG, "server started successfully $address")
@@ -493,7 +494,7 @@ class SensorWebSocketServer(private val context: Context, address: InetSocketAdd
 
         // if (serverStopListener != null && !serverStartUpFailed) serverStopListener!!.onServerStopped()
 
-        onStopListener?.run {
+        onStopCallBack?.run {
 
             if (!serverStartUpFailed)
                 invoke()
@@ -582,7 +583,7 @@ class SensorWebSocketServer(private val context: Context, address: InetSocketAdd
     private fun notifyConnectionsChanged()
     {
         Log.d(TAG, "notifyConnectionsChanged() : " + connections.size)
-        connectionsChangeListener?.invoke(ArrayList(connections))
+        connectionsChangeCallBack?.invoke(ArrayList(connections))
     }
 
     fun getConnectionCount(): Int
@@ -590,13 +591,32 @@ class SensorWebSocketServer(private val context: Context, address: InetSocketAdd
         return connections.size
     }
 
-    fun closeAllConnections()
+    private fun closeAllConnections()
     {
 
         connections.forEach { webSocket ->
             webSocket.close(CLOSE_CODE_SERVER_STOPPED, "Server stopped")
         }
 
+    }
+
+
+    fun onStart(callBack: ((ServerInfo) -> Unit)? )
+    {
+        onStartCallBack = callBack
+    }
+
+    fun onStop(callBack: (() -> Unit)? )
+    {
+        onStopCallBack = callBack
+    }
+    fun onError(callBack: ((Exception?) -> Unit)? )
+    {
+        onErrorCallBack = callBack
+    }
+    fun onConnectionsChange(callBack: ((List<WebSocket>) -> Unit)?)
+    {
+        connectionsChangeCallBack = callBack
     }
 
 
