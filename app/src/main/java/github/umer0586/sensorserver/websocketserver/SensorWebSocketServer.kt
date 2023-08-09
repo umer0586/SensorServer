@@ -39,8 +39,8 @@ class SensorWebSocketServer(private val context: Context, address: InetSocketAdd
     private val sensorManager = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
     private val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
 
-    //To track the list of sensors registered
-    private val registeredSensors = mutableListOf<Sensor>()
+    //To keep a record of the sensors that this server is actively listening to for their events. It may contain duplicate entries
+    private val sensorsInUse = mutableListOf<Sensor>()
 
     //Callbacks
     private var onStartCallBack: ((ServerInfo) -> Unit)? = null
@@ -149,7 +149,12 @@ class SensorWebSocketServer(private val context: Context, address: InetSocketAdd
             requestedSensorList.add(sensor)
         }
 
-        registerMultipleSensors(requestedSensorList, clientWebsocket)
+        // For new requesting client, attach a tag of requested sensor type with client
+        clientWebsocket.setAttachment(requestedSensorList)
+
+        for (sensor in requestedSensorList)
+            registerListenerForSensor(sensor)
+
     }
 
     /**
@@ -196,87 +201,46 @@ class SensorWebSocketServer(private val context: Context, address: InetSocketAdd
         }
 
         //At this point paramType is valid (e.g android.sensor.light etc..)
-        registerSensor(requestedSensor, clientWebsocket)
-        notifyConnectionsChanged()
-    }
-
-    // Helper method used in handleMultiSensorRequest()
-    private fun registerMultipleSensors(sensors: List<Sensor>, clientWebsocket: WebSocket)
-    {
-
-        // For new requesting client, attach a tag of requested sensor type with client
-        clientWebsocket.setAttachment(sensors)
-
-        for (sensor in sensors)
-        {
-
-            /*
-            If this WebSocket Server has already registered itself for some type of sensor (e.g android.sensor.light),
-            then we don't have to registered this Server for the same sensor again
-            */
-            if (registeredSensors.contains(sensor))
-            {
-
-                // Log the sensor type and that it is already registered
-                Log.i(TAG, "Sensor ${sensor.stringType} already registered, skipping registration")
-
-                // Update registry
-                registeredSensors.add(sensor)
-                notifyConnectionsChanged()
-
-                // No need to call sensorManager.registerListener()
-                return
-            }
-
-
-            // Register the requested sensor
-            // Sensor events will be reported to the main thread if a handler is not provided
-            sensorManager.registerListener(this, sensor, samplingRate, handler)
-
-            // Update registry
-            registeredSensors.add(sensor)
-            notifyConnectionsChanged()
-
-        }
-    }
-
-
-    // Helper method used in  handleSingleSensorRequest()
-    private fun registerSensor(requestedSensor: Sensor, clientWebsocket: WebSocket) {
 
         // Attach info with newly connected client
         // so that this Servers knows which client has requested which type of sensor
         clientWebsocket.setAttachment(requestedSensor)
+        registerListenerForSensor(requestedSensor)
 
-        // if this WebSocket Server has already registered itself for some type of sensor (e.g android.sensor.light)
-        // then we don't have to registered this Server for the same sensor again
-        if (registeredSensors.contains(requestedSensor))
+        notifyConnectionsChanged()
+    }
+
+    private fun registerListenerForSensor(sensor: Sensor)
+    {
+        // if this WebSocket Server is already listening for some type of sensor (e.g android.sensor.light)
+        // then we don't have to registered this Server as listener for the same sensor again
+        if (sensorsInUse.contains(sensor))
         {
 
             // Log the sensor type and that it is already registered
-            Log.i(TAG, "Sensor ${requestedSensor.stringType} already registered, skipping registration")
+            Log.i(TAG, "Sensor ${sensor.stringType} already registered, skipping registration")
 
-            // Update registry
-            registeredSensors.add(requestedSensor)
+            // Update a list
+            // Duplicate entries allowed
+            sensorsInUse.add(sensor)
             notifyConnectionsChanged()
 
             // No need to call sensorManager.registerListener()
             return
         }
 
-            // Register the requested sensor
-            // Sensor events will be reported to the main thread if a handler is not provided
-            sensorManager.registerListener(this, requestedSensor, samplingRate, handler)
+        // Register listener for requested sensor
+        // Sensor events will be reported to the main thread if a handler is not provided
+        sensorManager.registerListener(this, sensor, samplingRate, handler)
 
-            // TODO:
-            // Android official docs say (https://developer.android.com/reference/android/hardware/SensorManager)
-            // "Note: Don't use this method (registerListener) with a one shot trigger sensor such as Sensor#TYPE_SIGNIFICANT_MOTION.
-            // Use requestTriggerSensor(android.hardware.TriggerEventListener, android.hardware.Sensor) instead."
+        // TODO:
+        // Android official docs say (https://developer.android.com/reference/android/hardware/SensorManager)
+        // "Note: Don't use this method (registerListener) with a one shot trigger sensor such as Sensor#TYPE_SIGNIFICANT_MOTION.
+        // Use requestTriggerSensor(android.hardware.TriggerEventListener, android.hardware.Sensor) instead."
 
-            // Update registry
-            registeredSensors.add(requestedSensor)
-            notifyConnectionsChanged()
-
+        // Update a list
+        sensorsInUse.add(sensor)
+        notifyConnectionsChanged()
     }
 
 
@@ -386,13 +350,13 @@ class SensorWebSocketServer(private val context: Context, address: InetSocketAdd
         {
             // Get sensor type of recently closed client
             val sensor = clientWebsocket.getAttachment<Sensor>()
-            unregisterSensor(sensor)
+            unregisterListenerForSensor(sensor)
         }
         else if (clientWebsocket.getAttachment<Any>() is ArrayList<*>)
         {
             val sensors = clientWebsocket.getAttachment<List<Sensor>>()
             for (sensor in sensors)
-                unregisterSensor(sensor)
+                unregisterListenerForSensor(sensor)
         }
         else if (clientWebsocket.getAttachment<Any>() is GPS)
         {
@@ -406,7 +370,7 @@ class SensorWebSocketServer(private val context: Context, address: InetSocketAdd
     }
 
     // This method is used in OnClose()
-    private fun unregisterSensor(sensor: Sensor)
+    private fun unregisterListenerForSensor(sensor: Sensor)
     {
 
         // When client has closed connection, how many clients receiving same sensor data from this server
@@ -420,11 +384,11 @@ class SensorWebSocketServer(private val context: Context, address: InetSocketAdd
 
         */
 
-        //  Unregister sensor if and only if one client is using it
+        //  Unregister listener if and only if one client is using it
         if (sensorConnectionCount == 1L)
             sensorManager.unregisterListener(this, sensor)
 
-        registeredSensors.remove(sensor)
+        sensorsInUse.remove(sensor)
         Log.i(TAG, "Total Connections : " + getConnectionCount())
 
         notifyConnectionsChanged()
@@ -527,7 +491,7 @@ class SensorWebSocketServer(private val context: Context, address: InetSocketAdd
         // Log.i(TAG, "onSensorChanged: Thread " + Thread.currentThread().getName());
         // Log.i(TAG, "onSensorChanged: Sensor " + sensorEvent.sensor.getStringType());
         if (getConnectionCount() == 0)
-            Log.e( TAG," Sensor event reported when no client in connected" )
+            Log.w( TAG," Sensor event reported when no client in connected" )
 
         response.clear()
 
@@ -573,8 +537,8 @@ class SensorWebSocketServer(private val context: Context, address: InetSocketAdd
     private fun getSensorConnectionCount(sensor: Sensor): Int
     {
         var count = 0
-        for (registeredSensor in registeredSensors)
-            if (registeredSensor.type == sensor.type)
+        for (sensorInUse in sensorsInUse)
+            if (sensorInUse.type == sensor.type)
                 count++
 
         return count
