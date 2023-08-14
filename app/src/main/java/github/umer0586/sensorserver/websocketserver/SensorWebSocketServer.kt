@@ -14,6 +14,7 @@ import android.location.LocationManager
 import android.net.Uri
 import android.os.*
 import android.util.Log
+import android.view.MotionEvent
 import github.umer0586.sensorserver.customextensions.getSensorFromStringType
 import github.umer0586.sensorserver.util.JsonUtil
 import org.java_websocket.WebSocket
@@ -25,6 +26,7 @@ import java.util.*
 
 data class ServerInfo(val ipAddress: String, val port: Int)
 class GPS
+class TouchSensors
 
 
 class SensorWebSocketServer(private val context: Context, address: InetSocketAddress) :
@@ -35,6 +37,7 @@ class SensorWebSocketServer(private val context: Context, address: InetSocketAdd
 
     private var handlerThread: HandlerThread = HandlerThread("Handler Thread")
     private lateinit var handler: Handler
+    private lateinit var motionEventHandler : Handler
 
     private val sensorManager = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
     private val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
@@ -61,6 +64,7 @@ class SensorWebSocketServer(private val context: Context, address: InetSocketAdd
         private const val CONNECTION_PATH_SINGLE_SENSOR = "/sensor/connect"
         private const val CONNECTION_PATH_MULTIPLE_SENSORS = "/sensors/connect"
         private const val CONNECTION_PATH_GPS = "/gps"
+        private const val CONNECTION_PATH_TOUCH_SENSORS = "/touchscreen"
         private val response = mutableMapOf<String,Any>()
 
         //websocket close codes ranging 4000 - 4999 are for application's custom messages
@@ -91,6 +95,10 @@ class SensorWebSocketServer(private val context: Context, address: InetSocketAdd
                 {
                     CONNECTION_PATH_SINGLE_SENSOR -> handleSingleSensorRequest(uri, clientWebsocket)
                     CONNECTION_PATH_MULTIPLE_SENSORS -> handleMultiSensorRequest(uri, clientWebsocket)
+                    CONNECTION_PATH_TOUCH_SENSORS -> {
+                        clientWebsocket.setAttachment(TouchSensors())
+                        notifyConnectionsChanged()
+                    }
 
                     // TODO : handleGPSRequest(websocket) never gets called when app has no location permission
                     CONNECTION_PATH_GPS -> handleGPSRequest(clientWebsocket)
@@ -103,6 +111,7 @@ class SensorWebSocketServer(private val context: Context, address: InetSocketAdd
 
 
     }
+
 
     /**
      * Helper method to handle multiple sensor request on single websocket connection
@@ -484,6 +493,69 @@ class SensorWebSocketServer(private val context: Context, address: InetSocketAdd
 
         handlerThread.start()
         handler = Handler(handlerThread.looper)
+
+
+
+        motionEventHandler = object : Handler(handlerThread.looper){
+
+            override fun handleMessage(msg: Message)
+            {
+                //Log.d(TAG,"Handler" + Thread.currentThread().name)
+                response.clear()
+                val motionEvent = msg.obj as MotionEvent
+
+                for (websocket in connections)
+                {
+                    if(websocket.getAttachment<Any>() is TouchSensors)
+                    {
+                        when(motionEvent.actionMasked)
+                        {
+                            MotionEvent.ACTION_UP -> {
+                                response["action"] = "ACTION_UP"
+                                response["x"] = motionEvent.x
+                                response["y"] = motionEvent.y
+
+                                websocket.send(JsonUtil.toJSON(response))
+                            }
+
+                            MotionEvent.ACTION_DOWN -> {
+                                response["action"] = "ACTION_DOWN"
+                                response["x"] = motionEvent.x
+                                response["y"] = motionEvent.y
+
+                                websocket.send(JsonUtil.toJSON(response))
+                            }
+
+                            MotionEvent.ACTION_MOVE -> {
+                                response["action"] = "ACTION_MOVE"
+                                response["x"] = motionEvent.x
+                                response["y"] = motionEvent.y
+
+                                websocket.send(JsonUtil.toJSON(response))
+                            }
+
+
+                        }
+
+
+                    }
+                }
+
+            }
+        }
+
+
+
+
+    }
+
+    fun onMotionEvent(motionEvent : MotionEvent)
+    {
+
+        val message = Message.obtain()
+        message.obj = motionEvent
+        motionEventHandler.sendMessage(message)
+
     }
 
     override fun onSensorChanged(sensorEvent: SensorEvent)

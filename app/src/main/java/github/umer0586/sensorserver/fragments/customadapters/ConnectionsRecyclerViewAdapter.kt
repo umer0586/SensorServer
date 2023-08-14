@@ -12,6 +12,7 @@ import github.umer0586.sensorserver.R
 import github.umer0586.sensorserver.fragments.customadapters.ConnectionsRecyclerViewAdapter.MyViewHolder
 import github.umer0586.sensorserver.websocketserver.GPS
 import github.umer0586.sensorserver.websocketserver.SensorWebSocketServer
+import github.umer0586.sensorserver.websocketserver.TouchSensors
 import net.cachapa.expandablelayout.ExpandableLayout
 import org.java_websocket.WebSocket
 
@@ -62,6 +63,9 @@ class ConnectionsRecyclerViewAdapter(private val webSockets: List<WebSocket>) : 
 
         if (webSocket.getAttachment<Any>() is Sensor)
             viewHolder.sensorDetails.text = (webSocket.getAttachment<Any>() as Sensor).name
+
+        else if (webSocket.getAttachment<Any>() is TouchSensors)
+            viewHolder.sensorDetails.text = "Touch sensor"
 
         else if (webSocket.getAttachment<Any>() is ArrayList<*>)
         {

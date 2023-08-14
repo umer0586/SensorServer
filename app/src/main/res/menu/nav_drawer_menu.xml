@@ -22,4 +22,10 @@
         android:icon="@drawable/ic_axis"
         />
 
+    <item
+        android:id="@+id/nav_drawer_touch_sensors"
+        android:title="Touch Screen"
+        android:icon="@drawable/ic_touchscreen"
+        />
+
 </menu>
