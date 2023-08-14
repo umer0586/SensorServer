@@ -1,0 +1,1 @@
+The app now has a basic touch sensor feature. When a websocket client connects to /touchscreen, it will receive information about touch actions.
