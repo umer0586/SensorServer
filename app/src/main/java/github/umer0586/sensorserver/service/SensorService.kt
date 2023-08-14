@@ -11,6 +11,7 @@ import android.os.Binder
 import android.os.Build
 import android.os.IBinder
 import android.util.Log
+import android.view.MotionEvent
 import androidx.core.app.NotificationCompat
 import github.umer0586.sensorserver.R
 import github.umer0586.sensorserver.activities.MainActivity
@@ -309,6 +310,14 @@ class SensorService : Service(), BroadcastMessageListener
                 serverStateListener?.onServerAlreadyRunning( ServerInfo(server.address.hostName,server.port) )
             }
 
+        }
+    }
+
+    fun sendMotionEvent(motionEvent : MotionEvent)
+    {
+
+        sensorWebSocketServer?.let{
+            it.onMotionEvent(motionEvent)
         }
     }
 
