@@ -122,6 +122,20 @@ You can also use to multiple sensors over single websocket connection. To use mu
 
 By connecting using above URL you will receive JSON response containing sensor data along with a type of sensor. See complete example at [Using Multiple Sensors On Single Websocket Connection](https://github.com/umer0586/SensorServer/wiki/Using-Multiple-Sensors-On-Single-Websocket-Connection)
 
+## Reading Touch Screen Data
+By connecting to the address `ws://<ip>:<port>/touchscreen`, clients can now receive touch screen events in following JSON formate.
+
+|   Key   |   Value                  |
+|:-------:|:-----------------------:|
+|   x     |         x coordinate of touch           |
+|   y     |         y coordinate of touch          |
+| action  | ACTION_MOVE or ACTION_UP or ACTION_DOWN |
+
+"ACTION_DOWN" indicates that a user has touched the screen.
+"ACTION_UP" means the user has removed their finger from the screen.
+"ACTION_MOVE" implies the user is sliding their finger across the screen.
+See [Controlling Mouse Movement Using SensorServer app](https://github.com/umer0586/SensorServer/wiki/Controlling-Mouse-Using-SensorServer-App)
+
 ## Getting Device Location Using GPS
 You can access device location through GPS using following URL.
 
