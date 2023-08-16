@@ -85,17 +85,14 @@ def on_message(ws, message):
     x = values[0]
     y = values[1]
     z = values[2]
-    print(f"x = {x} , y = {y} , z = {z}")
+    print("x = ", x , "y = ", y , "z = ", z )
 
 def on_error(ws, error):
-    print("error occurred")
-    print(error)
-
+    print("error occurred ", error)
+    
 def on_close(ws, close_code, reason):
-    print("connection close")
-    print("close code : ", close_code)
-    print("reason : ", reason  )
-
+    print("connection closed : ", reason)
+    
 def on_open(ws):
     print("connected")
     
@@ -110,20 +107,20 @@ def connect(url):
     ws.run_forever()
  
  
-connect("ws://192.168.0.101:8080/sensor/connect?type=android.sensor.accelerometer") 
+connect("ws://192.168.0.103:8080/sensor/connect?type=android.sensor.accelerometer") 
 
 ```
  *Your device's IP might be different when you tap start button, so make sure you are using correct IP address at client side*
  
 ## Using Multiple Sensors Over single Websocket Connection
-You can also use to multiple sensors over single websocket connection. To use multiple sensors over single websocket connection use following **URL**.
+You can also connect to multiple sensors over single websocket connection. To use multiple sensors over single websocket connection use following **URL**.
 
                  ws://<ip>:<port>/sensors/connect?types=["<type1>","<type2>","<type3>"...]
 
-By connecting using above URL you will receive JSON response containing sensor data along with a type of sensor. See complete example at [Using Multiple Sensors On Single Websocket Connection](https://github.com/umer0586/SensorServer/wiki/Using-Multiple-Sensors-On-Single-Websocket-Connection)
+By connecting using above URL you will receive JSON response containing sensor data along with a type of sensor. See complete example at [Using Multiple Sensors On Single Websocket Connection](https://github.com/umer0586/SensorServer/wiki/Using-Multiple-Sensors-On-Single-Websocket-Connection). Avoid connecting too many sensors over single connection
 
 ## Reading Touch Screen Data
-By connecting to the address `ws://<ip>:<port>/touchscreen`, clients can now receive touch screen events in following JSON formate.
+By connecting to the address `ws://<ip>:<port>/touchscreen`, clients can receive touch screen events in following JSON formate.
 
 |   Key   |   Value                  |
 |:-------:|:-----------------------:|
@@ -143,29 +140,25 @@ You can access device location through GPS using following URL.
                  
 
 JSON response contains following key fields.
-```json
-{
-"longitude": "longitude in degrees",
-"latitude": "latitude in degrees",
-"altitude": "The altitude of location in meters above the WGS84 reference ellipsoid",
-"bearing": "bearing at the time of this location in degrees. Bearing is the horizontal direction of travel of this device and is unrelated to the device orientation. The bearing is guaranteed to be in the range [0, 360)",
-"accuracy": "Estimated horizontal accuracy radius in meters of this location at the 68th percentile confidence level",
-"speed": "Speed at the time of this location in meters per second",
-"time": "the Unix epoch time of this location fix, in milliseconds since the start of the Unix epoch (00:00:00 January 1, 1970 UTC)"
-}
-```
+
+| Field       | Description                                                                                                            |
+|-------------|------------------------------------------------------------------------------------------------------------------------|
+| longitude   | Longitude in degrees.                                                                                                 |
+| latitude    | Latitude in degrees.                                                                                                  |
+| altitude    | The altitude of the location in meters above the WGS84 reference ellipsoid.                                         |
+| bearing     | Bearing at the time of this location in degrees. Bearing is the horizontal direction of travel and is unrelated to device orientation. The bearing is guaranteed to be in the range \[0, 360). |
+| accuracy    | Estimated horizontal accuracy radius in meters of this location at the 68th percentile confidence level.           |
+| speed       | Speed at the time of this location in meters per second.                                                            |
+| time        | The Unix epoch time of this location fix, in milliseconds since the start of the Unix epoch (00:00:00 January 1, 1970 UTC). |
 
 Fields only for Android 8.0 and above.
 
-```json
-
-{
-"speedAccuracyMetersPerSecond": "Estimated speed accuracy in meters per second of this location at the 68th percentile confidence level",
-"bearingAccuracyDegrees": "Estimated bearing accuracy in degrees of this location at the 68th percentile confidence level",
-"elapsedRealtimeNanos": "Time of this fix in nanoseconds of elapsed realtime since system boot",
-"verticalAccuracyMeters": "The estimated altitude accuracy in meters of this location at the 68th percentile confidence level"
-}
-```
+| Field                     | Description                                                                                                     |
+|---------------------------|-----------------------------------------------------------------------------------------------------------------|
+| speedAccuracyMetersPerSecond | Estimated speed accuracy in meters per second of this location at the 68th percentile confidence level.     |
+| bearingAccuracyDegrees    | Estimated bearing accuracy in degrees of this location at the 68th percentile confidence level.                |
+| elapsedRealtimeNanos      | Time of this fix in nanoseconds of elapsed realtime since system boot.                                        |
+| verticalAccuracyMeters    | The estimated altitude accuracy in meters of this location at the 68th percentile confidence level.          |
 
 
 
@@ -197,7 +190,7 @@ Make sure you have installed your android device driver and `adb devices` comman
 
 [<img src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png"
     alt="Get it on F-Droid"
-    height="80">](https://f-droid.org/packages/github.umer0586.sensorserver)
+    height="100">](https://f-droid.org/packages/github.umer0586.sensorserver)
     
 OR
 
