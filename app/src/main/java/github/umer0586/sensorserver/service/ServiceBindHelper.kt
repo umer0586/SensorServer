@@ -55,10 +55,15 @@ class ServiceBindHelper(private val context: Context, private val serviceConnect
     override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event)
     {
         Log.d(TAG + " : " + source.javaClass.getSimpleName(), event.name)
-        if (event == Lifecycle.Event.ON_RESUME)
-            bindToService()
-        else if (event == Lifecycle.Event.ON_PAUSE)
-            unBindFromService()
+
+        when(event)
+        {
+            Lifecycle.Event.ON_RESUME -> bindToService()
+            Lifecycle.Event.ON_PAUSE -> unBindFromService()
+            else ->{}
+
+        }
+
     }
 
     companion object
