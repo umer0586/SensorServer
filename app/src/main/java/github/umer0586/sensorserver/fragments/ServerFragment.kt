@@ -1,12 +1,9 @@
 package github.umer0586.sensorserver.fragments
 
-import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
-import android.content.ServiceConnection
 import android.net.wifi.WifiManager
 import android.os.Bundle
-import android.os.IBinder
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -28,7 +25,7 @@ import github.umer0586.sensorserver.websocketserver.ServerInfo
 import java.net.BindException
 import java.net.UnknownHostException
 
-class ServerFragment : Fragment(), ServiceConnection, ServerStateListener
+class ServerFragment : Fragment(), ServerStateListener
 {
 
     private var sensorService: SensorService? = null
@@ -59,10 +56,18 @@ class ServerFragment : Fragment(), ServiceConnection, ServerStateListener
 
         serviceBindHelper = ServiceBindHelper(
             context = requireContext(),
-            serviceConnection = this,
-            service = SensorService::class.java
+            service = SensorService::class.java,
+            componentLifecycle = lifecycle
         )
-        lifecycle.addObserver(serviceBindHelper)
+
+        serviceBindHelper.onServiceConnected { binder ->
+
+            val localBinder = binder as LocalBinder
+            sensorService = localBinder.service
+
+            sensorService?.setServerStateListener(this)
+            sensorService?.checkState() // this callbacks onServerAlreadyRunning()
+        }
 
         hidePulseAnimation()
         hideServerAddress()
@@ -217,25 +222,6 @@ class ServerFragment : Fragment(), ServiceConnection, ServerStateListener
         binding.serverAddress.visibility = View.GONE
     }
 
-    override fun onServiceConnected(name: ComponentName, service: IBinder)
-    {
-        val localBinder = service as LocalBinder
-        sensorService = localBinder.service
-
-        sensorService?.setServerStateListener(this)
-        sensorService?.checkState() // this callbacks onServerAlreadyRunning()
-
-    }
-
-    override fun onServiceDisconnected(name: ComponentName)
-    {
-    }
-
-    override fun onDestroy()
-    {
-        super.onDestroy()
-        lifecycle.removeObserver(serviceBindHelper)
-    }
 
     override fun onDestroyView() {
         super.onDestroyView()

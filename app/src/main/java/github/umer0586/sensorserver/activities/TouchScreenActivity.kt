@@ -16,7 +16,7 @@ import github.umer0586.sensorserver.service.ServiceBindHelper
 import github.umer0586.sensorserver.util.JsonUtil
 import github.umer0586.sensorserver.websocketserver.TouchSensors
 
-class TouchScreenActivity : AppCompatActivity(),ServiceConnection
+class TouchScreenActivity : AppCompatActivity()
 {
     private val TAG = "TouchScreenActivity"
     private var sensorService: SensorService? = null
@@ -29,10 +29,15 @@ class TouchScreenActivity : AppCompatActivity(),ServiceConnection
 
         val serviceBindHelper = ServiceBindHelper(
             context = applicationContext,
-            serviceConnection = this,
-            service = SensorService::class.java
+            service = SensorService::class.java,
+            componentLifecycle = lifecycle
         )
-        lifecycle.addObserver(serviceBindHelper)
+
+        serviceBindHelper.onServiceConnected { binder ->
+
+            val localBinder = binder as SensorService.LocalBinder
+            sensorService = localBinder.service
+        }
 
     }
 
@@ -45,17 +50,5 @@ class TouchScreenActivity : AppCompatActivity(),ServiceConnection
         return super.onTouchEvent(event)
     }
 
-    override fun onServiceConnected(name: ComponentName?, service: IBinder?)
-    {
-        Log.d(TAG,"onServiceConnected()")
 
-        val localBinder = service as SensorService.LocalBinder
-        sensorService = localBinder.service
-
-    }
-
-    override fun onServiceDisconnected(name: ComponentName?)
-    {
-        TODO("Not yet implemented")
-    }
 }

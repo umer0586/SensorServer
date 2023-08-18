@@ -21,7 +21,7 @@ import org.java_websocket.WebSocket
 /**
  * TODO: functionality to allow user to close all connections (using button in action bar)
  */
-class ConnectionsFragment : Fragment(), ServiceConnection
+class ConnectionsFragment : Fragment()
 {
 
     private var sensorService: SensorService? = null
@@ -56,10 +56,12 @@ class ConnectionsFragment : Fragment(), ServiceConnection
 
         serviceBindHelper = ServiceBindHelper(
             context = requireContext(),
-            serviceConnection = this,
-            service = SensorService::class.java
+            service = SensorService::class.java,
+            componentLifecycle = lifecycle
         )
-        lifecycle.addObserver(serviceBindHelper)
+
+        serviceBindHelper.onServiceConnected(this::onServiceConnected)
+
     }
 
     override fun onPause()
@@ -71,15 +73,10 @@ class ConnectionsFragment : Fragment(), ServiceConnection
         sensorService?.onConnectionsChange( callBack = null)
     }
 
-    override fun onDestroy()
-    {
-        super.onDestroy()
-        lifecycle.removeObserver(serviceBindHelper)
-    }
 
-    override fun onServiceConnected(name: ComponentName, service: IBinder)
+    fun onServiceConnected(binder: IBinder)
     {
-        val localBinder = service as LocalBinder
+        val localBinder = binder as LocalBinder
         sensorService = localBinder.service
 
 
@@ -107,10 +104,6 @@ class ConnectionsFragment : Fragment(), ServiceConnection
 
 
 
-    }
-
-    override fun onServiceDisconnected(name: ComponentName)
-    {
     }
 
     override fun onDestroyView() {

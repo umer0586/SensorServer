@@ -22,7 +22,7 @@ import github.umer0586.sensorserver.service.SensorService
 import github.umer0586.sensorserver.service.SensorService.LocalBinder
 import github.umer0586.sensorserver.service.ServiceBindHelper
 
-class MainActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedListener, ServiceConnection
+class MainActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedListener
 {
 
     private lateinit var actionBarDrawerToggle: ActionBarDrawerToggle
@@ -61,10 +61,12 @@ class MainActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedListen
 
         serviceBindHelper = ServiceBindHelper(
             context = applicationContext,
-            serviceConnection = this,
-            service = SensorService::class.java
+            service = SensorService::class.java,
+            componentLifecycle = lifecycle
         )
-        lifecycle.addObserver(serviceBindHelper)
+
+        serviceBindHelper.onServiceConnected(this::onServiceConnected)
+
 
 
         binding.dashboard.viewPager.isUserInputEnabled = false
@@ -109,9 +111,9 @@ class MainActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedListen
     }
 
 
-    override fun onServiceConnected(name: ComponentName, service: IBinder)
+    fun onServiceConnected(binder: IBinder)
     {
-        val localBinder = service as LocalBinder
+        val localBinder = binder as LocalBinder
         sensorService = localBinder.service
 
         sensorService?.let{ setConnectionCountBadge( it.getConnectionCount() ) }
@@ -123,9 +125,6 @@ class MainActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedListen
 
     }
 
-    override fun onServiceDisconnected(name: ComponentName)
-    {
-    }
 
     override fun onPause()
     {
@@ -136,12 +135,6 @@ class MainActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedListen
         sensorService?.onConnectionsCountChange(callBack = null)
     }
 
-    override fun onDestroy()
-    {
-        super.onDestroy()
-        Log.d(TAG, "onDestroy()")
-        lifecycle.removeObserver(serviceBindHelper)
-    }
 
     private fun setConnectionCountBadge(totalConnections: Int)
     {

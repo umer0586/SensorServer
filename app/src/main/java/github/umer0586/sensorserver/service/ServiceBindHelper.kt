@@ -10,14 +10,22 @@ import android.util.Log
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
-import github.umer0586.sensorserver.service.ServiceBindHelper
 
-class ServiceBindHelper(private val context: Context, private val serviceConnection: ServiceConnection, private val service: Class<out Service>
+class ServiceBindHelper(private val context: Context,
+                        private val service: Class<out Service>,
+                        componentLifecycle : Lifecycle
 ) : ServiceConnection, LifecycleEventObserver
 {
 
+    init
+    {
+        // Make this class observe lifecycle of Activity/Fragment
+        componentLifecycle.addObserver(this)
+    }
+
 
     private var bounded = false
+    private var onServiceConnectedCallBack : ((IBinder) -> Unit)? = null
 
 
     private fun bindToService()
@@ -38,23 +46,35 @@ class ServiceBindHelper(private val context: Context, private val serviceConnect
         }
     }
 
-    override fun onServiceConnected(name: ComponentName, service: IBinder)
+    fun onServiceConnected(callBack: ((IBinder) -> Unit)?)
+    {
+        onServiceConnectedCallBack = callBack
+    }
+
+    override fun onServiceConnected(name: ComponentName, binder: IBinder)
     {
         Log.d(TAG, "onServiceConnected()")
         bounded = true
-        serviceConnection.onServiceConnected(name, service)
+
+        onServiceConnectedCallBack?.invoke(binder)
+
     }
 
+/*    The onServiceDisconnected() method in Android is called when the connection to the service is unexpectedly disconnected,
+    usually due to a crash or the service being killed by the system.
+    This allows you to handle the situation and possibly attempt to reestablish the connection.
+    onServiceDisconnected() method is not called when you explicitly call context.unbindService().
+    It's only called when the connection to the service is unexpectedly lost, such as when the service process crashes or is killed by the system.*/
     override fun onServiceDisconnected(name: ComponentName)
     {
         Log.d(TAG, "onServiceDisconnected()")
         bounded = false
-        serviceConnection.onServiceDisconnected(name)
+
     }
 
     override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event)
     {
-        Log.d(TAG + " : " + source.javaClass.getSimpleName(), event.name)
+        Log.d(TAG + " : " + source.javaClass.simpleName, event.name)
 
         when(event)
         {
@@ -68,6 +88,6 @@ class ServiceBindHelper(private val context: Context, private val serviceConnect
 
     companion object
     {
-        private val TAG: String = ServiceBindHelper::class.java.getSimpleName()
+        private val TAG: String = ServiceBindHelper::class.java.simpleName
     }
 }
