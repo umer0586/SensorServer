@@ -65,7 +65,7 @@ class SensorWebSocketServer(private val context: Context, address: InetSocketAdd
         private const val CONNECTION_PATH_MULTIPLE_SENSORS = "/sensors/connect"
         private const val CONNECTION_PATH_GPS = "/gps"
         private const val CONNECTION_PATH_TOUCH_SENSORS = "/touchscreen"
-        private val response = mutableMapOf<String,Any>()
+        private val message = mutableMapOf<String,Any>()
 
         //websocket close codes ranging 4000 - 4999 are for application's custom messages
         const val CLOSE_CODE_SENSOR_NOT_FOUND = 4001
@@ -299,33 +299,33 @@ class SensorWebSocketServer(private val context: Context, address: InetSocketAdd
         {
             if (websocket.getAttachment<Any>() is GPS)
             {
-                response.clear()
-                response["longitude"] = location.longitude
-                response["latitude"] = location.latitude
-                response["altitude"] = location.altitude
-                response["bearing"] = location.bearing
-                response["accuracy"] = location.accuracy
-                response["speed"] = location.speed
-                response["time"] = location.time
+                message.clear()
+                message["longitude"] = location.longitude
+                message["latitude"] = location.latitude
+                message["altitude"] = location.altitude
+                message["bearing"] = location.bearing
+                message["accuracy"] = location.accuracy
+                message["speed"] = location.speed
+                message["time"] = location.time
 
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
                 {
-                    response["speedAccuracyMetersPerSecond"] = location.speedAccuracyMetersPerSecond
-                    response["bearingAccuracyDegrees"] = location.bearingAccuracyDegrees
-                    response["elapsedRealtimeNanos"] = location.elapsedRealtimeNanos
-                    response["verticalAccuracyMeters"] = location.verticalAccuracyMeters
+                    message["speedAccuracyMetersPerSecond"] = location.speedAccuracyMetersPerSecond
+                    message["bearingAccuracyDegrees"] = location.bearingAccuracyDegrees
+                    message["elapsedRealtimeNanos"] = location.elapsedRealtimeNanos
+                    message["verticalAccuracyMeters"] = location.verticalAccuracyMeters
                 }
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
                 {
-                    response["elapsedRealtimeAgeMillis"] = location.elapsedRealtimeAgeMillis
+                    message["elapsedRealtimeAgeMillis"] = location.elapsedRealtimeAgeMillis
                 }
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
                 {
-                    response["elapsedRealtimeUncertaintyNanos"] = location.elapsedRealtimeUncertaintyNanos
+                    message["elapsedRealtimeUncertaintyNanos"] = location.elapsedRealtimeUncertaintyNanos
                 }
 
-                websocket.send( JsonUtil.toJSON(response) )
+                websocket.send( JsonUtil.toJSON(message) )
             }
         }
     }
@@ -501,7 +501,7 @@ class SensorWebSocketServer(private val context: Context, address: InetSocketAdd
             override fun handleMessage(msg: Message)
             {
                 //Log.d(TAG,"Handler" + Thread.currentThread().name)
-                response.clear()
+                message.clear()
                 val motionEvent = msg.obj as MotionEvent
 
                 for (websocket in connections)
@@ -511,27 +511,27 @@ class SensorWebSocketServer(private val context: Context, address: InetSocketAdd
                         when(motionEvent.actionMasked)
                         {
                             MotionEvent.ACTION_UP -> {
-                                response["action"] = "ACTION_UP"
-                                response["x"] = motionEvent.x
-                                response["y"] = motionEvent.y
+                                message["action"] = "ACTION_UP"
+                                message["x"] = motionEvent.x
+                                message["y"] = motionEvent.y
 
-                                websocket.send(JsonUtil.toJSON(response))
+                                websocket.send(JsonUtil.toJSON(message))
                             }
 
                             MotionEvent.ACTION_DOWN -> {
-                                response["action"] = "ACTION_DOWN"
-                                response["x"] = motionEvent.x
-                                response["y"] = motionEvent.y
+                                message["action"] = "ACTION_DOWN"
+                                message["x"] = motionEvent.x
+                                message["y"] = motionEvent.y
 
-                                websocket.send(JsonUtil.toJSON(response))
+                                websocket.send(JsonUtil.toJSON(message))
                             }
 
                             MotionEvent.ACTION_MOVE -> {
-                                response["action"] = "ACTION_MOVE"
-                                response["x"] = motionEvent.x
-                                response["y"] = motionEvent.y
+                                message["action"] = "ACTION_MOVE"
+                                message["x"] = motionEvent.x
+                                message["y"] = motionEvent.y
 
-                                websocket.send(JsonUtil.toJSON(response))
+                                websocket.send(JsonUtil.toJSON(message))
                             }
 
 
@@ -565,7 +565,7 @@ class SensorWebSocketServer(private val context: Context, address: InetSocketAdd
         if (getConnectionCount() == 0)
             Log.w( TAG," Sensor event reported when no client in connected" )
 
-        response.clear()
+        message.clear()
 
         // Loop through each connected client
         for (webSocket in connections)
@@ -577,10 +577,10 @@ class SensorWebSocketServer(private val context: Context, address: InetSocketAdd
 
                 if (clientAssociatedSensor != null) if (clientAssociatedSensor.type == sensorEvent.sensor.type && !webSocket.isClosing)
                 {
-                    response["values"] = sensorEvent.values
-                    response["timestamp"] = sensorEvent.timestamp
-                    response["accuracy"] = sensorEvent.accuracy
-                    webSocket.send(JsonUtil.toJSON(response))
+                    message["values"] = sensorEvent.values
+                    message["timestamp"] = sensorEvent.timestamp
+                    message["accuracy"] = sensorEvent.accuracy
+                    webSocket.send(JsonUtil.toJSON(message))
                 }
             }
             else if (webSocket.getAttachment<Any>() is ArrayList<*>)
@@ -591,11 +591,11 @@ class SensorWebSocketServer(private val context: Context, address: InetSocketAdd
                 {
                     if (clientAssociatedSensor.type == sensorEvent.sensor.type && !webSocket.isClosing)
                     {
-                        response["values"] = sensorEvent.values
-                        response["timestamp"] = sensorEvent.timestamp
-                        response["accuracy"] = sensorEvent.accuracy
-                        response["type"] = sensorEvent.sensor.stringType
-                        webSocket.send(JsonUtil.toJSON(response))
+                        message["values"] = sensorEvent.values
+                        message["timestamp"] = sensorEvent.timestamp
+                        message["accuracy"] = sensorEvent.accuracy
+                        message["type"] = sensorEvent.sensor.stringType
+                        webSocket.send(JsonUtil.toJSON(message))
                     }
                 }
             }
