@@ -1,0 +1,1 @@
+The WebSocket server can be configured to bind to the address 0.0.0.0. This enables it to listen for incoming connections on all network interfaces of the Android device.
