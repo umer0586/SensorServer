@@ -97,7 +97,13 @@ class ServerFragment : Fragment(), ServerStateListener
 
         val wifiManager = requireContext().applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
 
-        if (appSettings.isHotspotOptionEnabled())
+        if(appSettings.isAllInterfaceOptionEnabled())
+        {
+            // don't check for wifi availability when use selects to listen on 0.0.0.0
+            val intent = Intent(context, SensorService::class.java)
+            ContextCompat.startForegroundService(requireContext(), intent)
+        }
+        else if (appSettings.isHotspotOptionEnabled())
         {
             if (wifiManager.isHotSpotEnabled())
             {

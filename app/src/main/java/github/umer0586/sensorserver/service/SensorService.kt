@@ -118,7 +118,14 @@ class SensorService : Service(), BroadcastMessageListener
         val wifiManager = applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
 
 
-        sensorWebSocketServer = if (appSettings.isHotspotOptionEnabled())
+        sensorWebSocketServer = if(appSettings.isAllInterfaceOptionEnabled())
+        {
+            SensorWebSocketServer(
+                applicationContext,
+                InetSocketAddress("0.0.0.0", appSettings.getPortNo())
+            )
+        }
+        else if (appSettings.isHotspotOptionEnabled())
         {
             val hotspotIpAddress = wifiManager.getHotspotIp()
             if (hotspotIpAddress != null)

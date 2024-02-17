@@ -30,6 +30,7 @@ class SettingsFragment : PreferenceFragmentCompat()
 
         handlePortNoPreference()
         handleLocalHostPreference()
+        handleAllInterfacesPreference()
         handleSamplingRatePreference()
         handleHotspotPref()
     }
@@ -99,6 +100,23 @@ class SettingsFragment : PreferenceFragmentCompat()
 
     }
 
+
+    private fun handleAllInterfacesPreference()
+    {
+        val allInterfacesPref = findPreference<SwitchPreferenceCompat>(getString(R.string.pref_key_all_interface))
+        allInterfacesPref?.isChecked = appSettings.isAllInterfaceOptionEnabled()
+
+
+
+        allInterfacesPref?.setOnPreferenceChangeListener { preference, newValue ->
+            val newState = newValue as Boolean
+            appSettings.listenOnAllInterfaces(newState)
+
+            return@setOnPreferenceChangeListener true
+        }
+
+
+    }
     private fun handlePortNoPreference()
     {
         val websocketPortPref = findPreference<EditTextPreference>(getString(R.string.pref_key_port_no))

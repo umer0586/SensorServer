@@ -32,6 +32,14 @@
             app:icon="@drawable/ic_baseline_usb_24"
         />
 
+    <SwitchPreferenceCompat
+        app:key="@string/pref_key_all_interface"
+        app:defaultValue="false"
+        app:title="Listen on 0.0.0.0"
+        app:summary="Listen on all available network interfaces"
+        app:icon="@drawable/unmerge_node"
+        />
+
         <SwitchPreferenceCompat
             app:key="@string/pref_key_hotspot"
             app:defaultValue="false"

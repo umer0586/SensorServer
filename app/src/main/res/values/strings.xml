@@ -15,6 +15,7 @@
 
     <string name="shared_pref_file">shared_pref_file</string>
     <string name="pref_key_localhost">pref_key_localhost</string>
+    <string name="pref_key_all_interface">pref_key_all_interface</string>
     <string name="pref_key_hotspot">pref_key_hotspot</string>
 
 

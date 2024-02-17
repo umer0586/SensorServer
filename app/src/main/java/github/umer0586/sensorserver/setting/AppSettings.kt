@@ -74,6 +74,18 @@ class AppSettings(context: Context)
         return sharedPreferences.getBoolean(context.getString(R.string.pref_key_hotspot), false)
     }
 
+    fun listenOnAllInterfaces(state : Boolean)
+    {
+        sharedPreferences.edit()
+            .putBoolean(context.getString(R.string.pref_key_all_interface), state)
+            .apply()
+    }
+
+    fun isAllInterfaceOptionEnabled() : Boolean
+    {
+        return sharedPreferences.getBoolean(context.getString(R.string.pref_key_all_interface), false)
+    }
+
     companion object
     {
 
