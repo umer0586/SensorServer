@@ -10,6 +10,7 @@ import java.net.SocketException
 import java.net.UnknownHostException
 import java.nio.ByteOrder
 
+@Suppress("DEPRECATION")
 fun WifiManager.getIp() : String?
 {
     var ipAddress = this.connectionInfo.ipAddress
