@@ -337,10 +337,7 @@ class SensorService : Service()
 
     fun sendMotionEvent(motionEvent : MotionEvent)
     {
-
-        sensorWebSocketServer?.let{
-            it.onMotionEvent(motionEvent)
-        }
+        sensorWebSocketServer?.onMotionEvent(motionEvent)
     }
 
     fun getConnectedClients(): List<WebSocket>
@@ -350,7 +347,7 @@ class SensorService : Service()
             return server.connections.toList()
         }
 
-        return emptyList();
+        return emptyList()
 
     }
 
