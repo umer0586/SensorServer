@@ -190,17 +190,25 @@ class SensorService : Service()
 
             // intent to start activity
             val activityIntent = Intent(this, MainActivity::class.java)
+
+            // Intent to be broadcast (when user press action button in notification)
+            val broadcastIntent = Intent(ACTION_STOP_SERVER)
+
             // create a pending intent that can invoke an activity (use to open activity from notification message)
-            val pendingIntent = PendingIntent.getActivity(this, 0, activityIntent, PendingIntent.FLAG_IMMUTABLE)
+            val pendingIntentActivity = PendingIntent.getActivity(this, 0, activityIntent, PendingIntent.FLAG_IMMUTABLE)
+
+            // create a pending intent that can fire broadcast (use to send broadcast when user taps action button from notification)
+            val pendingIntentBroadcast = PendingIntent.getBroadcast(this,0,broadcastIntent,PendingIntent.FLAG_IMMUTABLE)
 
             val notificationBuilder = NotificationCompat.Builder(applicationContext, CHANNEL_ID)
                 .apply {
                     setSmallIcon(R.drawable.ic_radar_signal)
                     setContentTitle("Sensor Server Running...")
                     setContentText("ws://" + serverInfo.ipAddress + ":" + serverInfo.port)
-                    setPriority(NotificationCompat.PRIORITY_DEFAULT) // Set the intent that will fire when the user taps the notification
-                    setContentIntent(pendingIntent) // don't cancel notification when user taps it
-                    setAutoCancel(false)
+                    setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                    setContentIntent(pendingIntentActivity) // Set the intent that will fire when the user taps the notification
+                    addAction(android.R.drawable.ic_lock_power_off,"stop", pendingIntentBroadcast)
+                    setAutoCancel(false) // don't cancel notification when user taps it
                 }
 
 
