@@ -6,6 +6,7 @@ import android.app.PendingIntent
 import android.app.Service
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.net.wifi.WifiManager
 import android.os.Binder
 import android.os.Build
@@ -16,7 +17,6 @@ import androidx.core.app.NotificationCompat
 import github.umer0586.sensorserver.R
 import github.umer0586.sensorserver.activities.MainActivity
 import github.umer0586.sensorserver.broadcastreceiver.BroadcastMessageReceiver
-import github.umer0586.sensorserver.broadcastreceiver.BroadcastMessageReceiver.BroadcastMessageListener
 import github.umer0586.sensorserver.customextensions.getHotspotIp
 import github.umer0586.sensorserver.customextensions.getIp
 import github.umer0586.sensorserver.setting.AppSettings
@@ -36,7 +36,7 @@ interface ServerStateListener
     fun onServerAlreadyRunning(serverInfo: ServerInfo)
 }
 
-class SensorService : Service(), BroadcastMessageListener
+class SensorService : Service()
 {
 
 
@@ -77,11 +77,25 @@ class SensorService : Service(), BroadcastMessageListener
         createNotificationChannel()
         appSettings = AppSettings(applicationContext)
         broadcastMessageReceiver = BroadcastMessageReceiver(applicationContext)
-        broadcastMessageReceiver.setBroadcastMessageListener(this)
-        broadcastMessageReceiver.registerEvents()
+
+        with(broadcastMessageReceiver)
+        {
+
+            setOnMessageReceived { intent ->
+                onMessage(intent)
+            }
+
+            registerEvents(
+                IntentFilter().apply {
+                    addAction(ACTION_STOP_SERVER)
+                }
+            )
+        }
+
+
     }
 
-    override fun onMessage(intent: Intent)
+    fun onMessage(intent: Intent)
     {
         Log.d(TAG, "onMessage() called with: intent = [$intent]")
         if (intent.action == ACTION_STOP_SERVER)

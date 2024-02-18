@@ -5,42 +5,40 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.util.Log
-import github.umer0586.sensorserver.service.SensorService
+import androidx.core.content.ContextCompat
 
 class BroadcastMessageReceiver(private val context: Context) : BroadcastReceiver()
 {
-
-    private var broadcastMessageListener: BroadcastMessageListener? = null
+    private var messageReceiveCallBack : ((Intent) -> Unit)? = null
     private var isRegistered = false
 
     companion object
     {
-        private val TAG: String = BroadcastMessageReceiver::class.java.getSimpleName()
+        private val TAG: String = BroadcastMessageReceiver::class.java.simpleName
+    }
+
+    fun setOnMessageReceived(callBack : ((Intent) -> Unit)?)
+    {
+        messageReceiveCallBack = callBack
     }
 
     override fun onReceive(context: Context, intent: Intent)
     {
-        Log.d(TAG, "onReceive() called with: context = [$context], intent = [$intent]")
+        Log.d(TAG, "onReceive() intent = [$intent]")
+        messageReceiveCallBack?.invoke(intent)
 
-        // Dispatch received broadcast intent via MessageListener Interface
-        if (broadcastMessageListener != null) broadcastMessageListener?.onMessage(intent)
     }
 
-    fun setBroadcastMessageListener(broadcastMessageListener: BroadcastMessageListener?)
-    {
-        this.broadcastMessageListener = broadcastMessageListener
-    }
-
-    fun registerEvents()
+    fun registerEvents(intentFilter: IntentFilter)
     {
         Log.d(TAG, "registerEvents() called")
 
-        val intentFilter = IntentFilter()
-        intentFilter.addAction(SensorService.ACTION_STOP_SERVER)
-
         try
         {
-            if (!isRegistered) context.registerReceiver(this, intentFilter)
+            if (!isRegistered)
+                ContextCompat.registerReceiver(context,this, intentFilter,ContextCompat.RECEIVER_NOT_EXPORTED)
+
+
             isRegistered = true
         }
         catch (e: IllegalArgumentException)
@@ -56,7 +54,9 @@ class BroadcastMessageReceiver(private val context: Context) : BroadcastReceiver
 
         try
         {
-            if (isRegistered) context.unregisterReceiver(this)
+            if (isRegistered)
+                context.unregisterReceiver(this)
+
             isRegistered = false
         }
         catch (e: IllegalArgumentException)
@@ -64,11 +64,6 @@ class BroadcastMessageReceiver(private val context: Context) : BroadcastReceiver
             isRegistered = false
             e.printStackTrace()
         }
-    }
-
-    interface BroadcastMessageListener
-    {
-        fun onMessage(intent: Intent)
     }
 
 
