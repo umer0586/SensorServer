@@ -23,6 +23,11 @@ class SettingsFragment : PreferenceFragmentCompat()
 
     private lateinit var appSettings: AppSettings
 
+    private var  hotspotPref : SwitchPreferenceCompat? = null
+    private var  localHostPref : SwitchPreferenceCompat? = null
+    private var  allInterfacesPref : SwitchPreferenceCompat? = null
+
+
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?)
     {
         setPreferencesFromResource(R.xml.settings_preference, rootKey)
@@ -39,7 +44,7 @@ class SettingsFragment : PreferenceFragmentCompat()
     {
         val wifiManager = requireContext().applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
 
-        val hotspotPref = findPreference<SwitchPreferenceCompat>(getString(R.string.pref_key_hotspot))
+        hotspotPref = findPreference(getString(R.string.pref_key_hotspot))
 
         // sync setting interface with previously saved preference
         if(wifiManager.isHotSpotEnabled() && appSettings.isHotspotOptionEnabled())
@@ -68,7 +73,19 @@ class SettingsFragment : PreferenceFragmentCompat()
                 if (wifiManager.isHotSpotEnabled())
                 {
                     appSettings.enableHotspotOption(true)
-                    hotspotPref.summary = wifiManager.getHotspotIp()
+                    hotspotPref?.summary = wifiManager.getHotspotIp()
+
+                    localHostPref?.apply {
+                        isChecked = false
+                        appSettings.enableLocalHostOption(false)
+                    }
+
+                    allInterfacesPref?.apply {
+                        isChecked = false
+                        appSettings.listenOnAllInterfaces(false)
+                    }
+
+
                     return@setOnPreferenceChangeListener true
                 }
                 else
@@ -88,11 +105,25 @@ class SettingsFragment : PreferenceFragmentCompat()
 
     private fun handleLocalHostPreference()
     {
-        val localHostPref = findPreference<SwitchPreferenceCompat>(getString(R.string.pref_key_localhost))
+        localHostPref = findPreference(getString(R.string.pref_key_localhost))
 
         localHostPref?.setOnPreferenceChangeListener { preference, newValue ->
             val newState = newValue as Boolean
             appSettings.enableLocalHostOption(newState)
+
+            if (newState == true)
+            {
+                hotspotPref?.apply {
+                    isChecked = false
+                    appSettings.enableHotspotOption(false)
+                }
+
+                allInterfacesPref?.apply {
+                    isChecked = false
+                    appSettings.listenOnAllInterfaces(false)
+                }
+            }
+
 
             return@setOnPreferenceChangeListener true
         }
@@ -103,14 +134,26 @@ class SettingsFragment : PreferenceFragmentCompat()
 
     private fun handleAllInterfacesPreference()
     {
-        val allInterfacesPref = findPreference<SwitchPreferenceCompat>(getString(R.string.pref_key_all_interface))
+        allInterfacesPref = findPreference(getString(R.string.pref_key_all_interface))
         allInterfacesPref?.isChecked = appSettings.isAllInterfaceOptionEnabled()
-
 
 
         allInterfacesPref?.setOnPreferenceChangeListener { preference, newValue ->
             val newState = newValue as Boolean
             appSettings.listenOnAllInterfaces(newState)
+
+            if (newState == true)
+            {
+                hotspotPref?.apply {
+                    isChecked = false
+                    appSettings.enableHotspotOption(false)
+                }
+
+                localHostPref?.apply {
+                    isChecked = false
+                    appSettings.enableLocalHostOption(false)
+                }
+            }
 
             return@setOnPreferenceChangeListener true
         }
@@ -120,6 +163,7 @@ class SettingsFragment : PreferenceFragmentCompat()
     private fun handlePortNoPreference()
     {
         val websocketPortPref = findPreference<EditTextPreference>(getString(R.string.pref_key_port_no))
+        //websocketPortPref?.summary = appSettings.getPortNo().toString()
 
         websocketPortPref?.setOnBindEditTextListener { editText: EditText ->
             editText.inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_SIGNED
@@ -152,6 +196,8 @@ class SettingsFragment : PreferenceFragmentCompat()
     private fun handleSamplingRatePreference()
     {
         val samplingRatePref = findPreference<EditTextPreference>(getString(R.string.pref_key_sampling_rate))
+        //samplingRatePref?.summary = appSettings.getSamplingRate().toString()
+
         val dialogText = """
                 The data delay (or sampling rate) controls the interval at which sensor events are sent to application. Change this value before starting a Server
                 <br><br>
