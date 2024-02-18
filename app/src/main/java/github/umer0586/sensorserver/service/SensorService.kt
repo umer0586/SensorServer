@@ -276,6 +276,7 @@ class SensorService : Service()
         }
     }
 
+    @Suppress("DEPRECATION")
     private fun stopForeground()
     {
         /*
