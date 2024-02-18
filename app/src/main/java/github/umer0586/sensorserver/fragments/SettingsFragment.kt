@@ -35,23 +35,23 @@ class SettingsFragment : PreferenceFragmentCompat()
         handleHotspotPref()
     }
 
-    override fun onResume()
-    {
-        super.onResume()
-        val wifiManager = requireContext().applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
-        if (wifiManager.isHotSpotEnabled())
-        {
-            val hotspotPref = findPreference<SwitchPreferenceCompat>(getString(R.string.pref_key_hotspot))
-            hotspotPref?.isChecked = false
-            appSettings.enableHotspotOption(false)
-        }
-    }
-
     private fun handleHotspotPref()
     {
         val wifiManager = requireContext().applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
 
         val hotspotPref = findPreference<SwitchPreferenceCompat>(getString(R.string.pref_key_hotspot))
+
+        // sync setting interface with previously saved preference
+        if(wifiManager.isHotSpotEnabled() && appSettings.isHotspotOptionEnabled())
+        {
+
+            hotspotPref?.apply {
+                summary = wifiManager.getHotspotIp()
+                isChecked = true
+            }
+
+
+        }
 
         hotspotPref?.setOnPreferenceChangeListener { _, newValue ->
 
