@@ -14,8 +14,6 @@ import androidx.core.text.HtmlCompat
 import androidx.fragment.app.ListFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import github.umer0586.sensorserver.R
-import github.umer0586.sensorserver.customextensions.detail
-import github.umer0586.sensorserver.customextensions.getAvailableSensors
 
 class AvailableSensorsFragment : ListFragment()
 {
@@ -33,7 +31,7 @@ class AvailableSensorsFragment : ListFragment()
         Log.i(TAG, "onViewCreated: ")
 
         val sensorManager = requireContext().getSystemService(Context.SENSOR_SERVICE) as SensorManager
-        val availableSensors: List<Sensor> = sensorManager.getAvailableSensors()
+        val availableSensors: List<Sensor> = sensorManager.getSensorList(Sensor.TYPE_ALL)
 
         val sensorsListAdapter = SensorsListAdapter(requireContext(), availableSensors)
         listView.adapter = sensorsListAdapter
@@ -82,3 +80,28 @@ class AvailableSensorsFragment : ListFragment()
     }
 }
 
+fun Sensor.detail(): String
+{
+
+    val reportingModeMapping = mapOf(
+        Sensor.REPORTING_MODE_CONTINUOUS to "Continuous",
+        Sensor.REPORTING_MODE_ON_CHANGE to "On Change",
+        Sensor.REPORTING_MODE_ONE_SHOT to "One Shot",
+        Sensor.REPORTING_MODE_SPECIAL_TRIGGER to "Special Trigger",
+    )
+
+
+    return """
+    Name : $name
+    MinDelay : ${minDelay}μs
+    MaxDelay : ${maxDelay}μs 
+    MaxRange : $maximumRange
+    Resolution : $resolution
+    Reporting Mode : ${if (reportingModeMapping.containsKey(reportingMode)) reportingModeMapping[reportingMode] else "Unknown"}
+    Power : ${power}mA
+    Vendor : $vendor
+    Version : $version
+    WakeUp sensor : $isWakeUpSensor        
+   
+    """.trimIndent()
+}

@@ -15,7 +15,6 @@ import android.net.Uri
 import android.os.*
 import android.util.Log
 import android.view.MotionEvent
-import github.umer0586.sensorserver.customextensions.getSensorFromStringType
 import github.umer0586.sensorserver.util.JsonUtil
 import org.java_websocket.WebSocket
 import org.java_websocket.handshake.ClientHandshake
@@ -655,5 +654,13 @@ class SensorWebSocketServer(private val context: Context, address: InetSocketAdd
         connectionsChangeCallBack = callBack
     }
 
+
+}
+
+fun SensorManager.getSensorFromStringType(sensorStringType: String) : Sensor?
+{
+    return getSensorList(Sensor.TYPE_ALL)
+        .filter { it.stringType.equals(sensorStringType, ignoreCase = true) }
+        .firstOrNull()
 
 }
