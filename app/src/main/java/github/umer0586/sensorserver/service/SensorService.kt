@@ -188,8 +188,10 @@ class SensorService : Service()
 
             serverStateListener?.onServerStarted(serverInfo)
 
-            val notificationIntent = Intent(this, MainActivity::class.java)
-            val pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_IMMUTABLE)
+            // intent to start activity
+            val activityIntent = Intent(this, MainActivity::class.java)
+            // create a pending intent that can invoke an activity (use to open activity from notification message)
+            val pendingIntent = PendingIntent.getActivity(this, 0, activityIntent, PendingIntent.FLAG_IMMUTABLE)
 
             val notificationBuilder = NotificationCompat.Builder(applicationContext, CHANNEL_ID)
                 .apply {
