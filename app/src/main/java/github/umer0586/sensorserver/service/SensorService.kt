@@ -63,7 +63,6 @@ class SensorService : Service()
 
         // cannot be zero
         const val ON_GOING_NOTIFICATION_ID = 332
-        private const val TEMP_NOTIFICATION_ID = 421
 
         // Broadcast intent action (published by other app's component) to stop server thread
         val ACTION_STOP_SERVER = "ACTION_STOP_SERVER_" + SensorService::class.java.getName()
@@ -272,6 +271,8 @@ class SensorService : Service()
      * */
     private fun handleAndroid8andAbove()
     {
+        val TEMP_NOTIFICATION_ID = 421
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
         {
             val tempNotification = NotificationCompat.Builder(
