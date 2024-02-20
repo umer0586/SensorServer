@@ -31,7 +31,8 @@ class AvailableSensorsFragment : ListFragment()
         Log.i(TAG, "onViewCreated: ")
 
         val sensorManager = requireContext().getSystemService(Context.SENSOR_SERVICE) as SensorManager
-        val availableSensors: List<Sensor> = sensorManager.getSensorList(Sensor.TYPE_ALL)
+        val availableSensors: List<Sensor> = sensorManager.getSensorList(Sensor.TYPE_ALL).filter{ it.reportingMode != Sensor.REPORTING_MODE_ONE_SHOT}
+
 
         val sensorsListAdapter = SensorsListAdapter(requireContext(), availableSensors)
         listView.adapter = sensorsListAdapter
