@@ -1,7 +1,5 @@
 package github.umer0586.sensorserver.fragments
 
-import android.content.ComponentName
-import android.content.ServiceConnection
 import android.os.Bundle
 import android.os.IBinder
 import android.util.Log
@@ -9,13 +7,15 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import github.umer0586.sensorserver.databinding.FragmentConnectionsBinding
 import github.umer0586.sensorserver.fragments.customadapters.ConnectionsRecyclerViewAdapter
 import github.umer0586.sensorserver.service.SensorService
 import github.umer0586.sensorserver.service.SensorService.LocalBinder
 import github.umer0586.sensorserver.service.ServiceBindHelper
-import github.umer0586.sensorserver.util.UIUtil
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import org.java_websocket.WebSocket
 
 /**
@@ -86,7 +86,9 @@ class ConnectionsFragment : Fragment()
             this.webSockets.addAll(webSockets)
 
             handleNoConnectionsText()
-            UIUtil.runOnUiThread { connectionsRecyclerViewAdapter.notifyDataSetChanged() }
+            lifecycleScope.launch(Dispatchers.Main) {
+                connectionsRecyclerViewAdapter.notifyDataSetChanged()
+            }
         }
 
 
@@ -114,11 +116,14 @@ class ConnectionsFragment : Fragment()
 
     private fun handleNoConnectionsText()
     {
-        if (webSockets.size > 0) UIUtil.runOnUiThread {
-            binding.noConnectionsText.visibility = View.INVISIBLE
+        lifecycleScope.launch(Dispatchers.Main) {
+            if (webSockets.size > 0)
+                binding.noConnectionsText.visibility = View.INVISIBLE
+            else
+                binding.noConnectionsText.visibility = View.VISIBLE
         }
-        else UIUtil.runOnUiThread { binding.noConnectionsText.visibility = View.VISIBLE }
     }
+
 
     companion object
     {

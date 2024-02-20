@@ -11,6 +11,7 @@ import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.google.android.material.navigation.NavigationBarView
 import github.umer0586.sensorserver.R
@@ -21,6 +22,8 @@ import github.umer0586.sensorserver.fragments.ServerFragment
 import github.umer0586.sensorserver.service.SensorService
 import github.umer0586.sensorserver.service.SensorService.LocalBinder
 import github.umer0586.sensorserver.service.ServiceBindHelper
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedListener
 {
@@ -120,7 +123,9 @@ class MainActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedListen
 
         sensorService?.onConnectionsCountChange { count ->
 
-            runOnUiThread { setConnectionCountBadge(count) }
+            lifecycleScope.launch(Dispatchers.Main) {
+                setConnectionCountBadge(count)
+            }
         }
 
     }

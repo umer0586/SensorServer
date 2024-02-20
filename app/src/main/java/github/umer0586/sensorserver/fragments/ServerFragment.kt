@@ -11,6 +11,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import com.google.android.material.snackbar.Snackbar
 import github.umer0586.sensorserver.R
 import github.umer0586.sensorserver.customextensions.isHotSpotEnabled
@@ -20,8 +21,9 @@ import github.umer0586.sensorserver.service.SensorService.LocalBinder
 import github.umer0586.sensorserver.service.ServerStateListener
 import github.umer0586.sensorserver.service.ServiceBindHelper
 import github.umer0586.sensorserver.setting.AppSettings
-import github.umer0586.sensorserver.util.UIUtil
 import github.umer0586.sensorserver.websocketserver.ServerInfo
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.net.BindException
 import java.net.UnknownHostException
 
@@ -154,7 +156,8 @@ class ServerFragment : Fragment(), ServerStateListener
     override fun onServerStarted(serverInfo: ServerInfo)
     {
         Log.d(TAG, "onServerStarted() called")
-        UIUtil.runOnUiThread {
+        lifecycleScope.launch(Dispatchers.Main) {
+
             showServerAddress("ws://" + serverInfo.ipAddress + ":" + serverInfo.port)
             showPulseAnimation()
 
@@ -162,6 +165,7 @@ class ServerFragment : Fragment(), ServerStateListener
             binding.startButton.text = "STOP"
 
             showMessage("Server started")
+
         }
     }
 
@@ -169,21 +173,21 @@ class ServerFragment : Fragment(), ServerStateListener
     {
         Log.d(TAG, "onServerStopped() called ")
 
-        UIUtil.runOnUiThread {
+       lifecycleScope.launch(Dispatchers.Main) {
 
-            hideServerAddress()
-            hidePulseAnimation()
+           hideServerAddress()
+           hidePulseAnimation()
 
-            binding.startButton.tag = "stopped"
-            binding.startButton.text = "START"
+           binding.startButton.tag = "stopped"
+           binding.startButton.text = "START"
 
-            showMessage("Server Stopped")
-        }
+           showMessage("Server Stopped")
+       }
     }
 
     override fun onServerError(ex: Exception?)
     {
-        UIUtil.runOnUiThread {
+        lifecycleScope.launch(Dispatchers.Main) {
             if (ex is BindException)
                 showMessage("Port already in use")
             else if (ex is UnknownHostException)
@@ -203,7 +207,7 @@ class ServerFragment : Fragment(), ServerStateListener
     override fun onServerAlreadyRunning(serverInfo: ServerInfo)
     {
         Log.d(TAG, "onServerAlreadyRunning() called")
-        UIUtil.runOnUiThread {
+        lifecycleScope.launch(Dispatchers.Main) {
             showServerAddress("ws://" + serverInfo.ipAddress + ":" + serverInfo.port)
             Toast.makeText(context, "service running", Toast.LENGTH_SHORT).show()
             binding.startButton.tag = "started"
