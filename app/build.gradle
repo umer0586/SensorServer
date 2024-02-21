@@ -4,12 +4,12 @@ plugins {
 }
 
 android {
-    compileSdk 33
+    compileSdk 34
 
     defaultConfig {
         applicationId 'github.umer0586.sensorserver'
         minSdk 21
-        targetSdk 33
+        targetSdk 34
         multiDexEnabled true
         versionCode 25
         versionName "5.2.0"
