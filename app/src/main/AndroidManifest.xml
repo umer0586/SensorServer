@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE"/>
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
@@ -36,14 +37,15 @@
         <activity
             android:name=".activities.AboutActivity"
             android:exported="false"
-            android:theme="@style/Theme.SensorServer.FullScreen"></activity>
+            android:theme="@style/Theme.SensorServer.FullScreen"/>
         <activity
             android:name=".activities.DeviceAxisActivity"
             android:exported="false"
-            android:theme="@style/Theme.SensorServer.FullScreen"></activity>
+            android:theme="@style/Theme.SensorServer.FullScreen"/>
 
         <service
             android:name=".service.SensorService"
+            android:foregroundServiceType="specialUse"
             android:enabled="true"
             android:exported="false" />
 
