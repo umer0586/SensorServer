@@ -198,8 +198,12 @@ Download latest *APK* from Github's [Release page](https://github.com/umer0586/S
 
 *(requires Android 5.0 or above)* . 
 
-## Donate 
+## Found this useful
 <a href="https://www.buymeacoffee.com/umerfarooq" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>
+
+Send Bitcoin at 1NHkiJmjUdjqbCKJf6ZksGKMvYu52Q5tew 
+
+OR
 
 Scan following QR code with bitcoin wallet app to send bitcoins
 
