@@ -1,0 +1,2 @@
+1 Fix : Hotspot option gets disable while navigating back to settings screen
+2 New Feature : User can now stop server from notification message
