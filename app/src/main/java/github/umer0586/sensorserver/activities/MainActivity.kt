@@ -1,8 +1,6 @@
 package github.umer0586.sensorserver.activities
 
-import android.content.ComponentName
 import android.content.Intent
-import android.content.ServiceConnection
 import android.os.Bundle
 import android.os.IBinder
 import android.util.Log
@@ -19,8 +17,8 @@ import github.umer0586.sensorserver.databinding.ActivityMainBinding
 import github.umer0586.sensorserver.fragments.AvailableSensorsFragment
 import github.umer0586.sensorserver.fragments.ConnectionsFragment
 import github.umer0586.sensorserver.fragments.ServerFragment
-import github.umer0586.sensorserver.service.SensorService
-import github.umer0586.sensorserver.service.SensorService.LocalBinder
+import github.umer0586.sensorserver.service.WebsocketService
+import github.umer0586.sensorserver.service.WebsocketService.LocalBinder
 import github.umer0586.sensorserver.service.ServiceBindHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -31,7 +29,7 @@ class MainActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedListen
     private lateinit var actionBarDrawerToggle: ActionBarDrawerToggle
 
     private lateinit var serviceBindHelper: ServiceBindHelper
-    private var sensorService: SensorService? = null
+    private var websocketService: WebsocketService? = null
 
     private lateinit var binding : ActivityMainBinding
 
@@ -64,7 +62,7 @@ class MainActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedListen
 
         serviceBindHelper = ServiceBindHelper(
             context = applicationContext,
-            service = SensorService::class.java,
+            service = WebsocketService::class.java,
             componentLifecycle = lifecycle
         )
 
@@ -117,11 +115,11 @@ class MainActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedListen
     fun onServiceConnected(binder: IBinder)
     {
         val localBinder = binder as LocalBinder
-        sensorService = localBinder.service
+        websocketService = localBinder.service
 
-        sensorService?.let{ setConnectionCountBadge( it.getConnectionCount() ) }
+        websocketService?.let{ setConnectionCountBadge( it.getConnectionCount() ) }
 
-        sensorService?.onConnectionsCountChange { count ->
+        websocketService?.onConnectionsCountChange { count ->
 
             lifecycleScope.launch(Dispatchers.Main) {
                 setConnectionCountBadge(count)
@@ -137,7 +135,7 @@ class MainActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedListen
         Log.d(TAG, "onPause()")
 
         // To prevent memory leak
-        sensorService?.onConnectionsCountChange(callBack = null)
+        websocketService?.onConnectionsCountChange(callBack = null)
     }
 
 

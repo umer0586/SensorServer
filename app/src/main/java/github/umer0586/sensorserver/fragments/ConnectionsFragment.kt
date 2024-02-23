@@ -11,8 +11,8 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import github.umer0586.sensorserver.databinding.FragmentConnectionsBinding
 import github.umer0586.sensorserver.fragments.customadapters.ConnectionsRecyclerViewAdapter
-import github.umer0586.sensorserver.service.SensorService
-import github.umer0586.sensorserver.service.SensorService.LocalBinder
+import github.umer0586.sensorserver.service.WebsocketService
+import github.umer0586.sensorserver.service.WebsocketService.LocalBinder
 import github.umer0586.sensorserver.service.ServiceBindHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -24,7 +24,7 @@ import org.java_websocket.WebSocket
 class ConnectionsFragment : Fragment()
 {
 
-    private var sensorService: SensorService? = null
+    private var websocketService: WebsocketService? = null
     private lateinit var serviceBindHelper: ServiceBindHelper
 
     private lateinit var connectionsRecyclerViewAdapter: ConnectionsRecyclerViewAdapter
@@ -56,7 +56,7 @@ class ConnectionsFragment : Fragment()
 
         serviceBindHelper = ServiceBindHelper(
             context = requireContext(),
-            service = SensorService::class.java,
+            service = WebsocketService::class.java,
             componentLifecycle = lifecycle
         )
 
@@ -70,17 +70,17 @@ class ConnectionsFragment : Fragment()
         Log.d(TAG, "onPause()")
 
         // To prevent memory leak
-        sensorService?.onConnectionsChange( callBack = null)
+        websocketService?.onConnectionsChange( callBack = null)
     }
 
 
     fun onServiceConnected(binder: IBinder)
     {
         val localBinder = binder as LocalBinder
-        sensorService = localBinder.service
+        websocketService = localBinder.service
 
 
-        sensorService?.onConnectionsChange{ webSockets ->
+        websocketService?.onConnectionsChange{ webSockets ->
 
             this.webSockets.clear()
             this.webSockets.addAll(webSockets)
@@ -93,7 +93,7 @@ class ConnectionsFragment : Fragment()
 
 
 
-        sensorService?.getConnectedClients().let { webSockets ->
+        websocketService?.getConnectedClients().let { webSockets ->
 
             this.webSockets.clear()
             webSockets?.let{this.webSockets.addAll(it)}

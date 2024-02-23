@@ -16,8 +16,8 @@ import com.google.android.material.snackbar.Snackbar
 import github.umer0586.sensorserver.R
 import github.umer0586.sensorserver.customextensions.isHotSpotEnabled
 import github.umer0586.sensorserver.databinding.FragmentServerBinding
-import github.umer0586.sensorserver.service.SensorService
-import github.umer0586.sensorserver.service.SensorService.LocalBinder
+import github.umer0586.sensorserver.service.WebsocketService
+import github.umer0586.sensorserver.service.WebsocketService.LocalBinder
 import github.umer0586.sensorserver.service.ServerStateListener
 import github.umer0586.sensorserver.service.ServiceBindHelper
 import github.umer0586.sensorserver.setting.AppSettings
@@ -30,7 +30,7 @@ import java.net.UnknownHostException
 class ServerFragment : Fragment(), ServerStateListener
 {
 
-    private var sensorService: SensorService? = null
+    private var websocketService: WebsocketService? = null
     private lateinit var serviceBindHelper: ServiceBindHelper
     private lateinit var appSettings: AppSettings
 
@@ -58,17 +58,17 @@ class ServerFragment : Fragment(), ServerStateListener
 
         serviceBindHelper = ServiceBindHelper(
             context = requireContext(),
-            service = SensorService::class.java,
+            service = WebsocketService::class.java,
             componentLifecycle = lifecycle
         )
 
         serviceBindHelper.onServiceConnected { binder ->
 
             val localBinder = binder as LocalBinder
-            sensorService = localBinder.service
+            websocketService = localBinder.service
 
-            sensorService?.setServerStateListener(this)
-            sensorService?.checkState() // this callbacks onServerAlreadyRunning()
+            websocketService?.setServerStateListener(this)
+            websocketService?.checkState() // this callbacks onServerAlreadyRunning()
         }
 
         hidePulseAnimation()
@@ -102,14 +102,14 @@ class ServerFragment : Fragment(), ServerStateListener
         if(appSettings.isAllInterfaceOptionEnabled())
         {
             // don't check for wifi availability when use selects to listen on 0.0.0.0
-            val intent = Intent(context, SensorService::class.java)
+            val intent = Intent(context, WebsocketService::class.java)
             ContextCompat.startForegroundService(requireContext(), intent)
         }
         else if (appSettings.isHotspotOptionEnabled())
         {
             if (wifiManager.isHotSpotEnabled())
             {
-                val intent = Intent(context, SensorService::class.java)
+                val intent = Intent(context, WebsocketService::class.java)
                 ContextCompat.startForegroundService(requireContext(), intent)
             }
             else
@@ -119,14 +119,14 @@ class ServerFragment : Fragment(), ServerStateListener
         }
         else if (appSettings.isLocalHostOptionEnable())
         {
-            val intent = Intent(context, SensorService::class.java)
+            val intent = Intent(context, WebsocketService::class.java)
             ContextCompat.startForegroundService(requireContext(), intent)
         }
         else
         {
             if (wifiManager.isWifiEnabled())
             {
-                val intent = Intent(context, SensorService::class.java)
+                val intent = Intent(context, WebsocketService::class.java)
                 ContextCompat.startForegroundService(requireContext(), intent)
             }
             else
@@ -141,7 +141,7 @@ class ServerFragment : Fragment(), ServerStateListener
         Log.d(TAG, "stopServer()")
 
         // getContext().stopService(new Intent(getContext(),SensorService.class));
-        requireContext().sendBroadcast(Intent(SensorService.Companion.ACTION_STOP_SERVER))
+        requireContext().sendBroadcast(Intent(WebsocketService.Companion.ACTION_STOP_SERVER))
     }
 
     override fun onPause()
@@ -150,7 +150,7 @@ class ServerFragment : Fragment(), ServerStateListener
         Log.d(TAG, "onPause()")
 
         // To prevent memory leak
-        sensorService?.setServerStateListener(null)
+        websocketService?.setServerStateListener(null)
     }
 
     override fun onServerStarted(serverInfo: ServerInfo)

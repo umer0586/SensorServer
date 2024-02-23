@@ -36,7 +36,7 @@ interface ServerStateListener
     fun onServerAlreadyRunning(serverInfo: ServerInfo)
 }
 
-class SensorService : Service()
+class WebsocketService : Service()
 {
 
 
@@ -58,14 +58,14 @@ class SensorService : Service()
     {
 
 
-        private val TAG: String = SensorService::class.java.getSimpleName()
+        private val TAG: String = WebsocketService::class.java.getSimpleName()
         const val CHANNEL_ID = "ForegroundServiceChannel"
 
         // cannot be zero
         const val ON_GOING_NOTIFICATION_ID = 332
 
         // Broadcast intent action (published by other app's component) to stop server thread
-        val ACTION_STOP_SERVER = "ACTION_STOP_SERVER_" + SensorService::class.java.getName()
+        val ACTION_STOP_SERVER = "ACTION_STOP_SERVER_" + WebsocketService::class.java.getName()
     }
 
 
@@ -384,8 +384,8 @@ class SensorService : Service()
     {
 
         // Return this instance of LocalService so clients can call public methods
-        val service: SensorService
-            get() = this@SensorService // Return this instance of LocalService so clients can call public methods
+        val service: WebsocketService
+            get() = this@WebsocketService // Return this instance of LocalService so clients can call public methods
 
     }
 
