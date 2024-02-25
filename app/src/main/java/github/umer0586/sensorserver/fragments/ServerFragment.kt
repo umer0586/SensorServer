@@ -99,41 +99,21 @@ class ServerFragment : Fragment(), ServerStateListener
 
         val wifiManager = requireContext().applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
 
-        if(appSettings.isAllInterfaceOptionEnabled())
-        {
-            // don't check for wifi availability when use selects to listen on 0.0.0.0
-            val intent = Intent(context, WebsocketService::class.java)
-            ContextCompat.startForegroundService(requireContext(), intent)
+        val noOptionEnabled = with(appSettings){
+            !(isLocalHostOptionEnable() || isAllInterfaceOptionEnabled() || isHotspotOptionEnabled())
         }
-        else if (appSettings.isHotspotOptionEnabled())
-        {
-            if (wifiManager.isHotSpotEnabled())
-            {
-                val intent = Intent(context, WebsocketService::class.java)
-                ContextCompat.startForegroundService(requireContext(), intent)
-            }
-            else
-            {
-                showMessage("Please Enable Hotspot")
-            }
-        }
-        else if (appSettings.isLocalHostOptionEnable())
-        {
-            val intent = Intent(context, WebsocketService::class.java)
-            ContextCompat.startForegroundService(requireContext(), intent)
-        }
+
+        // if a User has selected no option then we will get Ip of wifi (in service)
+        // wifi must be enabled to obtain its ip
+        if (noOptionEnabled && !wifiManager.isWifiEnabled)
+            showMessage("Please Enable Wi-Fi")
         else
         {
-            if (wifiManager.isWifiEnabled())
-            {
-                val intent = Intent(context, WebsocketService::class.java)
-                ContextCompat.startForegroundService(requireContext(), intent)
-            }
-            else
-            {
-                showMessage("Please Enable Wi-Fi")
-            }
+            // IP address will be obtained in service
+            val intent = Intent(context, WebsocketService::class.java)
+            ContextCompat.startForegroundService(requireContext(), intent)
         }
+
     }
 
     private fun stopServer()

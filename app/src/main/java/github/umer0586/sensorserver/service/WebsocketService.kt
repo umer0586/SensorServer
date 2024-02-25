@@ -130,59 +130,29 @@ class WebsocketService : Service()
 
         val wifiManager = applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
 
+        val ipAddress : String? = when{
+            appSettings.isLocalHostOptionEnable() -> "127.0.0.1"
+            appSettings.isAllInterfaceOptionEnabled() -> "0.0.0.0"
+            appSettings.isHotspotOptionEnabled() -> wifiManager.getHotspotIp() // could be null
+            else -> wifiManager.getIp() // could be null
 
-        sensorWebSocketServer = if(appSettings.isAllInterfaceOptionEnabled())
-        {
-            SensorWebSocketServer(
-                applicationContext,
-                InetSocketAddress("0.0.0.0", appSettings.getPortNo())
-            )
         }
-        else if (appSettings.isHotspotOptionEnabled())
+
+        if(ipAddress == null)
         {
-            val hotspotIpAddress = wifiManager.getHotspotIp()
-            if (hotspotIpAddress != null)
-            {
-                SensorWebSocketServer(
-                    applicationContext,
-                    InetSocketAddress(hotspotIpAddress, appSettings.getPortNo())
-                )
-            }
-            else
-            {
+            serverStateListener?.onServerError(UnknownHostException("Unable to obtain hotspot IP"))
 
-                serverStateListener?.onServerError(UnknownHostException("Unable to obtain hotspot IP"))
-
-                stopForeground()
-                return START_NOT_STICKY
-            }
+            // Not calling a handleAndroid8andAbove() immediately after onStartCommand
+            // would cause application to crash as we are not calling startForeground() here before returning
+            stopForeground()
+            return START_NOT_STICKY
         }
-        else if (appSettings.isLocalHostOptionEnable())
-        {
-            SensorWebSocketServer(
-                applicationContext,
-                InetSocketAddress("127.0.0.1", appSettings.getPortNo())
-            )
-        }
-        else
-        {
-            val wifiIpAddress = wifiManager.getIp()
-            if (wifiIpAddress != null)
-            {
-                SensorWebSocketServer(
-                    applicationContext,
-                    InetSocketAddress(wifiIpAddress, appSettings.getPortNo())
-                )
-            }
-            else
-            {
 
-                serverStateListener?.onServerError(UnknownHostException("Unable to obtain IP"))
+        sensorWebSocketServer = SensorWebSocketServer(
+            applicationContext,
+            InetSocketAddress(ipAddress, appSettings.getPortNo())
+        )
 
-                stopForeground()
-                return START_NOT_STICKY
-            }
-        }
         sensorWebSocketServer?.onStart { serverInfo ->
 
             serverStateListener?.onServerStarted(serverInfo)
