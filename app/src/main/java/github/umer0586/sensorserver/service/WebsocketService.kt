@@ -123,7 +123,7 @@ class WebsocketService : Service()
 
     }
 
-    override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int
     {
         Log.d(TAG, "onStartCommand()")
         handleAndroid8andAbove()
