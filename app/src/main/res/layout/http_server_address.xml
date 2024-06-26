@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/card_view"
+        android:layout_width="match_parent"
+        android:layout_marginStart="5dp"
+        android:layout_marginEnd="5dp"
+        android:layout_marginTop="10dp"
+        android:layout_height="80dp"
+        android:layout_centerInParent="true"
+        app:cardCornerRadius="10dp"
+        app:cardElevation="7dp"
+        >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="20dp"
+            android:text="Enter in web browser"
+            android:layout_gravity="top|center"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="7dp"
+            />
+
+        <TextView
+            android:id="@+id/server_address"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="http://255.255.255.255:8080"
+            android:textAlignment="center"
+            android:singleLine="true"
+            android:scrollbars="horizontal"
+            android:textSize="12sp" />
+
+        <com.github.ybq.android.spinkit.SpinKitView
+            android:id="@+id/pulse_animation"
+            android:layout_width="80dp"
+            android:layout_height="30dp"
+            android:paddingTop="5dp"
+            android:paddingBottom="5dp"
+            android:layout_gravity="center|bottom"
+            app:SpinKit_Color="?attr/colorSecondary"
+            app:SpinKit_Style="ThreeBounce" />
+
+
+
+
+    </androidx.cardview.widget.CardView>
+
+</RelativeLayout>

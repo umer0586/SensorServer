@@ -5,8 +5,14 @@ import android.os.Bundle
 import android.os.IBinder
 import android.util.Log
 import android.view.MenuItem
+import android.view.View
+import android.widget.RelativeLayout
+import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.SwitchCompat
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
@@ -17,11 +23,14 @@ import github.umer0586.sensorserver.databinding.ActivityMainBinding
 import github.umer0586.sensorserver.fragments.AvailableSensorsFragment
 import github.umer0586.sensorserver.fragments.ConnectionsFragment
 import github.umer0586.sensorserver.fragments.ServerFragment
+import github.umer0586.sensorserver.service.HttpServerStateListener
+import github.umer0586.sensorserver.service.HttpService
 import github.umer0586.sensorserver.service.WebsocketService
-import github.umer0586.sensorserver.service.WebsocketService.LocalBinder
 import github.umer0586.sensorserver.service.ServiceBindHelper
+import github.umer0586.sensorserver.webserver.HttpServerInfo
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.lang.Exception
 
 class MainActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedListener
 {
@@ -30,6 +39,9 @@ class MainActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedListen
 
     private lateinit var serviceBindHelper: ServiceBindHelper
     private var websocketService: WebsocketService? = null
+
+    private lateinit var httpServiceBinder: ServiceBindHelper
+    private var httpService: HttpService? = null
 
     private lateinit var binding : ActivityMainBinding
 
@@ -60,6 +72,11 @@ class MainActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedListen
         binding.dashboard.bottomNavView.selectedItemId = R.id.navigation_server
         binding.dashboard.bottomNavView.setOnItemSelectedListener(this)
 
+
+
+
+
+
         serviceBindHelper = ServiceBindHelper(
             context = applicationContext,
             service = WebsocketService::class.java,
@@ -68,7 +85,13 @@ class MainActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedListen
 
         serviceBindHelper.onServiceConnected(this::onServiceConnected)
 
+        httpServiceBinder = ServiceBindHelper(
+                context = applicationContext,
+                service = HttpService::class.java,
+                componentLifecycle = lifecycle
+        )
 
+        httpServiceBinder.onServiceConnected(this::onHttpServiceConnected)
 
         binding.dashboard.viewPager.isUserInputEnabled = false
         binding.dashboard.viewPager.adapter = MyFragmentStateAdapter(this)
@@ -114,7 +137,7 @@ class MainActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedListen
 
     fun onServiceConnected(binder: IBinder)
     {
-        val localBinder = binder as LocalBinder
+        val localBinder = binder as WebsocketService.LocalBinder
         websocketService = localBinder.service
 
         websocketService?.let{ setConnectionCountBadge( it.getConnectionCount() ) }
@@ -128,6 +151,84 @@ class MainActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedListen
 
     }
 
+    private fun onHttpServiceConnected(binder: IBinder){
+
+
+        val httpServerAddressParentView = (binding.drawerNavigationView.menu
+                .findItem(R.id.nav_drawer_http_server_address).actionView as RelativeLayout)
+        val httpServerAddress = httpServerAddressParentView.findViewById<TextView>(R.id.server_address)
+
+        val httpServerSwitch = (binding.drawerNavigationView.menu.findItem(R.id.nav_drawer_http_server_switch).actionView as RelativeLayout).getChildAt(0) as SwitchCompat
+
+
+        val showServerAddress : ((HttpServerInfo) -> Unit) = {info ->
+            httpServerAddressParentView.visibility = View.VISIBLE
+            httpServerAddress.apply {
+                visibility = View.VISIBLE
+                text = info.baseUrl
+            }
+
+        }
+
+        val hideServerAddress  = {
+            httpServerAddressParentView.visibility = View.GONE
+            httpServerAddress.visibility = View.INVISIBLE
+        }
+
+        hideServerAddress()
+
+        val localBinder = binder as HttpService.LocalBinder
+        httpService = localBinder.service
+
+        httpService?.setServerStateListener(object : HttpServerStateListener{
+            override fun onStart(httpServerInfo: HttpServerInfo) {
+                lifecycleScope.launch(Dispatchers.Main){
+                    showServerAddress(httpServerInfo)
+                    Toast.makeText(this@MainActivity,"web server started",Toast.LENGTH_SHORT).show()
+                    httpServerSwitch.isChecked = true
+                }
+            }
+
+            override fun onStop() {
+                lifecycleScope.launch(Dispatchers.Main){
+                    hideServerAddress()
+                    Toast.makeText(this@MainActivity,"web server stopped",Toast.LENGTH_SHORT).show()
+                    httpServerSwitch.isChecked = false
+                }
+            }
+
+            override fun onError(exception: Exception) {
+                lifecycleScope.launch(Dispatchers.Main){
+                    Toast.makeText(this@MainActivity,exception.message,Toast.LENGTH_SHORT).show()
+                    httpServerSwitch.isChecked = false
+                    Log.e(TAG,exception.message.toString())
+                }
+
+            }
+
+            override fun onRunning(httpServerInfo: HttpServerInfo) {
+                lifecycleScope.launch(Dispatchers.Main){
+                    showServerAddress(httpServerInfo)
+                    httpServerSwitch.isChecked = true
+                }
+            }
+
+        })
+
+        httpService?.checkState()
+
+        httpServerSwitch.setOnCheckedChangeListener { _, isChecked ->
+            val isServerRunning = httpService?.isServerRunning ?: false
+            if(isChecked && !isServerRunning){
+                val intent = Intent(applicationContext, HttpService::class.java)
+                ContextCompat.startForegroundService(applicationContext, intent)
+            }
+            else if (!isChecked && isServerRunning) {
+                this.sendBroadcast(Intent(HttpService.ACTION_STOP_SERVER))
+            }
+        }
+    }
+
 
     override fun onPause()
     {
@@ -136,6 +237,7 @@ class MainActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedListen
 
         // To prevent memory leak
         websocketService?.onConnectionsCountChange(callBack = null)
+        httpService?.setServerStateListener(null)
     }
 
 
