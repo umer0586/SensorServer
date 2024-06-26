@@ -37,10 +37,10 @@ class MainActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedListen
 
     private lateinit var actionBarDrawerToggle: ActionBarDrawerToggle
 
-    private lateinit var serviceBindHelper: ServiceBindHelper
+    private lateinit var websocketServiceBindHelper: ServiceBindHelper
     private var websocketService: WebsocketService? = null
 
-    private lateinit var httpServiceBinder: ServiceBindHelper
+    private lateinit var httpServiceBindHelper: ServiceBindHelper
     private var httpService: HttpService? = null
 
     private lateinit var binding : ActivityMainBinding
@@ -77,21 +77,21 @@ class MainActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedListen
 
 
 
-        serviceBindHelper = ServiceBindHelper(
+        websocketServiceBindHelper = ServiceBindHelper(
             context = applicationContext,
             service = WebsocketService::class.java,
             componentLifecycle = lifecycle
         )
 
-        serviceBindHelper.onServiceConnected(this::onServiceConnected)
+        websocketServiceBindHelper.onServiceConnected(this::onWebsocketServiceConnected)
 
-        httpServiceBinder = ServiceBindHelper(
+        httpServiceBindHelper = ServiceBindHelper(
                 context = applicationContext,
                 service = HttpService::class.java,
                 componentLifecycle = lifecycle
         )
 
-        httpServiceBinder.onServiceConnected(this::onHttpServiceConnected)
+        httpServiceBindHelper.onServiceConnected(this::onHttpServiceConnected)
 
         binding.dashboard.viewPager.isUserInputEnabled = false
         binding.dashboard.viewPager.adapter = MyFragmentStateAdapter(this)
@@ -135,7 +135,7 @@ class MainActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedListen
     }
 
 
-    fun onServiceConnected(binder: IBinder)
+    private fun onWebsocketServiceConnected(binder: IBinder)
     {
         val localBinder = binder as WebsocketService.LocalBinder
         websocketService = localBinder.service
