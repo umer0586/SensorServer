@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:ignore="HardcodedText">
 
@@ -27,5 +28,18 @@
         android:title="Touch Screen"
         android:icon="@drawable/ic_touchscreen"
         />
+    <item
+        android:id="@+id/nav_drawer_http_server_switch"
+        android:checked="false"
+        android:icon="@drawable/browser_icon"
+        android:title="Test in web browser"
+        app:actionLayout="@layout/switch_item" />
+
+    <item
+        android:id="@+id/nav_drawer_http_server_address"
+        android:title="@null"
+        android:icon="@null"
+        app:actionLayout="@layout/http_server_address" />
+
 
 </menu>

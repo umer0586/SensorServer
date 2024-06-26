@@ -49,6 +49,12 @@
             android:enabled="true"
             android:exported="false" />
 
+        <service
+            android:name=".service.HttpService"
+            android:foregroundServiceType="specialUse"
+            android:enabled="true"
+            android:exported="false" />
+
         <activity
             android:name=".activities.MainActivity"
             android:exported="true"

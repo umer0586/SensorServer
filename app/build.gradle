@@ -1,6 +1,8 @@
+
 plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
+    id 'kotlin-kapt'
 }
 
 android {
@@ -25,12 +27,12 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_11
-        targetCompatibility JavaVersion.VERSION_11
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
 
     kotlinOptions {
-        jvmTarget = "11"
+        jvmTarget = "17"
     }
 
     namespace 'github.umer0586.sensorserver'
@@ -39,6 +41,8 @@ android {
         viewBinding true
     }
 }
+
+apply plugin: 'com.yanzhenjie.andserver'
 
 dependencies {
 
@@ -64,6 +68,8 @@ dependencies {
     implementation 'androidx.core:core-ktx:1.10.1'
     implementation "org.jetbrains.kotlin:kotlin-stdlib:1.8.20"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4"
+    implementation 'com.yanzhenjie.andserver:api:2.1.12'
+    kapt 'com.yanzhenjie.andserver:processor:2.1.12'
 
 
 }
