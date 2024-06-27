@@ -33,11 +33,51 @@ class SettingsFragment : PreferenceFragmentCompat()
         setPreferencesFromResource(R.xml.settings_preference, rootKey)
         appSettings = AppSettings(requireContext())
 
-        handlePortNoPreference()
+        handleWebsocketPortNoPreference()
+        handleHttpPortPreference()
         handleLocalHostPreference()
         handleAllInterfacesPreference()
         handleSamplingRatePreference()
         handleHotspotPref()
+
+    }
+
+    private fun handleHttpPortPreference()
+    {
+        val httpPortNoPref = findPreference<EditTextPreference>(getString(R.string.pref_key_http_port_no))
+        //websocketPortPref?.summary = appSettings.getPortNo().toString()
+
+        httpPortNoPref?.setOnBindEditTextListener { editText: EditText ->
+            editText.inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_SIGNED
+        }
+
+        httpPortNoPref?.setOnPreferenceChangeListener { _, newValue ->
+            try
+            {
+                val portNo: Int = newValue.toString().toInt()
+                if (portNo >= 1024 && portNo <= 49151)
+                {
+                    if(portNo == appSettings.getWebsocketPortNo())
+                    {
+                        showAlertDialog("$portNo is already set for WebSocket server")
+                        return@setOnPreferenceChangeListener false
+                    }
+                    appSettings.saveHttpPortNo(portNo)
+                    return@setOnPreferenceChangeListener true
+                }
+                else
+                {
+                    showAlertDialog("Please Select valid port No")
+                    return@setOnPreferenceChangeListener false
+                }
+            }
+            catch (e: NumberFormatException)
+            {
+                e.printStackTrace()
+                showAlertDialog("Please Select valid port No")
+                return@setOnPreferenceChangeListener false
+            }
+        }
     }
 
     private fun handleHotspotPref()
@@ -160,9 +200,9 @@ class SettingsFragment : PreferenceFragmentCompat()
 
 
     }
-    private fun handlePortNoPreference()
+    private fun handleWebsocketPortNoPreference()
     {
-        val websocketPortPref = findPreference<EditTextPreference>(getString(R.string.pref_key_port_no))
+        val websocketPortPref = findPreference<EditTextPreference>(getString(R.string.pref_key_websocket_port_no))
         //websocketPortPref?.summary = appSettings.getPortNo().toString()
 
         websocketPortPref?.setOnBindEditTextListener { editText: EditText ->
@@ -175,7 +215,11 @@ class SettingsFragment : PreferenceFragmentCompat()
                 val portNo: Int = newValue.toString().toInt()
                 if (portNo >= 1024 && portNo <= 49151)
                 {
-                    appSettings.savePortNo(portNo)
+                    if(portNo == appSettings.getHttpPortNo()){
+                        showAlertDialog("$portNo is already set for Http server")
+                        return@setOnPreferenceChangeListener false
+                    }
+                    appSettings.saveWebsocketPortNo(portNo)
                     return@setOnPreferenceChangeListener true
                 }
                 else

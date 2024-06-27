@@ -1,15 +1,18 @@
 <resources>
     <string name="app_name">Sensor Server</string>
 
-    <string name="pref_key_port_no">portNo</string>
+    <string name="pref_key_websocket_port_no">websocketPortNo</string>
+    <string name="pref_key_http_port_no">httpPortNo</string>
     <string name="pref_key_server_switch">server_switch</string>
     <string name="pref_default_port">8080</string>
+    <string name="pref_default_http_port">9090</string>
     <string name="title_settings">Settings</string>
     <string name="title_connections">Connections</string>
     <string name="title_available_sensors">Sensors</string>
 
 
     <string name="pref_port_no_dialog_title">Enter port No</string>
+    <string name="pref_http_port_no_dialog_title">Enter http port No</string>
     <string name="pref_port_no_dialog_message">Enter Port No between 1024 to 49151</string>
     <string name="pref_key_sampling_rate">pref_sampling_rate</string>
 
@@ -21,6 +24,7 @@
 
     <string name="nav_open">Open</string>
     <string name="nav_close">Close</string>
+
 
 
 </resources>

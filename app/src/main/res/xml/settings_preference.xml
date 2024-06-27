@@ -6,8 +6,18 @@
         app:defaultValue="@string/pref_default_port"
         app:dialogMessage="@string/pref_port_no_dialog_message"
         app:dialogTitle="@string/pref_port_no_dialog_title"
-        app:key="@string/pref_key_port_no"
+        app:key="@string/pref_key_websocket_port_no"
         app:title="Websocket Port"
+        app:useSimpleSummaryProvider="true"
+        app:icon="@drawable/ic_baseline_info_24"
+        />
+
+    <EditTextPreference
+        app:defaultValue="@string/pref_default_http_port"
+        app:dialogMessage="@string/pref_port_no_dialog_message"
+        app:dialogTitle="@string/pref_http_port_no_dialog_title"
+        app:key="@string/pref_key_http_port_no"
+        app:title="Http Port"
         app:useSimpleSummaryProvider="true"
         app:icon="@drawable/ic_baseline_info_24"
         />

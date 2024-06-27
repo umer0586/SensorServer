@@ -20,18 +20,33 @@ class AppSettings(context: Context)
         )
     }
 
-    fun savePortNo(portNo: Int)
+    fun saveWebsocketPortNo(portNo: Int)
     {
         sharedPreferences.edit()
-            .putInt(context.getString(R.string.pref_key_port_no), portNo)
+            .putInt(context.getString(R.string.pref_key_websocket_port_no), portNo)
             .apply()
     }
 
-    fun getPortNo(): Int
+    fun getWebsocketPortNo(): Int
     {
         return sharedPreferences.getInt(
-            context.getString(R.string.pref_key_port_no),
-            DEFAULT_PORT_NO
+            context.getString(R.string.pref_key_websocket_port_no),
+            DEFAULT_WEBSOCKET_PORT_NO
+        )
+    }
+
+    fun saveHttpPortNo(portNo: Int)
+    {
+        sharedPreferences.edit()
+                .putInt(context.getString(R.string.pref_key_http_port_no), portNo)
+                .apply()
+    }
+
+    fun getHttpPortNo(): Int
+    {
+        return sharedPreferences.getInt(
+                context.getString(R.string.pref_key_http_port_no),
+                DEFAULT_HTTP_PORT_NO
         )
     }
 
@@ -90,7 +105,8 @@ class AppSettings(context: Context)
     {
 
 
-        private const val DEFAULT_PORT_NO = 8080
+        private const val DEFAULT_WEBSOCKET_PORT_NO = 8080
+        private const val DEFAULT_HTTP_PORT_NO = 9090
         private const val DEFAULT_SAMPLING_RATE = 200000
     }
 }

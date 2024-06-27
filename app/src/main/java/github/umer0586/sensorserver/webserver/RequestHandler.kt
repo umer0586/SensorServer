@@ -17,7 +17,7 @@ class RequestController {
 
         val settings = AppSettings(context)
         return JsonUtil.toJSON(
-                mapOf("portNo" to settings.getPortNo())
+                mapOf("portNo" to settings.getWebsocketPortNo())
         )
 
     }

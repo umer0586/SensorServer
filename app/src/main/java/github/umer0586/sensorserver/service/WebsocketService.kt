@@ -150,7 +150,7 @@ class WebsocketService : Service()
 
         sensorWebSocketServer = SensorWebSocketServer(
             applicationContext,
-            InetSocketAddress(ipAddress, appSettings.getPortNo())
+            InetSocketAddress(ipAddress, appSettings.getWebsocketPortNo())
         )
 
         sensorWebSocketServer?.onStart { serverInfo ->

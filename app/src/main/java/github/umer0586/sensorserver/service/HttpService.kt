@@ -129,7 +129,7 @@ class HttpService : Service() {
         httpServer = HttpServer(
                 context = applicationContext,
                 address = ipAddress,
-                portNo = 9090 )
+                portNo = appSettings.getHttpPortNo() )
 
         httpServer?.setOnStart { serverInfo ->
             onStarted(serverInfo)
