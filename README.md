@@ -180,6 +180,8 @@ You can also view your phone's sensor data in a Web Browser. Open the app's navi
 
 This web app is built using Flutter and its source could be found under [sensors_dashboard](https://github.com/umer0586/SensorServer/tree/main/sensors_dashboard). However, there's one current limitation to be aware of. The app is built with Flutter using the `--web-renderer canvaskit` option. This means that the resulting app will have some dependencies that need to be downloaded from the internet. This means that any device accessing the web app through a browser will require an internet connection to function properly.
 
+The web app is built and deployed to Android's assets folder via `python deploy_web_app.py`
+
 
 ## Connecting over Hotspot :fire:
 If you don't have Wifi network at your work place you can directly connect websocket clients to the app by enabling **Hotspot Option** from settings. Just make sure that websocket clients are connected to your phone's hotspot
