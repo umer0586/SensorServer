@@ -1,0 +1,3 @@
+1. Web server added
+2. An embedded web app added to allow viewing sensor data in a web browser
+3. Landscape orientation now supported 
