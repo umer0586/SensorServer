@@ -13,8 +13,8 @@ android {
         minSdk 21
         targetSdk 34
         multiDexEnabled true
-        versionCode 26
-        versionName "5.3.0"
+        versionCode 27
+        versionName "6.0.0"
 
 
     }
