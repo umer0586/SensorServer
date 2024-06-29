@@ -1,22 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/relative_layout"
+    android:fillViewport="true"
     >
-
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center"
+    android:animateLayoutChanges="true"
+    android:orientation="vertical">
 
     <androidx.cardview.widget.CardView
         android:id="@+id/card_view"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:layout_marginLeft="25dp"
-        android:layout_marginRight="25dp"
-        android:layout_above="@id/start_button"
-        android:layout_centerInParent="true"
-        android:layout_marginBottom="75dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="50dp"
         app:cardCornerRadius="30dp"
         app:cardElevation="7dp"
         >
@@ -30,13 +31,19 @@
                 android:text="https://192.168.102.112:8080"
                 android:textAlignment="center"
                 android:singleLine="true"
+                android:paddingVertical="15dp"
+                android:paddingHorizontal="40dp"
                 android:scrollbars="horizontal"
                 android:textSize="18dp" />
 
 
     </androidx.cardview.widget.CardView>
 
-
+<RelativeLayout
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_weight="0"
+    >
     <com.google.android.material.button.MaterialButton
         android:id="@+id/start_button"
         style="@style/startButton"
@@ -57,6 +64,9 @@
         app:SpinKit_Color="?attr/colorSecondary"
         app:SpinKit_Style="PulseRing" />
 
-
-
 </RelativeLayout>
+
+
+
+</LinearLayout>
+</ScrollView>
