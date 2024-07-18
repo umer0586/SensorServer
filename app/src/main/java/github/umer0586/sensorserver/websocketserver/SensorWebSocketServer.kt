@@ -339,6 +339,14 @@ class SensorWebSocketServer(private val context: Context, address: InetSocketAdd
         Log.i(TAG, "onProviderEnabled() $provider")
     }
 
+    // See issue  : https://github.com/umer0586/SensorServer/issues/61
+    // solution : https://stackoverflow.com/questions/64638260/android-locationlistener-abstractmethoderror-on-onstatuschanged-and-onproviderd
+    @Deprecated("Deprecated in Java")
+    override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?)
+    {
+       // super.onStatusChanged(provider, status, extras)
+    }
+
     private fun hasLocationPermission(): Boolean
     {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
