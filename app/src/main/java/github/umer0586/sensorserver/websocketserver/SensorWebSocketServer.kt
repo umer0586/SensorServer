@@ -99,8 +99,6 @@ class SensorWebSocketServer(private val context: Context, address: InetSocketAdd
                         clientWebsocket.setAttachment(TouchSensors())
                         notifyConnectionsChanged()
                     }
-
-                    // TODO : handleGPSRequest(websocket) never gets called when app has no location permission
                     CONNECTION_PATH_GPS -> handleGPSRequest(clientWebsocket)
                     else -> clientWebsocket.close(CLOSE_CODE_UNSUPPORTED_REQUEST, "unsupported request")
 
@@ -254,30 +252,30 @@ class SensorWebSocketServer(private val context: Context, address: InetSocketAdd
 
 
 
-    @SuppressLint("MissingPermission")
     private fun handleGPSRequest(clientWebsocket: WebSocket)
     {
-        if (!hasLocationPermission())
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
+                context.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)
         {
+            // Reason message must be 123 bytes or less
             clientWebsocket.close(
-                CLOSE_CODE_PERMISSION_DENIED,
-                "App has No permission to access location. Go to your device's installed apps settings and allow location permission to Sensor Server app"
+                    CLOSE_CODE_PERMISSION_DENIED,
+                    "Location permission required. Please enable it in your device's App Settings."
             )
             return
         }
 
-
+        // In Android 5.0 permissions are granted at installation time
         locationManager.requestLocationUpdates(
-            LocationManager.GPS_PROVIDER,
-            0,
-            0f,
-            this,
-            handlerThread.looper
+                LocationManager.GPS_PROVIDER,
+                0,
+                0f,
+                this,
+                handlerThread.looper
         )
 
         clientWebsocket.setAttachment( GPS() )
-
-
 
         notifyConnectionsChanged()
     }
@@ -321,18 +319,6 @@ class SensorWebSocketServer(private val context: Context, address: InetSocketAdd
     {
        // super.onStatusChanged(provider, status, extras)
     }
-
-    private fun hasLocationPermission(): Boolean
-    {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
-        {
-            context.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
-        }
-        else true
-
-        //prior to android marshmallow dangerous permission are prompt at install time
-    }
-
     override fun onClose(clientWebsocket: WebSocket, code: Int, reason: String, remote: Boolean)
     {
         Log.i(TAG,"Connection closed ${clientWebsocket.remoteSocketAddress}  with exit code  $code  additional info: $reason")
