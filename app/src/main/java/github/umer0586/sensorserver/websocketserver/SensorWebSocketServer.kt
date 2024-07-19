@@ -15,6 +15,7 @@ import android.net.Uri
 import android.os.*
 import android.util.Log
 import android.view.MotionEvent
+import androidx.annotation.RequiresApi
 import github.umer0586.sensorserver.util.JsonUtil
 import org.java_websocket.WebSocket
 import org.java_websocket.handshake.ClientHandshake
@@ -290,7 +291,7 @@ class SensorWebSocketServer(private val context: Context, address: InetSocketAdd
 
     override fun onLocationChanged(location: Location)
     {
-        if (getGPSConnectionCount() > 0)
+        if (getGPSConnectionCount() == 0)
         {
             Log.w( TAG, "onLocationChanged() :  " + "Location update received when no client with connected with GPS" )
         }
@@ -298,33 +299,7 @@ class SensorWebSocketServer(private val context: Context, address: InetSocketAdd
         {
             if (websocket.getAttachment<Any>() is GPS)
             {
-                message.clear()
-                message["longitude"] = location.longitude
-                message["latitude"] = location.latitude
-                message["altitude"] = location.altitude
-                message["bearing"] = location.bearing
-                message["accuracy"] = location.accuracy
-                message["speed"] = location.speed
-                message["time"] = location.time
-
-
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-                {
-                    message["speedAccuracyMetersPerSecond"] = location.speedAccuracyMetersPerSecond
-                    message["bearingAccuracyDegrees"] = location.bearingAccuracyDegrees
-                    message["elapsedRealtimeNanos"] = location.elapsedRealtimeNanos
-                    message["verticalAccuracyMeters"] = location.verticalAccuracyMeters
-                }
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
-                {
-                    message["elapsedRealtimeAgeMillis"] = location.elapsedRealtimeAgeMillis
-                }
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
-                {
-                    message["elapsedRealtimeUncertaintyNanos"] = location.elapsedRealtimeUncertaintyNanos
-                }
-
-                websocket.send( JsonUtil.toJSON(message) )
+                websocket.send(location.toJson())
             }
         }
     }
@@ -410,8 +385,39 @@ class SensorWebSocketServer(private val context: Context, address: InetSocketAdd
         notifyConnectionsChanged()
     }
 
-    override fun onMessage(conn: WebSocket, message: String)
+
+    override fun onMessage(websocket: WebSocket, message: String)
     {
+        //Log.d(TAG, "onMessage: $message")
+        //Log.d(TAG, "onMessage: ${Thread.currentThread().name}")
+        
+        if(message.equals("getLastKnownLocation",ignoreCase = true) && websocket.getAttachment<Any>() is GPS)
+        {
+           // For Android 6.0 or above check if user has allowed location permission
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && context.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)
+           {
+               if (context.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)
+               {
+                   locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)?.apply {
+                       websocket.send(this.toJson(lastKnownLocation = true))
+                   }
+               }
+               else
+               {
+                   websocket.close(
+                           CLOSE_CODE_PERMISSION_DENIED,
+                           "App has No permission to access location. Go to your device's installed apps settings and allow location permission to Sensor Server app"
+                           )
+               }
+           }
+           // For Android 5.0 permissions are granted at install time
+           else {
+
+               locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)?.apply {
+                    websocket.send(this.toJson(lastKnownLocation = true))
+               }
+           }
+        }
     }
 
     override fun onMessage(conn: WebSocket, message: ByteBuffer)
@@ -671,4 +677,36 @@ fun SensorManager.getSensorFromStringType(sensorStringType: String) : Sensor?
         .filter { it.stringType.equals(sensorStringType, ignoreCase = true) }
         .firstOrNull()
 
+}
+
+fun Location.toJson(lastKnownLocation : Boolean = false) : String
+{
+    val message = mutableMapOf<String,Any>()
+    message["longitude"] = longitude
+    message["latitude"] = latitude
+    message["altitude"] = altitude
+    message["bearing"] = bearing
+    message["accuracy"] = accuracy
+    message["speed"] = speed
+    message["time"] = time
+    message["lastKnowLocation"] = lastKnownLocation
+
+
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+    {
+        message["speedAccuracyMetersPerSecond"] = speedAccuracyMetersPerSecond
+        message["bearingAccuracyDegrees"] = bearingAccuracyDegrees
+        message["elapsedRealtimeNanos"] = elapsedRealtimeNanos
+        message["verticalAccuracyMeters"] = verticalAccuracyMeters
+    }
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
+    {
+        message["elapsedRealtimeAgeMillis"] = elapsedRealtimeAgeMillis
+    }
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
+    {
+        message["elapsedRealtimeUncertaintyNanos"] = elapsedRealtimeUncertaintyNanos
+    }
+
+    return JsonUtil.toJSON(message)
 }
