@@ -139,27 +139,7 @@ You can access device location through GPS using following URL.
 
                  ws://<ip>:<port>/gps
                  
-
-JSON response contains following key fields.
-
-| Field       | Description                                                                                                            |
-|-------------|------------------------------------------------------------------------------------------------------------------------|
-| longitude   | Longitude in degrees.                                                                                                 |
-| latitude    | Latitude in degrees.                                                                                                  |
-| altitude    | The altitude of the location in meters above the WGS84 reference ellipsoid.                                         |
-| bearing     | Bearing at the time of this location in degrees. Bearing is the horizontal direction of travel and is unrelated to device orientation. The bearing is guaranteed to be in the range \[0, 360). |
-| accuracy    | Estimated horizontal accuracy radius in meters of this location at the 68th percentile confidence level.           |
-| speed       | Speed at the time of this location in meters per second.                                                            |
-| time        | The Unix epoch time of this location fix, in milliseconds since the start of the Unix epoch (00:00:00 January 1, 1970 UTC). |
-
-Fields only for Android 8.0 and above.
-
-| Field                     | Description                                                                                                     |
-|---------------------------|-----------------------------------------------------------------------------------------------------------------|
-| speedAccuracyMetersPerSecond | Estimated speed accuracy in meters per second of this location at the 68th percentile confidence level.     |
-| bearingAccuracyDegrees    | Estimated bearing accuracy in degrees of this location at the 68th percentile confidence level.                |
-| elapsedRealtimeNanos      | Time of this fix in nanoseconds of elapsed realtime since system boot.                                        |
-| verticalAccuracyMeters    | The estimated altitude accuracy in meters of this location at the 68th percentile confidence level.          |
+See [Getting Data From GPS](https://github.com/umer0586/SensorServer/wiki/Getting-Data-From-GPS) for more details
 
 
 
