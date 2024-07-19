@@ -1,0 +1,5 @@
+New Feature:
+1. Clients can now request last known location from server by sending "getLastKnownLocation" message
+
+Bug fix:
+1. https://github.com/umer0586/SensorServer/issues/61
