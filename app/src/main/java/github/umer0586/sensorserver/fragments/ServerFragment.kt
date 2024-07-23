@@ -93,6 +93,9 @@ class ServerFragment : Fragment(), ServerStateListener
         showPulseAnimation()
     }
 
+    // TODO : When starting a foreground service it is required to provide a notification that will be visible to the user for the duration of the service execution.
+    //  Android 13 introduced a runtime permission for posting notifications,
+    //  requiring that apps ask for this permission and users have to explicitly grant it, otherwise notifications will not be visible.
     private fun startServer()
     {
         Log.d(TAG, "startServer() called")
