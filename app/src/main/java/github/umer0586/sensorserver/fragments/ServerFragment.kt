@@ -120,8 +120,14 @@ class ServerFragment : Fragment(), ServerStateListener
     {
         Log.d(TAG, "stopServer()")
 
-        // getContext().stopService(new Intent(getContext(),SensorService.class));
-        requireContext().sendBroadcast(Intent(WebsocketService.Companion.ACTION_STOP_SERVER))
+        // We are using the RECEIVER_NOT_EXPORTED flag in BroadcastMessageReceiver.
+        // Therefore, it is mandatory to set the package name of this app with the custom action in the intent.
+        // Not setting the package name will prevent the broadcast receiver from being triggered in Android 14 or later.
+        // For more information, see https://stackoverflow.com/questions/76919130/android-14-context-registered-broadcast-receivers-not-working
+        val intent = Intent(WebsocketService.ACTION_STOP_SERVER).apply {
+            setPackage(requireContext().packageName)
+        }
+        requireContext().sendBroadcast(intent)
     }
 
     override fun onPause()

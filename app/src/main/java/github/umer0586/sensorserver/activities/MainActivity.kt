@@ -224,7 +224,10 @@ class MainActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedListen
                 ContextCompat.startForegroundService(applicationContext, intent)
             }
             else if (!isChecked && isServerRunning) {
-                this.sendBroadcast(Intent(HttpService.ACTION_STOP_SERVER))
+                val intent = Intent(HttpService.ACTION_STOP_SERVER).apply {
+                    setPackage(applicationContext.packageName)
+                }
+                this.sendBroadcast(intent)
             }
         }
     }
