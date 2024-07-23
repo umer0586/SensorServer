@@ -1,0 +1,2 @@
+Bug Fix : Unable to stop server in Android 14
+https://github.com/umer0586/SensorServer/issues/56
