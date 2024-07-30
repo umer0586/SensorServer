@@ -18,27 +18,16 @@ class SensorViewModel with ChangeNotifier{
   bool get isConnected => _connected;
 
   bool _connecting = false;
-  bool get connecting => _connecting;
+  bool get isConnecting => _connecting;
 
-  String _values = "";
-  String get values => _values;
-
-  bool _connectionFailed = false;
-  bool get connectionFailed => _connectionFailed;
-
-  String _closeMessage = "";
-  String get closeMessage => _closeMessage;
-
-  String _errorMessage = "";
-  String get errorMessage => _errorMessage;
-
-  bool _hasError = false;
-  bool get hasError => _hasError;
 
   static const connectionTimeOutSecs = 2;
 
-  // A url for testing connections without repolying app to Android
-  final testUrl = "ws://192.168.0.103:8080/sensor/connect";
+  final StreamController<String> _sensorDataStreamController = StreamController.broadcast();
+  Stream<String> get sensorDataStream => _sensorDataStreamController.stream;
+
+  // A url for testing connections without deploying app to Android
+  final testUrl = "ws://192.168.18.3:8080/sensor/connect";
 
   web.WebSocket? _websocket;
  
@@ -49,10 +38,10 @@ class SensorViewModel with ChangeNotifier{
 
     Timer(const Duration(seconds: connectionTimeOutSecs), () {
       if (!isConnected) {
-        log("connection timed out after $connectionTimeOutSecs");
+        _sensorDataStreamController.add("connection timed out after $connectionTimeOutSecs");
         _websocket?.close();
         _setConnected(false);
-        _setErrorMessage("Connection Timmed Out");
+
       }
     });
 
@@ -80,27 +69,26 @@ class SensorViewModel with ChangeNotifier{
       final data = messageEvent.data;
       if (data != null) {
         final json = jsonDecode(data.toString());
-        _values = json["values"].toString();
-        notifyListeners();
+        _sensorDataStreamController.add(json["values"].toString());
       }
       
     });
 
-    _websocket?.onClose.listen((closeEvent){
-      _setConnected(false);   
+    _websocket?.onClose.listen((closeEvent) {
+      _setConnected(false);
+      _sensorDataStreamController.add("No Data");
     });
 
     _websocket?.onError.listen((event){
       _setConnected(false);
-      _setConnectionFailed(true);
-     _setErrorMessage("Error Occurred on Connection");
+      _sensorDataStreamController.addError("Error occurred \n $event");
     
     });
 
     
   }
 
-  void disconnect(){
+  void disconnect() async {
     _websocket?.close();
   }
 
@@ -129,25 +117,15 @@ class SensorViewModel with ChangeNotifier{
     notifyListeners();
   }
 
-  void _setConnectionFailed(bool connectionFailed){
-    if(_connectionFailed == connectionFailed){
-      return;
-    }
-
-    _connectionFailed = connectionFailed;
-    notifyListeners();
-  }
-
-void _setErrorMessage(String message){
-  _errorMessage = message;
-  _hasError = true;
-  notifyListeners();
-}
-
 @override
   void dispose() {
     super.dispose();
     _websocket?.close();
+
+    if(!_sensorDataStreamController.isClosed){
+      _sensorDataStreamController.close();
+    }
+
   }
 
 }

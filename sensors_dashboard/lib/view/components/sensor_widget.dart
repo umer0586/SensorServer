@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:sensors_dashboard/model/sensor.dart';
 import 'package:sensors_dashboard/view_model/sensor_viewmodel.dart';
 
-/// A wiget which represents sensor of Android device
+/// A widget which represents sensor of Android device
 class SensorWidget extends StatelessWidget {
   final Sensor sensor;
   const SensorWidget(this.sensor,{super.key});
@@ -12,7 +12,7 @@ class SensorWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    
+
     final viewModel = Provider.of<SensorViewModel>(context);
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
@@ -51,10 +51,18 @@ class SensorWidget extends StatelessWidget {
               Expanded(
                 flex: 6,
                   child: Center(
-                child: switch(viewModel.isConnected){
-                  true => Text(viewModel.values),
-                  false => viewModel.connecting ? const CircularProgressIndicator() : const Text("No Data")
-                }
+                child: viewModel.isConnecting ? const CircularProgressIndicator()
+                    : StreamBuilder<String>(
+                  stream: viewModel.sensorDataStream,
+                  builder: (context, snapshot){
+
+                    if(snapshot.hasData && snapshot.data != null){
+                      return Text(snapshot.data.toString());
+                    }
+
+                    return const Text("No data");
+                  },
+                )
               )),
         
             Expanded(
