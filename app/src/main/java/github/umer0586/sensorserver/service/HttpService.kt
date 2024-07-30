@@ -166,7 +166,11 @@ class HttpService : Service() {
         val activityIntent = Intent(this, MainActivity::class.java)
 
         // Intent to be broadcast (when user press action button in notification)
-        val broadcastIntent = Intent(ACTION_STOP_SERVER)
+        val broadcastIntent = Intent(ACTION_STOP_SERVER).apply {
+            // In Android 14, Intent with custom action must explicitly set package
+            // otherwise Broadcast receiver with RECEIVER_NOT_EXPORTED flag will not receive it
+            setPackage(packageName)
+        }
 
         // create a pending intent that can invoke an activity (use to open activity from notification message)
         val pendingIntentActivity = PendingIntent.getActivity(this, 0, activityIntent, PendingIntent.FLAG_IMMUTABLE)
