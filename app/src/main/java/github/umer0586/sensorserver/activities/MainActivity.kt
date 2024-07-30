@@ -1,6 +1,7 @@
 package github.umer0586.sensorserver.activities
 
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
 import android.util.Log
@@ -18,6 +19,7 @@ import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.google.android.material.navigation.NavigationBarView
+import com.permissionx.guolindev.PermissionX
 import github.umer0586.sensorserver.R
 import github.umer0586.sensorserver.databinding.ActivityMainBinding
 import github.umer0586.sensorserver.fragments.AvailableSensorsFragment
@@ -220,6 +222,15 @@ class MainActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedListen
         httpServerSwitch.setOnCheckedChangeListener { _, isChecked ->
             val isServerRunning = httpService?.isServerRunning ?: false
             if(isChecked && !isServerRunning){
+
+                // Whether user grant this permission or not we will start service anyway
+                // If permission is not granted foreground notification will not be shown
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    PermissionX.init(this)
+                            .permissions(android.Manifest.permission.POST_NOTIFICATIONS)
+                            .request{_,_,_ -> }
+                }
+
                 val intent = Intent(applicationContext, HttpService::class.java)
                 ContextCompat.startForegroundService(applicationContext, intent)
             }

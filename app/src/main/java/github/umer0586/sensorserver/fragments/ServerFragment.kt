@@ -3,6 +3,7 @@ package github.umer0586.sensorserver.fragments
 import android.content.Context
 import android.content.Intent
 import android.net.wifi.WifiManager
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -13,6 +14,7 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.snackbar.Snackbar
+import com.permissionx.guolindev.PermissionX
 import github.umer0586.sensorserver.R
 import github.umer0586.sensorserver.customextensions.isHotSpotEnabled
 import github.umer0586.sensorserver.databinding.FragmentServerBinding
@@ -93,12 +95,20 @@ class ServerFragment : Fragment(), ServerStateListener
         showPulseAnimation()
     }
 
-    // TODO : When starting a foreground service it is required to provide a notification that will be visible to the user for the duration of the service execution.
-    //  Android 13 introduced a runtime permission for posting notifications,
-    //  requiring that apps ask for this permission and users have to explicitly grant it, otherwise notifications will not be visible.
     private fun startServer()
     {
         Log.d(TAG, "startServer() called")
+
+        // Android 13 introduced a runtime permission for posting notifications,
+        // requiring that apps ask for this permission and users have to explicitly grant it, otherwise notifications will not be visible.
+        //
+        // Whether user grant this permission or not we will start service anyway
+        // If permission is not granted foreground notification will not be shown
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            PermissionX.init(this)
+                    .permissions(android.Manifest.permission.POST_NOTIFICATIONS)
+                    .request{_,_,_ -> }
+        }
 
         val wifiManager = requireContext().applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
 

@@ -70,6 +70,7 @@ dependencies {
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4"
     implementation 'com.yanzhenjie.andserver:api:2.1.12'
     kapt 'com.yanzhenjie.andserver:processor:2.1.12'
+    implementation 'com.guolindev.permissionx:permissionx:1.8.0'
 
 
 }
