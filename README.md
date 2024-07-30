@@ -112,6 +112,9 @@ connect("ws://192.168.0.103:8080/sensor/connect?type=android.sensor.acceleromete
 
 ```
  *Your device's IP might be different when you tap start button, so make sure you are using correct IP address at client side*
+
+ Also see [
+Connecting to Multiple Sensors Using Threading in Python](https://github.com/umer0586/SensorServer/wiki/Connecting-to-Multiple-Sensors-Using-Threading-in-Python) 
  
 ## Using Multiple Sensors Over single Websocket Connection
 You can also connect to multiple sensors over single websocket connection. To use multiple sensors over single websocket connection use following **URL**.
