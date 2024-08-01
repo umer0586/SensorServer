@@ -39,6 +39,7 @@ dependencies:
   web: ^0.5.1
   http: ^1.2.1
   get_it: ^7.7.0
+  fl_chart: ^0.68.0
 
 dev_dependencies:
   flutter_test:

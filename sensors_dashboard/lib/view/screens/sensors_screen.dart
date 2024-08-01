@@ -10,11 +10,13 @@ class SensorsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    
+    //debugPrint("SensorScreen()");
+
     final viewModel = Provider.of<SensorsScreenViewmodel>(context);
     
     return Scaffold(
         appBar: AppBar(
+          automaticallyImplyLeading: false,
           title: const Text("Sensors"),
           centerTitle: true,
         ),
