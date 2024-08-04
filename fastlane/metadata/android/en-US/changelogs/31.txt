@@ -1,0 +1,1 @@
+Real-time plotting of accelerometer, gyroscope, and magnetometer data has been integrated into a web application.
