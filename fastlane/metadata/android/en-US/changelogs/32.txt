@@ -1,0 +1,2 @@
+App Crash Fix:
+Resolved the issue where the app would crash if a WebSocketNotConnectedException was thrown.
