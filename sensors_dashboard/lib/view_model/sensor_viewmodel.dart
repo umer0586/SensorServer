@@ -45,8 +45,18 @@ class SensorViewModel with ChangeNotifier{
     });
 
 
-    _websocket = web.WebSocket("${serverInfo.sensorConnectionUrl}?type=${sensor.type}");
+     if(kReleaseMode) {
+       final websocketPortNo = await infoRepository.getWebSocketPortNo();
+       _websocket = web.WebSocket(
+           "ws://${serverInfo.iP}:$websocketPortNo/sensor/connect?type=${sensor.type}"
+       );
+     }
 
+     if(kDebugMode){
+       _websocket = web.WebSocket(
+           "ws://${serverInfo.address}/sensor/connect?type=${sensor.type}"
+       );
+     }
 
     _websocket?.onOpen.listen((event){
       _setConnected(true);
