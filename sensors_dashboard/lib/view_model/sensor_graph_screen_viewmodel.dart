@@ -70,7 +70,10 @@ class SensorGraphScreenViewmodel with ChangeNotifier {
       final data = messageEvent.data.toString();
       final json = jsonDecode(data);
 
-      // TODO : unable to read read json array into List<Double>
+      // TODO : Fix unable to read parsed json
+      // Its weird that json = jsonDecode(data) is successfully parsed
+      // but json["timestamp"] is causing error but json["timestamp"].toString() is not
+      // same issue with json["values"]
       List<double> values = json["values"]
           .toString()
           .replaceAll("[", "")
