@@ -1,14 +1,11 @@
 
 import 'dart:async';
 import 'dart:convert';
-import 'dart:developer';
 
 import 'package:flutter/foundation.dart';
-import 'package:get_it/get_it.dart';
-
+import 'package:sensors_dashboard/model/data/sensor.dart';
+import 'package:sensors_dashboard/model/data/server_info.dart';
 import 'package:sensors_dashboard/model/repository/info_repository.dart';
-import 'package:sensors_dashboard/model/sensor.dart';
-import 'package:sensors_dashboard/model/server_info.dart';
 import 'package:web/web.dart' as web;
 
 /// A ViewModel for SensorWiget
@@ -26,10 +23,12 @@ class SensorViewModel with ChangeNotifier{
   final StreamController<String> _sensorDataStreamController = StreamController.broadcast();
   Stream<String> get sensorDataStream => _sensorDataStreamController.stream;
 
-  // A url for testing connections without deploying app to Android
-  final testUrl = "ws://192.168.18.3:8080/sensor/connect";
-
   web.WebSocket? _websocket;
+
+  final InfoRepository infoRepository;
+  final ServerInfo serverInfo;
+
+  SensorViewModel({required this.infoRepository, required this.serverInfo});
  
   void connect(Sensor sensor) async {
 
@@ -45,20 +44,9 @@ class SensorViewModel with ChangeNotifier{
       }
     });
 
-    // Use hardcode or testUrl in debug mode.
-    if (kDebugMode) {
-      _websocket = web.WebSocket("$testUrl?type=${sensor.type}");
-    }
-    // Get actual address when deployed to Android
-    if (kReleaseMode) {
-      final serverInfo = GetIt.instance.get<ServerInfo>();
-      
-      log("getting websocket port from http://${serverInfo.address}/wsport");
-      final webSocketPort = await InfoRepository().getWebSocketPortNo();
-      final webSocketServerAddress = "ws://${serverInfo.iP}:$webSocketPort";
-      
-      _websocket = web.WebSocket("$webSocketServerAddress/sensor/connect?type=${sensor.type}");
-    }
+
+    _websocket = web.WebSocket("${serverInfo.sensorConnectionUrl}?type=${sensor.type}");
+
 
     _websocket?.onOpen.listen((event){
       _setConnected(true);

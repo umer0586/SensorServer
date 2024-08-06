@@ -1,12 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 import 'package:provider/provider.dart';
-import 'package:sensors_dashboard/model/sensor.dart';
+import 'package:sensors_dashboard/model/data/sensor.dart';
+import 'package:sensors_dashboard/model/data/server_info.dart';
+import 'package:sensors_dashboard/model/repository/info_repository.dart';
 import 'package:sensors_dashboard/view/components/sensor_widget.dart';
 import 'package:sensors_dashboard/view_model/sensor_viewmodel.dart';
 import 'package:sensors_dashboard/view_model/sensors_screen_viewmodel.dart';
 
 class SensorsScreen extends StatelessWidget {
   const SensorsScreen({super.key});
+
+  static const routeName = "/sensorsScreen";
 
   @override
   Widget build(BuildContext context) {
@@ -70,7 +75,7 @@ class _SensorGrid extends StatelessWidget {
         return ChangeNotifierProvider(
           // Handle each SensorWidget's state in SensorViewModel
           // Each SensorWidget should have separate websocket connection
-          create: (context) => SensorViewModel(),
+          create: (context) => SensorViewModel(infoRepository: GetIt.instance.get<InfoRepository>(), serverInfo: GetIt.instance.get<ServerInfo>()),
           child: SensorWidget(sensors[index]));
       },
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(

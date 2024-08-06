@@ -1,9 +1,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:sensors_dashboard/model/sensor.dart';
-import 'package:sensors_dashboard/view/components/sensor_graph_widget.dart';
-import 'package:sensors_dashboard/view_model/sensor_graph_viewmodel.dart';
+import 'package:sensors_dashboard/model/data/sensor.dart';
+import 'package:sensors_dashboard/view/screens/sensor_graph_screen.dart';
 import 'package:sensors_dashboard/view_model/sensor_viewmodel.dart';
 
 /// A widget which represents sensor of Android device
@@ -50,10 +49,10 @@ class SensorWidget extends StatelessWidget {
                       ),
                       if(sensor.type.contains("accelerometer") || sensor.type.contains("gyroscope") || sensor.type.contains("magnetic_field"))
                       IconButton(icon: const Icon(Icons.insert_chart), onPressed: viewModel.isConnected ? null : (){
-                        Navigator.of(context).push(
-                            MaterialPageRoute(builder: (context) => ChangeNotifierProvider(
-                                create: (context) => SensorGraphViewmodel(),
-                                child: SensorGraphWidget(sensor)),));
+                        Navigator.of(context).pushNamed(
+                          SensorGraphScreen.routeName,
+                          arguments: sensor,
+                        );
                       },)
                     ],
                   ),

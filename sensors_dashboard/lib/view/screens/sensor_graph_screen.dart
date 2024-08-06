@@ -1,19 +1,22 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:sensors_dashboard/view_model/sensor_graph_viewmodel.dart';
+import 'package:sensors_dashboard/view_model/sensor_graph_screen_viewmodel.dart';
 
-import '../../model/sensor.dart';
+import '../../model/data/sensor.dart';
 
-class SensorGraphWidget extends StatelessWidget {
-  final Sensor sensor;
-  const SensorGraphWidget(this.sensor, {super.key});
+class SensorGraphScreen extends StatelessWidget {
+
+  const SensorGraphScreen({super.key});
+
+  static const routeName = "/sensorsGraphScreen";
 
   @override
   Widget build(BuildContext context) {
     //debugPrint("GraphScreen()");
+    final sensor = ModalRoute.of(context)!.settings.arguments as Sensor;
 
-    final viewModel = Provider.of<SensorGraphViewmodel>(context);
+    final viewModel = Provider.of<SensorGraphScreenViewmodel>(context);
     const xDataColor = Colors.green;
     const yDataColor = Colors.blue;
     const zDataColor = Colors.red;

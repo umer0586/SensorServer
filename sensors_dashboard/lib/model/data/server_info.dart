@@ -22,6 +22,9 @@ class ServerInfo {
     };
   }
 
+  String get sensorsUrl => "http://$address/sensors";
+  String get websocketPortUrl => "http://$address/wsport";
+  String get sensorConnectionUrl => "ws://$address/sensor/connect";
 
   ServerInfo({this.deployed = false, this.testIp = "127.0.0.1", this.testPortNo = 8080});
 

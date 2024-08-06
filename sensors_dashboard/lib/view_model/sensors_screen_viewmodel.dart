@@ -1,22 +1,27 @@
 
-import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
+import 'package:sensors_dashboard/model/data/sensor.dart';
 import 'package:sensors_dashboard/model/repository/sensors_repository.dart';
-import 'package:sensors_dashboard/model/sensor.dart';
 
 class SensorsScreenViewmodel with ChangeNotifier{
 
   List<Sensor> _sensors = [];
   List<Sensor> get sensors => _sensors;
 
-  final repo = SensorsRepository();
+  final SensorsRepository sensorsRepository;
+  SensorsScreenViewmodel({required this.sensorsRepository});
 
-  void fetechSensors(){
-    repo.getSensors().then((sensors){
-      _sensors = sensors;
-    });
+  void fetchSensors(){
+
+    if(kReleaseMode) {
+      sensorsRepository.getSensors().then((sensors) {
+        _sensors = sensors;
+      });
+    }
+
   }
 
-  Future<List<Sensor>> getSensors() => repo.getSensors(); 
+  Future<List<Sensor>> getSensors() => sensorsRepository.getSensors();
  
   
 }
