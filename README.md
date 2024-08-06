@@ -160,6 +160,10 @@ You can also view your phone's sensor data in a Web Browser. Open the app's navi
 
 <img width="747" alt="web-browser-image" src="https://github.com/umer0586/SensorServer/assets/35717992/e4bbbe70-17d3-4246-b714-184f832f1ab4">
 
+![plotting](https://github.com/user-attachments/assets/297a001a-ed88-4299-9cf1-31451fff2c18)
+
+
+
 
 This web app is built using Flutter and its source could be found under [sensors_dashboard](https://github.com/umer0586/SensorServer/tree/main/sensors_dashboard). However, there's one current limitation to be aware of. The app is built with Flutter using the `--web-renderer canvaskit` option. This means that the resulting app will have some dependencies that need to be downloaded from the internet. This means that any device accessing the web app through a browser will require an internet connection to function properly.
 
