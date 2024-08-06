@@ -18,6 +18,7 @@ import android.view.MotionEvent
 import androidx.annotation.RequiresApi
 import github.umer0586.sensorserver.util.JsonUtil
 import org.java_websocket.WebSocket
+import org.java_websocket.exceptions.WebsocketNotConnectedException
 import org.java_websocket.handshake.ClientHandshake
 import org.java_websocket.server.WebSocketServer
 import java.net.InetSocketAddress
@@ -297,7 +298,11 @@ class SensorWebSocketServer(private val context: Context, address: InetSocketAdd
         {
             if (websocket.getAttachment<Any>() is GPS)
             {
-                websocket.send(location.toJson())
+                try {
+                    websocket.send(location.toJson())
+                }catch (e : WebsocketNotConnectedException){
+                    e.printStackTrace()
+                }
             }
         }
     }
@@ -385,7 +390,11 @@ class SensorWebSocketServer(private val context: Context, address: InetSocketAdd
                if (context.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)
                {
                    locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)?.apply {
-                       websocket.send(this.toJson(lastKnownLocation = true))
+                       try {
+                           websocket.send(this.toJson(lastKnownLocation = true))
+                       } catch(e : WebsocketNotConnectedException){
+                           e.printStackTrace()
+                       }
                    }
                }
                else
@@ -400,7 +409,11 @@ class SensorWebSocketServer(private val context: Context, address: InetSocketAdd
            else {
 
                locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)?.apply {
-                    websocket.send(this.toJson(lastKnownLocation = true))
+                   try {
+                       websocket.send(this.toJson(lastKnownLocation = true))
+                   } catch(e : WebsocketNotConnectedException){
+                       e.printStackTrace()
+                   }
                }
            }
         }
@@ -514,7 +527,12 @@ class SensorWebSocketServer(private val context: Context, address: InetSocketAdd
                                 message["x"] = motionEvent.x
                                 message["y"] = motionEvent.y
 
-                                websocket.send(JsonUtil.toJSON(message))
+                                try {
+                                    websocket.send(JsonUtil.toJSON(message))
+                                } catch (e : WebsocketNotConnectedException){
+                                    e.printStackTrace()
+                                }
+
                             }
 
                             MotionEvent.ACTION_DOWN -> {
@@ -522,7 +540,12 @@ class SensorWebSocketServer(private val context: Context, address: InetSocketAdd
                                 message["x"] = motionEvent.x
                                 message["y"] = motionEvent.y
 
-                                websocket.send(JsonUtil.toJSON(message))
+                                try {
+                                    websocket.send(JsonUtil.toJSON(message))
+                                } catch (e : WebsocketNotConnectedException){
+                                    e.printStackTrace()
+                                }
+
                             }
 
                             MotionEvent.ACTION_MOVE -> {
@@ -530,7 +553,12 @@ class SensorWebSocketServer(private val context: Context, address: InetSocketAdd
                                 message["x"] = motionEvent.x
                                 message["y"] = motionEvent.y
 
-                                websocket.send(JsonUtil.toJSON(message))
+                                try {
+                                    websocket.send(JsonUtil.toJSON(message))
+                                } catch (e : WebsocketNotConnectedException){
+                                    e.printStackTrace()
+                                }
+
                             }
 
 
@@ -574,12 +602,17 @@ class SensorWebSocketServer(private val context: Context, address: InetSocketAdd
             {
                 val clientAssociatedSensor = webSocket.getAttachment<Sensor>()
 
-                if (clientAssociatedSensor != null) if (clientAssociatedSensor.type == sensorEvent.sensor.type && !webSocket.isClosing)
+                if (clientAssociatedSensor != null) if (clientAssociatedSensor.type == sensorEvent.sensor.type && webSocket.isOpen)
                 {
                     message["values"] = sensorEvent.values
                     message["timestamp"] = sensorEvent.timestamp
                     message["accuracy"] = sensorEvent.accuracy
-                    webSocket.send(JsonUtil.toJSON(message))
+                    try{
+                        webSocket.send(JsonUtil.toJSON(message))
+                    } catch(e: WebsocketNotConnectedException){
+                        e.printStackTrace()
+                    }
+
                 }
             }
             else if (webSocket.getAttachment<Any>() is ArrayList<*>)
@@ -588,13 +621,18 @@ class SensorWebSocketServer(private val context: Context, address: InetSocketAdd
 
                 for (clientAssociatedSensor in clientAssociatedSensors)
                 {
-                    if (clientAssociatedSensor.type == sensorEvent.sensor.type && !webSocket.isClosing)
+                    if (clientAssociatedSensor.type == sensorEvent.sensor.type && webSocket.isOpen)
                     {
                         message["values"] = sensorEvent.values
                         message["timestamp"] = sensorEvent.timestamp
                         message["accuracy"] = sensorEvent.accuracy
                         message["type"] = sensorEvent.sensor.stringType
-                        webSocket.send(JsonUtil.toJSON(message))
+                        try{
+                            webSocket.send(JsonUtil.toJSON(message))
+                        } catch (e : WebsocketNotConnectedException){
+                            e.printStackTrace()
+                        }
+
                     }
                 }
             }
