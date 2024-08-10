@@ -1,12 +1,11 @@
-<img width="10%" height="10%"  src="https://github.com/user-attachments/assets/ed156485-62ad-4a25-8d1a-c6a4d910cc63">
 
+<img width="250" alt="flutter" src="https://github.com/user-attachments/assets/5842548d-04f2-4ae9-96ca-b9c23f812dfd">
 
 A web app built using Flutter to test WebSocket connections with [SensorServer](https://github.com/umer0586/SensorServer) in a web browser.
 
+<img width="742" src="https://github.com/user-attachments/assets/6ddac5cc-dc88-4ab2-aca9-b53fbd57a9c2">
 
-<img width="700" height="400" src="https://github.com/user-attachments/assets/9cbf16ff-69c1-4d95-a5b0-377aedb8035b">
-
-<img width="50%" height="50%" src="https://github.com/user-attachments/assets/bb99ad34-4e59-4673-98b6-7a06945fd85a">
+![plotting](https://github.com/user-attachments/assets/297a001a-ed88-4299-9cf1-31451fff2c18)
 
 ### App Architecture
 The app is built using the MVVM (Model-View-ViewModel) pattern.
