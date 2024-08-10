@@ -165,7 +165,7 @@ https://github.com/umer0586/SensorServer/assets/35717992/2ebf865d-529e-4702-8254
 ## Testing in a Web Browser
 You can also view your phone's sensor data in a Web Browser. Open the app's navigation drawer menu and enable `Test in a Web Browser`.Once the web server is running, the app will display an address on your screen. This address will look something like `http://<ip>:<port>`.On your device or another computer on the same network, open a web browser and enter that address. The web browser will now display a list of all the sensors available on your device. The web interface have options to connect to and disconnect from individual sensors, allowing you to view their real-time data readings.
 
-<img width="747" alt="web-browser-image" src="https://github.com/umer0586/SensorServer/assets/35717992/e4bbbe70-17d3-4246-b714-184f832f1ab4">
+<img width="742" src="https://github.com/user-attachments/assets/6ddac5cc-dc88-4ab2-aca9-b53fbd57a9c2">
 
 ![plotting](https://github.com/user-attachments/assets/297a001a-ed88-4299-9cf1-31451fff2c18)
 
