@@ -1,0 +1,2 @@
+Bug Fix:
+Resolved an issue that occurred when attempting to use a high sensor sampling rate without the necessary HIGH_SAMPLING_RATE_SENSORS permission on devices running Android 12 or later.
