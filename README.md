@@ -122,6 +122,11 @@ connect("ws://192.168.0.103:8080/sensor/connect?type=android.sensor.acceleromete
 
  Also see [
 Connecting to Multiple Sensors Using Threading in Python](https://github.com/umer0586/SensorServer/wiki/Connecting-to-Multiple-Sensors-Using-Threading-in-Python) 
+
+
+![Animation - 1728327011432](https://github.com/user-attachments/assets/17381525-4e37-42d2-bc6d-0eb64547cb94) 
+## [7 Oct 2024] I’ve started another open-source project for streaming Android sensor data over UDP (User Datagram Protocol). You can check it out here: [SensaGram](https://github.com/umer0586/SensaGram).
+
  
 ## Using Multiple Sensors Over single Websocket Connection
 You can also connect to multiple sensors over single websocket connection. To use multiple sensors over single websocket connection use following **URL**.
