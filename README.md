@@ -8,7 +8,7 @@
 
 
  
-#### SensorServer transforms your Android device into a versatile sensor hub, providing real-time access to its entire array of sensors. Through its WebSocket server, SensorServer allows multiple clients to simultaneously connect and retrieve live sensor data.The app exposes all available sensors of the Android device, enabling WebSocket clients to read sensor data related to device position, motion (e.g., accelerometer, gyroscope), environment (e.g., temperature, light, pressure), GPS location, and even touchscreen interactions.
+#### SensorServer transforms Android device into a versatile sensor hub, providing real-time access to its entire array of sensors. It allows multiple Websocket clients to simultaneously connect and retrieve live sensor data.The app exposes all available sensors of the Android device, enabling WebSocket clients to read sensor data related to device position, motion (e.g., accelerometer, gyroscope), environment (e.g., temperature, light, pressure), GPS location, and even touchscreen interactions.
 
 <img src="https://github.com/umer0586/SensorServer/blob/main/fastlane/metadata/android/en-US/images/phoneScreenshots/01.png" width="250" heigth="250"> <img src="https://github.com/umer0586/SensorServer/blob/main/fastlane/metadata/android/en-US/images/phoneScreenshots/02.png" width="250" heigth="250"> <img src="https://github.com/umer0586/SensorServer/blob/main/fastlane/metadata/android/en-US/images/phoneScreenshots/03.png" width="250" heigth="250"> <img src="https://github.com/umer0586/SensorServer/blob/main/fastlane/metadata/android/en-US/images/phoneScreenshots/04.png" width="250" heigth="250"> <img src="https://github.com/umer0586/SensorServer/blob/main/fastlane/metadata/android/en-US/images/phoneScreenshots/05.png" width="250" heigth="250"> <img src="https://github.com/umer0586/SensorServer/blob/main/fastlane/metadata/android/en-US/images/phoneScreenshots/06.png" width="250" heigth="250">
 <img src="https://github.com/umer0586/SensorServer/blob/main/fastlane/metadata/android/en-US/images/phoneScreenshots/07.png" width="250" heigth="250">
@@ -122,10 +122,6 @@ connect("ws://192.168.0.103:8080/sensor/connect?type=android.sensor.acceleromete
 
  Also see [
 Connecting to Multiple Sensors Using Threading in Python](https://github.com/umer0586/SensorServer/wiki/Connecting-to-Multiple-Sensors-Using-Threading-in-Python) 
-
-
-![Animation - 1728327011432](https://github.com/user-attachments/assets/17381525-4e37-42d2-bc6d-0eb64547cb94) 
-## [7 Oct 2024] I’ve started another open-source project for streaming Android sensor data over UDP (User Datagram Protocol). You can check it out here: [SensaGram](https://github.com/umer0586/SensaGram).
 
  
 ## Using Multiple Sensors Over single Websocket Connection
