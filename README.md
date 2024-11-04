@@ -123,6 +123,11 @@ connect("ws://192.168.0.103:8080/sensor/connect?type=android.sensor.acceleromete
  Also see [
 Connecting to Multiple Sensors Using Threading in Python](https://github.com/umer0586/SensorServer/wiki/Connecting-to-Multiple-Sensors-Using-Threading-in-Python) 
 
+
+## Connecting To The Server without hardcoding IP Address and Port No
+In networks using DHCP (Dynamic Host Configuration Protocol), devices frequently receive different IP addresses upon reconnection, making it impractical to rely on hardcoded network configurations. To address this challenge, the app supports Zero-configuration networking (Zeroconf/mDNS), enabling automatic server discovery on local networks. This feature eliminates the need for clients to hardcode IP addresses and port numbers when connecting to the WebSocket server. When enabled by the app user, the server broadcasts its presence on the network using the service type `_websocket._tcp`, allowing clients to discover the server automatically. Clients can now implement service discovery to locate the server dynamically, rather than relying on hardcoded network configurations.
+
+See complete python Example at [Connecting To the Server Using Service Discovery](https://github.com/umer0586/SensorServer/wiki/Connecting-To-the-Server-Using-Service-Discovery) 
  
 ## Using Multiple Sensors Over single Websocket Connection
 You can also connect to multiple sensors over single websocket connection. To use multiple sensors over single websocket connection use following **URL**.
