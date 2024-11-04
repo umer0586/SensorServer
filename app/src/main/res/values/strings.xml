@@ -20,6 +20,7 @@
     <string name="pref_key_localhost">pref_key_localhost</string>
     <string name="pref_key_all_interface">pref_key_all_interface</string>
     <string name="pref_key_hotspot">pref_key_hotspot</string>
+    <string name="pref_key_discoverable">pref_key_discoverable</string>
 
 
     <string name="nav_open">Open</string>

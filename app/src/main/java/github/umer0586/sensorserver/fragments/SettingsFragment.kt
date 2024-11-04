@@ -26,6 +26,7 @@ class SettingsFragment : PreferenceFragmentCompat()
     private var  hotspotPref : SwitchPreferenceCompat? = null
     private var  localHostPref : SwitchPreferenceCompat? = null
     private var  allInterfacesPref : SwitchPreferenceCompat? = null
+    private var  discoverablePref : SwitchPreferenceCompat? = null
 
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?)
@@ -39,7 +40,27 @@ class SettingsFragment : PreferenceFragmentCompat()
         handleAllInterfacesPreference()
         handleSamplingRatePreference()
         handleHotspotPref()
+        handleDiscoverablePref()
 
+    }
+
+    private fun handleDiscoverablePref() {
+        discoverablePref = findPreference(getString(R.string.pref_key_discoverable))
+        discoverablePref?.isChecked = appSettings.isDiscoverableEnabled()
+
+        discoverablePref?.setOnPreferenceChangeListener { _, newValue ->
+            appSettings.saveDiscoverable(newValue as Boolean)
+
+            if(newValue == true)
+            {
+                localHostPref?.apply {
+                    isChecked = false
+                    appSettings.enableLocalHostOption(false)
+                }
+            }
+
+            return@setOnPreferenceChangeListener true
+        }
     }
 
     private fun handleHttpPortPreference()
@@ -147,7 +168,7 @@ class SettingsFragment : PreferenceFragmentCompat()
     {
         localHostPref = findPreference(getString(R.string.pref_key_localhost))
 
-        localHostPref?.setOnPreferenceChangeListener { preference, newValue ->
+        localHostPref?.setOnPreferenceChangeListener { _, newValue ->
             val newState = newValue as Boolean
             appSettings.enableLocalHostOption(newState)
 
@@ -161,6 +182,11 @@ class SettingsFragment : PreferenceFragmentCompat()
                 allInterfacesPref?.apply {
                     isChecked = false
                     appSettings.listenOnAllInterfaces(false)
+                }
+
+                discoverablePref?.apply {
+                    isChecked = false
+                    appSettings.saveDiscoverable(false)
                 }
             }
 

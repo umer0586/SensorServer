@@ -7,6 +7,8 @@ import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.net.nsd.NsdManager
+import android.net.nsd.NsdServiceInfo
 import android.net.wifi.WifiManager
 import android.os.Binder
 import android.os.Build
@@ -36,6 +38,15 @@ interface ServerStateListener
     fun onServerAlreadyRunning(serverInfo: ServerInfo)
 }
 
+enum class ServiceRegistrationState{
+    REGISTERING,
+    REGISTRATION_SUCCESS,
+    REGISTRATION_FAIL,
+    UNREGISTERING,
+    UNREGISTRATION_SUCCESS,
+    UNREGISTRATION_FAIL
+}
+
 class WebsocketService : Service()
 {
 
@@ -45,6 +56,9 @@ class WebsocketService : Service()
     private var serverStateListener: ServerStateListener? = null
     private var connectionsChangeCallBack: ((List<WebSocket>) -> Unit)? = null
     private var connectionsCountChangeCallBack: ((Int) -> Unit)? = null
+
+    private lateinit var nsdManager : NsdManager
+    private var serviceRegistrationCallBack: ((ServiceRegistrationState, NsdServiceInfo?, Int?) -> Unit)? = null
 
     private lateinit var appSettings: AppSettings
 
@@ -73,6 +87,7 @@ class WebsocketService : Service()
     {
         super.onCreate()
         Log.d(TAG, "onCreate()")
+        nsdManager = (getSystemService(Context.NSD_SERVICE) as NsdManager)
         createNotificationChannel()
         appSettings = AppSettings(applicationContext)
         broadcastMessageReceiver = BroadcastMessageReceiver(applicationContext)
@@ -188,6 +203,9 @@ class WebsocketService : Service()
             val notification = notificationBuilder.build()
             startForeground(ON_GOING_NOTIFICATION_ID, notification)
 
+            if(appSettings.isDiscoverableEnabled())
+                makeServiceDiscoverable(serverInfo.port)
+
         }
         sensorWebSocketServer?.onStop {
 
@@ -196,6 +214,9 @@ class WebsocketService : Service()
             //remove the service from foreground but don't stop (destroy) the service
             //stopForeground(true)
             stopForeground()
+
+            if(appSettings.isDiscoverableEnabled())
+                makeServiceNotDiscoverable()
         }
 
         sensorWebSocketServer?.onError { exception ->
@@ -362,6 +383,47 @@ class WebsocketService : Service()
             get() = this@WebsocketService // Return this instance of LocalService so clients can call public methods
 
     }
+
+    private val serviceRegistrationListener = object : NsdManager.RegistrationListener {
+
+        override fun onRegistrationFailed(serviceInfo: NsdServiceInfo?, errorCode: Int) {
+            serviceRegistrationCallBack?.invoke(ServiceRegistrationState.REGISTRATION_FAIL,serviceInfo,errorCode)
+        }
+
+        override fun onUnregistrationFailed(serviceInfo: NsdServiceInfo?, errorCode: Int) {
+            serviceRegistrationCallBack?.invoke(ServiceRegistrationState.UNREGISTRATION_FAIL,serviceInfo,errorCode)
+        }
+
+        override fun onServiceRegistered(serviceInfo: NsdServiceInfo?) {
+            serviceRegistrationCallBack?.invoke(ServiceRegistrationState.REGISTRATION_SUCCESS,serviceInfo,null)
+        }
+
+        override fun onServiceUnregistered(serviceInfo: NsdServiceInfo?) {
+            serviceRegistrationCallBack?.invoke(ServiceRegistrationState.UNREGISTRATION_SUCCESS,serviceInfo,null)
+        }
+
+    }
+
+    private fun makeServiceDiscoverable(portNo : Int){
+        val serviceInfo = NsdServiceInfo().apply {
+            serviceName = "SensorServer"
+            serviceType = "_websocket._tcp"
+            port = portNo
+        }
+        nsdManager.registerService(serviceInfo, NsdManager.PROTOCOL_DNS_SD, serviceRegistrationListener)
+        serviceRegistrationCallBack?.invoke(ServiceRegistrationState.REGISTERING,serviceInfo,null)
+    }
+
+    private fun makeServiceNotDiscoverable(){
+        nsdManager.unregisterService(serviceRegistrationListener)
+        serviceRegistrationCallBack?.invoke(ServiceRegistrationState.UNREGISTERING,null,null)
+    }
+
+
+    fun setServiceRegistrationCallBack(callBack: ((ServiceRegistrationState, NsdServiceInfo?, Int?) -> Unit)?){
+        serviceRegistrationCallBack = callBack
+    }
+
 
 
 

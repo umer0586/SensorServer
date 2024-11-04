@@ -1,7 +1,11 @@
 package github.umer0586.sensorserver.fragments
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
+import android.graphics.drawable.Drawable
+import android.graphics.drawable.Icon
+import android.net.nsd.NsdServiceInfo
 import android.net.wifi.WifiManager
 import android.os.Build
 import android.os.Bundle
@@ -9,22 +13,26 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.android.material.progressindicator.LinearProgressIndicator
 import com.google.android.material.snackbar.Snackbar
 import com.permissionx.guolindev.PermissionX
 import github.umer0586.sensorserver.R
-import github.umer0586.sensorserver.customextensions.isHotSpotEnabled
 import github.umer0586.sensorserver.databinding.FragmentServerBinding
 import github.umer0586.sensorserver.service.WebsocketService
 import github.umer0586.sensorserver.service.WebsocketService.LocalBinder
 import github.umer0586.sensorserver.service.ServerStateListener
 import github.umer0586.sensorserver.service.ServiceBindHelper
+import github.umer0586.sensorserver.service.ServiceRegistrationState
 import github.umer0586.sensorserver.setting.AppSettings
 import github.umer0586.sensorserver.websocketserver.ServerInfo
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.net.BindException
 import java.net.UnknownHostException
@@ -35,6 +43,9 @@ class ServerFragment : Fragment(), ServerStateListener
     private var websocketService: WebsocketService? = null
     private lateinit var serviceBindHelper: ServiceBindHelper
     private lateinit var appSettings: AppSettings
+
+    private lateinit var bottomSheetDialog: BottomSheetDialog
+    private lateinit var bottomSheetContent: View
 
     private var _binding : FragmentServerBinding? = null
     // This property is only valid between onCreateView and
@@ -54,6 +65,10 @@ class ServerFragment : Fragment(), ServerStateListener
         super.onViewCreated(view, savedInstanceState)
         Log.i(TAG, "onViewCreated: ")
 
+        bottomSheetDialog = BottomSheetDialog(requireContext())
+        bottomSheetContent = layoutInflater.inflate(R.layout.bottom_sheet_dialog, null)
+        bottomSheetDialog.setContentView(bottomSheetContent)
+
 
         appSettings = AppSettings(requireContext())
 
@@ -70,6 +85,7 @@ class ServerFragment : Fragment(), ServerStateListener
             websocketService = localBinder.service
 
             websocketService?.setServerStateListener(this)
+            websocketService?.setServiceRegistrationCallBack(this::onServiceRegistrationStateChanged)
             websocketService?.checkState() // this callbacks onServerAlreadyRunning()
         }
 
@@ -150,6 +166,7 @@ class ServerFragment : Fragment(), ServerStateListener
 
         // To prevent memory leak
         websocketService?.setServerStateListener(null)
+        websocketService?.setServiceRegistrationCallBack(null)
     }
 
     override fun onServerStarted(serverInfo: ServerInfo)
@@ -250,6 +267,91 @@ class ServerFragment : Fragment(), ServerStateListener
 
         }
 
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun onServiceRegistrationStateChanged(
+        serviceRegistrationState: ServiceRegistrationState,
+        serivceInfo: NsdServiceInfo?,
+        errorCode: Int?
+    ) {
+
+        lifecycleScope.launch(Dispatchers.Main) {
+
+            val messageText = bottomSheetContent.findViewById<TextView>(R.id.message)
+            val progressIndicator =
+                bottomSheetContent.findViewById<LinearProgressIndicator>(R.id.progress_indicator)
+
+
+            when (serviceRegistrationState) {
+                ServiceRegistrationState.REGISTERING -> {
+                    messageText.text = "Registering..."
+                    bottomSheetDialog.show()
+                    progressIndicator.show()
+
+                }
+
+                ServiceRegistrationState.REGISTRATION_SUCCESS -> {
+
+                    messageText.text = "Successfully registered"
+                    delay(2000L)
+                    showToastMessage("Service Discoverable !")
+                    bottomSheetDialog.dismiss()
+                    progressIndicator.hide()
+
+                }
+
+                ServiceRegistrationState.UNREGISTERING -> {
+
+                    messageText.text = "Unregistering..."
+                    bottomSheetDialog.show()
+                    progressIndicator.show()
+
+                }
+
+                ServiceRegistrationState.REGISTRATION_FAIL -> {
+
+                    messageText.text = "Registration Failed"
+                    delay(2000L)
+                    showToastMessage("Service Not Discoverable")
+                    bottomSheetDialog.show()
+                    progressIndicator.hide()
+
+                }
+
+                ServiceRegistrationState.UNREGISTRATION_SUCCESS -> {
+
+                    messageText.text = "Successfully unregistered"
+                    delay(2000L)
+                    showToastMessage("Service Not Discoverable")
+                    bottomSheetDialog.dismiss()
+                    progressIndicator.hide()
+
+
+                }
+
+                ServiceRegistrationState.UNREGISTRATION_FAIL -> {
+
+                    messageText.text = "Unregistration Failed"
+                    delay(2000L)
+                    showToastMessage("Failed to unregister service")
+                    bottomSheetDialog.show()
+                    progressIndicator.hide()
+
+                }
+            }
+        }
+
+    }
+
+    private fun showToastMessage(message: String){
+        lifecycleScope.launch(Dispatchers.Main) {
+            Toast.makeText(
+                requireContext(),
+                message,
+                Toast.LENGTH_SHORT
+            ).show()
+        }
     }
 
     companion object

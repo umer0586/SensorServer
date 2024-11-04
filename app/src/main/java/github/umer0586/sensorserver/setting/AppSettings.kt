@@ -101,6 +101,19 @@ class AppSettings(context: Context)
         return sharedPreferences.getBoolean(context.getString(R.string.pref_key_all_interface), false)
     }
 
+    fun saveDiscoverable(state: Boolean)
+    {
+        sharedPreferences.edit()
+            .putBoolean(context.getString(R.string.pref_key_discoverable), state)
+            .apply()
+
+    }
+
+    fun isDiscoverableEnabled() : Boolean
+    {
+        return sharedPreferences.getBoolean(context.getString(R.string.pref_key_discoverable), DEFAULT_DISCOVERABLE)
+    }
+
     companion object
     {
 
@@ -108,5 +121,6 @@ class AppSettings(context: Context)
         private const val DEFAULT_WEBSOCKET_PORT_NO = 8080
         private const val DEFAULT_HTTP_PORT_NO = 9090
         private const val DEFAULT_SAMPLING_RATE = 200000
+        private const val DEFAULT_DISCOVERABLE = false
     }
 }

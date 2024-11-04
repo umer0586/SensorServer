@@ -57,6 +57,12 @@
             app:summaryOff="Use device's Hotspot"
             app:icon="@drawable/ic_wifi_tethering"
             />
+    <SwitchPreferenceCompat
+        app:key="@string/pref_key_discoverable"
+        app:icon="@android:drawable/ic_menu_search"
+        app:title="Discoverable"
+        android:summaryOn="Service type : _websocket._tcp"
+        />
 
 
 </PreferenceScreen>
