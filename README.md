@@ -195,6 +195,18 @@ To connect over USB make sure `USB debugging` option is enable in your phone and
 
 Make sure you have installed your android device driver and `adb devices` command detects your connected android phone.
 
+## Links To Projects using SensorServer
+1. Utilizing smartphone IMU sensors for controlling a robot via ROS ([http://www.rc.is.ritsumei.ac.jp/FILES/PBL5/2024/IMU_based_control/](http://www.rc.is.ritsumei.ac.jp/FILES/PBL5/2024/IMU_based_control/))
+2. Use smartphone as "sensor" into RTMaps studio ([https://github.com/Intempora/smartphone-sensors](https://github.com/Intempora/smartphone-sensors))
+3. Streams IMU and GPS data via WebSocket from Android app and integrates with MinIO CSI server for building-scale WiFi sensing testbeds. ([https://github.com/WS-UB/WiSense-Mobile-Client](https://github.com/WS-UB/WiSense-Mobile-Client))
+4. A Python graphical user interface to visualize real-time data streams from a generic WebSocket & HTTP source ([https://github.com/AlyShmahell/robolytics](https://github.com/AlyShmahell/robolytics))
+5. PHASETIMER ([https://github.com/zenbooster/phasetimer](https://github.com/zenbooster/phasetimer))
+6. Score real-time walking data of users wearing an Andriod device. ([https://github.com/eliasHw/BME450W_Fall2022](https://github.com/eliasHw/BME450W_Fall2022))
+7. Wireless Steering wheel using python and android with paddles and breaks. ([https://rutube.ru/video/03d53de54054337a8c54b825f7fcc3fe/](https://rutube.ru/video/03d53de54054337a8c54b825f7fcc3fe/))
+8. [https://github.com/strets123/walking-pictionary](https://github.com/strets123/walking-pictionary)
+
+If you're using this app in a project and would like to share the link, feel free to submit a pull request with the link and a brief description so that it can be helpful to others.
+
 
 # Installation
 
