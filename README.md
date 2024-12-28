@@ -211,6 +211,9 @@ Make sure you have installed your android device driver and `adb devices` comman
 
 If you're using this app in a project and would like to share the link, feel free to submit a pull request with the link and a brief description so that it can be helpful to others.
 
+# My Other Android Projects
+1. [SensaGram](https://github.com/umer0586/SensaGram). For streaming realtime sensor data over UDP
+2. [DroidPad](https://github.com/umer0586/DroidPad). Use Android Device as a controller by sending commands over Websocket,MQTT,TCP and UDP 
 
 # Installation
 
