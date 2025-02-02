@@ -1,11 +1,11 @@
+<div align="center">
+
 # SensorServer
-![GitHub](https://img.shields.io/github/license/umer0586/SensorServer) ![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/umer0586/SensorServer) ![GitHub all releases](https://img.shields.io/github/downloads/umer0586/SensorServer/total?label=GitHub%20downloads) ![Android](https://img.shields.io/badge/Android%205.0+-3DDC84?style=flat&logo=android&logoColor=white) ![F-Droid](https://img.shields.io/f-droid/v/github.umer0586.sensorserver) ![Websocket](https://img.shields.io/badge/protocol-websocket-green)
+![GitHub](https://img.shields.io/github/license/umer0586/SensorServer?style=for-the-badge) ![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/umer0586/SensorServer?style=for-the-badge) ![GitHub all releases](https://img.shields.io/github/downloads/umer0586/SensorServer/total?label=GitHub%20downloads&style=for-the-badge) ![Android](https://img.shields.io/badge/Android%205.0+-3DDC84?style=for-the-badge&logo=android&logoColor=white) ![F-Droid](https://img.shields.io/f-droid/v/github.umer0586.sensorserver?style=for-the-badge) ![Websocket](https://img.shields.io/badge/protocol-websocket-green?style=for-the-badge)
 
-<img width="30" height="30" src="https://github.com/user-attachments/assets/a09d3061-c6b0-4694-b34f-1be628c3ceed">  <img width="30" height="30" src="https://github.com/user-attachments/assets/1428f41e-35da-44c4-90f3-d1e93ded16fc"> <img width="35" height="35" src="https://github.com/user-attachments/assets/de7be8d4-e84a-4f6d-a3fd-9f9909b9a774">
-
-
-
-
+[<img src="https://github.com/user-attachments/assets/0f628053-199f-4587-a5b2-034cf027fb99" height="100">](https://github.com/umer0586/SensorServer/releases) [<img src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png"
+    alt="Get it on F-Droid"
+    height="100">](https://f-droid.org/packages/github.umer0586.sensorserver)
 
  
 #### SensorServer transforms Android device into a versatile sensor hub, providing real-time access to its entire array of sensors. It allows multiple Websocket clients to simultaneously connect and retrieve live sensor data.The app exposes all available sensors of the Android device, enabling WebSocket clients to read sensor data related to device position, motion (e.g., accelerometer, gyroscope), environment (e.g., temperature, light, pressure), GPS location, and even touchscreen interactions.
@@ -13,7 +13,7 @@
 <img src="https://github.com/umer0586/SensorServer/blob/main/fastlane/metadata/android/en-US/images/phoneScreenshots/01.png" width="250" heigth="250"> <img src="https://github.com/umer0586/SensorServer/blob/main/fastlane/metadata/android/en-US/images/phoneScreenshots/02.png" width="250" heigth="250"> <img src="https://github.com/umer0586/SensorServer/blob/main/fastlane/metadata/android/en-US/images/phoneScreenshots/03.png" width="250" heigth="250"> <img src="https://github.com/umer0586/SensorServer/blob/main/fastlane/metadata/android/en-US/images/phoneScreenshots/04.png" width="250" heigth="250"> <img src="https://github.com/umer0586/SensorServer/blob/main/fastlane/metadata/android/en-US/images/phoneScreenshots/05.png" width="250" heigth="250"> <img src="https://github.com/umer0586/SensorServer/blob/main/fastlane/metadata/android/en-US/images/phoneScreenshots/06.png" width="250" heigth="250">
 <img src="https://github.com/umer0586/SensorServer/blob/main/fastlane/metadata/android/en-US/images/phoneScreenshots/07.png" width="250" heigth="250">
 
-
+</div>
 
 
 
@@ -213,19 +213,7 @@ If you're using this app in a project and would like to share the link, feel fre
 
 # My Other Android Projects
 1. [SensaGram](https://github.com/umer0586/SensaGram). For streaming realtime sensor data over UDP
-2. [DroidPad](https://github.com/umer0586/DroidPad). Use Android Device as a controller by sending commands over Websocket,MQTT,TCP and UDP 
-
-# Installation
-
-[<img src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png"
-    alt="Get it on F-Droid"
-    height="100">](https://f-droid.org/packages/github.umer0586.sensorserver)
-    
-OR
-
-Download latest *APK* from Github's [Release page](https://github.com/umer0586/SensorServer/releases) ![GitHub all releases](https://img.shields.io/github/downloads/umer0586/SensorServer/total?label=GitHub%20downloads)
-
-*(requires Android 5.0 or above)* . 
+2. [DroidPad](https://github.com/umer0586/DroidPad). Android app for creating customizable control interfaces for Bluetooth Low energy,WebSocket, MQTT, TCP, and UDP protocols. 
 
 ## Found this useful
 <a href="https://www.buymeacoffee.com/umerfarooq" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>
