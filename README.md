@@ -204,10 +204,12 @@ Make sure you have installed your android device driver and `adb devices` comman
 6. A Python graphical user interface to visualize real-time data streams from a generic WebSocket & HTTP source ([https://github.com/AlyShmahell/robolytics](https://github.com/AlyShmahell/robolytics))
 7. Tool designed to address the current limitations of passthrough mode in modern virtual reality (VR) headsets.([https://github.com/LucasHartmanWestern/Screen-Sight](https://github.com/LucasHartmanWestern/Screen-Sight))
 8. Real-Time Sensor Data Streaming, Storage, and Visualization System with Kafka, InfluxDB, and Grafana.([https://github.com/TouradBaba/Iot_sensors_streaming](https://github.com/TouradBaba/Iot_sensors_streaming))
-9. PHASETIMER ([https://github.com/zenbooster/phasetimer](https://github.com/zenbooster/phasetimer))
-10. Score real-time walking data of users wearing an Andriod device. ([https://github.com/eliasHw/BME450W_Fall2022](https://github.com/eliasHw/BME450W_Fall2022))
-11. Wireless Steering wheel using python and android with paddles and breaks. ([https://rutube.ru/video/03d53de54054337a8c54b825f7fcc3fe/](https://rutube.ru/video/03d53de54054337a8c54b825f7fcc3fe/))
-12. [https://github.com/strets123/walking-pictionary](https://github.com/strets123/walking-pictionary)
+9. A project that uses data from IMU, GPS and Barometer modules to estimate position based on space state filters implementation [https://github.com/Peterex08/IMUGPS](https://github.com/Peterex08/IMUGPS)
+10. A Windows desktop application that transforms a smartphone into a gesture‑based remote control. It streams real‑time sensor (gyroscope) data over WebSockets, recognizes swipe gestures, and maps them to system or media actions on the desktop [https://github.com/Guerric9018/Frogmote](https://github.com/Guerric9018/Frogmote)
+11. PHASETIMER ([https://github.com/zenbooster/phasetimer](https://github.com/zenbooster/phasetimer))
+12. Score real-time walking data of users wearing an Andriod device. ([https://github.com/eliasHw/BME450W_Fall2022](https://github.com/eliasHw/BME450W_Fall2022))
+13. Wireless Steering wheel using python and android with paddles and breaks. ([https://rutube.ru/video/03d53de54054337a8c54b825f7fcc3fe/](https://rutube.ru/video/03d53de54054337a8c54b825f7fcc3fe/))
+14. [https://github.com/strets123/walking-pictionary](https://github.com/strets123/walking-pictionary)
 
 If you're using this app in a project and would like to share the link, feel free to submit a pull request with the link and a brief description so that it can be helpful to others.
 
